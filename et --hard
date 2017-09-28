@@ -1,0 +1,939 @@
+[33mcommit 58d4d35ce4efa303e770a01e14b93ee01d812cd6[m[33m ([m[1;36mHEAD -> [m[1;32mudsp-1.2.1-tzb[m[33m)[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Thu Sep 28 14:20:22 2017 +0800
+
+    版本回退到udsp-tzb-1.2.1
+
+[33mcommit af016444a1a0bed1d4ffea93fb73d9037b9ebe46[m[33m ([m[1;31morigin/udsp-1.2.1-tzb[m[33m)[m
+Merge: ab30f5b 0f37678
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Thu Sep 28 09:33:32 2017 +0800
+
+    Merge branch 'udsp-1.2.1-tzb' of https://github.com/wylgeek/boracay into udsp-1.2.1-tzb
+    
+    解决冲突
+
+[33mcommit ab30f5b65ba5d9ec3b4581e556070d4c592e7c29[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Thu Sep 28 09:16:42 2017 +0800
+
+    elasticsearch历史数据查询支持
+
+[33mcommit bb782a9b7460d8cf63180d847063f583de99fb60[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Thu Sep 28 09:15:12 2017 +0800
+
+    bug修复
+
+[33mcommit 0f37678ff418e4b0b634d7df412efabfd23e565c[m
+Merge: 0a0e205 b51f0af
+Author: tomnic.wang <wyl_ahnu@qq.com>
+Date:   Thu Sep 28 08:59:42 2017 +0800
+
+    Merge pull request #1 from junjiem/udsp-1.2.1-tzb
+    
+    Merge pull request #20 from wylgeek/udsp-1.2.1-tzb
+
+[33mcommit b51f0af77d0f68109b34b7c8cf00564c5b02f573[m
+Merge: 763bfbe 0a0e205
+Author: Junjie.M <118170653@qq.com>
+Date:   Tue Sep 19 15:29:04 2017 +0800
+
+    Merge pull request #20 from wylgeek/udsp-1.2.1-tzb
+    
+    Udsp 1.2.1 tzb
+
+[33mcommit 0a0e2055bb93ce7a6f552643c060c46fcc0fa524[m
+Merge: a886cac 763bfbe
+Author: tomnic.wang <wyl_ahnu@qq.com>
+Date:   Tue Sep 19 14:52:53 2017 +0800
+
+    Merge branch 'udsp-1.2.1-tzb' into udsp-1.2.1-tzb
+
+[33mcommit a886cac2852e66eb519d9139af56b1b12c3165db[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Tue Sep 19 14:48:42 2017 +0800
+
+    服务启停控制以及导入导出修改
+
+[33mcommit 2842fafeb04e4a49085519b5b928eb2698f8534f[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Tue Sep 19 14:46:05 2017 +0800
+
+    服务启停控制
+
+[33mcommit baf9a19dab884033d081d1c91dec365fc2be0401[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Tue Sep 19 14:42:59 2017 +0800
+
+    服务启停控制
+
+[33mcommit c385d3a0fa78b07f9896dfc0f91e14e4dffcdff1[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Mon Sep 18 14:34:45 2017 +0800
+
+    缓冲队列添加-20170918
+
+[33mcommit c5d240f87ef670f502771367451cd32b7aa2245a[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Mon Sep 18 09:11:09 2017 +0800
+
+    缓冲队列-表结构
+
+[33mcommit eba7b3d801f3524f898f8c116dfaee6a5baca39b[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Fri Sep 15 17:04:03 2017 +0800
+
+    缓冲队列添加
+
+[33mcommit cb635aaece81e7ad8305a71f50154f6d80ccebd1[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Fri Sep 15 17:00:21 2017 +0800
+
+    缓冲队列添加
+
+[33mcommit 146f4a2685da961010197797e3ff5cdc2a7763c2[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Fri Sep 15 16:58:27 2017 +0800
+
+    缓冲队列添加
+
+[33mcommit ac064e367da6cd1d24a60347637935b922d6a8f3[m
+Author: tomnic.wang <tomnic.wang@goupwith.com>
+Date:   Fri Sep 15 16:58:09 2017 +0800
+
+    缓冲队列添加
+
+[33mcommit 763bfbeab4f03f0fef3007e9648dd3f02106fe13[m
+Merge: 3eda742 16d3b67
+Author: Junjie.M <118170653@qq.com>
+Date:   Thu Sep 14 17:52:40 2017 +0800
+
+    Merge pull request #12 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 16d3b679b4545e04f8a556a701879bde02ee9f92[m
+Merge: 9fef514 5af6de6
+Author: Junjie.M <118170653@qq.com>
+Date:   Thu Sep 14 17:06:03 2017 +0800
+
+    Merge pull request #11 from jintianjiekong/udsp-2.0.0-tzb
+    
+    交互建模-模型   下载上传功能添加及一些bug修改
+
+[33mcommit 5af6de600c39fb9703c4d9d08c0e53cfa695ff04[m
+Merge: afa7bc8 708d390
+Author: jiekong <13770677221@139.com>
+Date:   Thu Sep 14 15:33:08 2017 +0800
+
+    Merge remote-tracking branch 'origin/udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit afa7bc80f6d0b17d7a50274f82478b50fd06927c[m
+Author: jiekong <13770677221@139.com>
+Date:   Thu Sep 14 15:32:36 2017 +0800
+
+    初始化
+
+[33mcommit 708d390b04150e0276ceda4b308d2ca47f821468[m
+Merge: d289362 9fef514
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Thu Sep 14 15:24:17 2017 +0800
+
+    Merge pull request #9 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit d28936208c04500a8cff0f024306b719eb1be904[m
+Author: jiekong <13770677221@139.com>
+Date:   Thu Sep 14 15:20:05 2017 +0800
+
+    交互建模-模型 上传下载功能添加
+
+[33mcommit 9fef51400c109d260cd993ca0f1c1486999fada5[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Thu Sep 14 09:39:51 2017 +0800
+
+    update
+
+[33mcommit de39a7258bc04652479a10d8c340642d59ee8a57[m
+Merge: 07a19f6 ef217f0
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Thu Sep 14 09:38:26 2017 +0800
+
+    Merge remote-tracking branch 'origin/udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+    
+    # Conflicts:
+    #       im/src/com/hex/bigdata/udsp/im/provider/impl/SolrHBaseProvider.java
+
+[33mcommit 07a19f635276607d4d29e499195252523ca5961b[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Thu Sep 14 09:37:49 2017 +0800
+
+    update
+
+[33mcommit ef217f02e893c5123210407ca35181e56ce5efd0[m
+Merge: ed1cdb8 f5191aa
+Author: Junjie.M <118170653@qq.com>
+Date:   Thu Sep 14 09:37:23 2017 +0800
+
+    Merge pull request #10 from hjtoday/udsp-2.0.0-tzb
+    
+    0913push
+
+[33mcommit f5191aadec6a86d2c80e928d2b242fd2777e88a7[m
+Author: hjtoday <972546183@qq.com>
+Date:   Wed Sep 13 23:12:52 2017 +0800
+
+    0913
+
+[33mcommit 8e243713f70386ff2155f3610e33fe6ae75533ec[m
+Author: hjtoday <972546183@qq.com>
+Date:   Wed Sep 13 23:05:57 2017 +0800
+
+    immetdata0913
+
+[33mcommit 88ea9de1ea278d3af42424b97e25a9bcb82cb636[m
+Merge: 0156f88 ed1cdb8
+Author: hjtoday <972546183@qq.com>
+Date:   Wed Sep 13 19:46:59 2017 +0800
+
+    Merge pull request #3 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit ed1cdb80ae761b6da4d11432aa907a5a90297443[m
+Merge: b24028a f4aa556
+Author: Junjie.M <118170653@qq.com>
+Date:   Wed Sep 13 19:16:16 2017 +0800
+
+    Merge pull request #9 from jintianjiekong/udsp-2.0.0-tzb
+    
+    页面提示信息添加
+
+[33mcommit b24028a19c7e4152b824c5a29f4d5a9888c1e727[m
+Merge: f2e1bb4 0156f88
+Author: Junjie.M <118170653@qq.com>
+Date:   Wed Sep 13 19:15:23 2017 +0800
+
+    Merge pull request #8 from hjtoday/udsp-2.0.0-tzb
+    
+    push 0912
+
+[33mcommit f2e1bb4fa12370f547b61caefa074e2339ffe856[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Wed Sep 13 19:14:53 2017 +0800
+
+    update
+
+[33mcommit f4aa55679c07d63e30f496e2683ebc5db511717b[m
+Author: jiekong <13770677221@139.com>
+Date:   Wed Sep 13 14:13:27 2017 +0800
+
+    提示信息bug修改
+
+[33mcommit e06f79898e427e3bdb54079491e8eb1d1a386119[m
+Author: jiekong <13770677221@139.com>
+Date:   Wed Sep 13 14:01:53 2017 +0800
+
+    获取源数据字段信息修改
+
+[33mcommit 7b2c70f20557abbb464bdced31ef194b8ff4deca[m
+Author: jiekong <13770677221@139.com>
+Date:   Wed Sep 13 11:08:46 2017 +0800
+
+    注释修改
+
+[33mcommit 298eb066ca436f4a45f7e96999dad9b95b790a6c[m
+Author: jiekong <13770677221@139.com>
+Date:   Wed Sep 13 11:05:37 2017 +0800
+
+    页面微调
+
+[33mcommit 6c329b8cbd909c5f443e4507cdd7b12dcda0f07c[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Wed Sep 13 08:56:53 2017 +0800
+
+    update
+
+[33mcommit 0156f88a0db633ec1ebe743f308f125e89add3fc[m
+Merge: 65dd5e7 9a7d9d5
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 19:17:07 2017 +0800
+
+    Merge branch 'udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit 65dd5e7ce73e17be8249288c0002b359a1e23242[m
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 19:12:13 2017 +0800
+
+    ImMetadata 0912
+
+[33mcommit 1fd7e46d6e3cdc206a4e2c873cb2bbef9b1f38bb[m
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 17:23:50 2017 +0800
+
+    页面提示信息添加
+
+[33mcommit 9a7d9d5b557367e3757594e505963035fb01df1a[m
+Merge: 5ef5dc5 33a9dd4
+Author: Junjie.M <118170653@qq.com>
+Date:   Tue Sep 12 17:21:24 2017 +0800
+
+    Merge pull request #7 from jintianjiekong/udsp-2.0.0-tzb
+    
+    交互建模-模型内容校验以及页面一些功能完善
+
+[33mcommit 5ef5dc51929af8ad70e3c0dbab38d9d15e7eae69[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 17:20:45 2017 +0800
+
+    update
+
+[33mcommit 33a9dd4c92dd979eb9cc82f61edd5f84f118e09f[m
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 15:44:08 2017 +0800
+
+    初始化
+
+[33mcommit 3cbc055d63fc518304356d45247d5452ba208dc8[m
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 15:40:37 2017 +0800
+
+    校验内容添加，微调下页面
+
+[33mcommit f296c801cb42660c9f5698af19288263a851cfd2[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 15:00:56 2017 +0800
+
+    update
+
+[33mcommit 465adc0918ba7418be580beed8de3ac3e7dc076a[m
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 14:24:28 2017 +0800
+
+    修改获取目标元数据可选内容
+
+[33mcommit 212e9fe6c58dd8149ccd7bcd6aec87dfa07fd139[m
+Merge: d5225cf 3eb1744
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 14:23:37 2017 +0800
+
+    Merge remote-tracking branch 'origin/udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+    
+    # Conflicts:
+    #       im/src/com/hex/bigdata/udsp/im/service/ImMetadataService.java
+
+[33mcommit 3eb1744c63c189c2f2cdf787645d690bd229847e[m
+Merge: 6b05897 b6090e3
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Tue Sep 12 14:22:51 2017 +0800
+
+    Merge pull request #8 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit d5225cf4236ad54d3e1c00feaffe5e4ae54ebf45[m
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 14:21:19 2017 +0800
+
+    源数据字段获取
+
+[33mcommit b6090e3f1d4d02a86a2ba73a93a03bc8dc661d0a[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 14:18:58 2017 +0800
+
+    update
+
+[33mcommit 081a827c6771531cf3f2e5be3e446a6daa989303[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 10:22:36 2017 +0800
+
+    update
+
+[33mcommit c108e49cbe2dcc2736642240139a7c6daa8a280f[m
+Merge: c0101ce ca3d2f2
+Author: Junjie.M <118170653@qq.com>
+Date:   Tue Sep 12 10:21:54 2017 +0800
+
+    Merge pull request #6 from hjtoday/udsp-2.0.0-tzb
+    
+    push
+
+[33mcommit ca3d2f2cdcc587bef4750a3fc2515389003bd3f2[m
+Merge: 3f0a6e0 c0101ce
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 10:14:31 2017 +0800
+
+    Merge branch 'udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit 3f0a6e0b5d30bbe49d21157d9d463c6addb6c140[m
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 10:11:16 2017 +0800
+
+    Im0912
+
+[33mcommit c0101ceb13dd366ec9b2338a92162904b75a688f[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 10:09:30 2017 +0800
+
+    update
+
+[33mcommit c41687a02a87a8257ba0e6ddbd953276fc9b4051[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 10:08:11 2017 +0800
+
+    update
+
+[33mcommit 4ae30b35ca764f8acad0d06cbd229007b394e54d[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 10:04:56 2017 +0800
+
+    update
+
+[33mcommit 357732c105ee2233a5b64e579ac8eb7403cc21d2[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 12 10:00:07 2017 +0800
+
+    update
+
+[33mcommit 163b3a357e0ff3c1b4cbffa0f49a57003cd4ab4c[m
+Merge: 2acf637 3fbc799
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 09:54:07 2017 +0800
+
+    Merge pull request #2 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 3fbc799e186662612f0db551a1c09e8dcfb912a7[m
+Merge: 68f8044 6b05897
+Author: Junjie.M <118170653@qq.com>
+Date:   Tue Sep 12 09:52:33 2017 +0800
+
+    Merge pull request #4 from jintianjiekong/udsp-2.0.0-tzb
+    
+    交互建模--模型
+
+[33mcommit 6b05897ca6e70e06dcd63b1a5f1544bc0fdfecff[m
+Merge: a374ada 68f8044
+Author: Junjie.M <118170653@qq.com>
+Date:   Tue Sep 12 09:52:25 2017 +0800
+
+    Merge branch 'udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit 68f8044d478239cccb2763076c5a0c1d46345142[m
+Merge: 3943074 2acf637
+Author: Junjie.M <118170653@qq.com>
+Date:   Tue Sep 12 09:34:55 2017 +0800
+
+    Merge pull request #5 from hjtoday/udsp-2.0.0-tzb
+    
+    123
+
+[33mcommit a374ada4d390d0620b26ac4c30f1f0a4e4255c3a[m
+Merge: f41492e 3943074
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Tue Sep 12 09:32:01 2017 +0800
+
+    Merge branch 'udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit f41492e2a81cef008118c1669e1ac5e52e70e98c[m
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 09:25:56 2017 +0800
+
+    初始化
+
+[33mcommit 2acf637847e07f0bd946fd1307ed59372f62fe55[m
+Merge: c76ab9c 3943074
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 08:58:54 2017 +0800
+
+    Merge branch 'udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit 642c6260343ce41d0ab7e6b1226ce1d691048e3f[m
+Author: jiekong <13770677221@139.com>
+Date:   Tue Sep 12 08:50:56 2017 +0800
+
+    更新主键弹出框修改
+
+[33mcommit c76ab9c7553b6d6b871ca5efc59fcd83d0922e72[m
+Merge: 30da36c d2e63b9
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 08:46:05 2017 +0800
+
+    Merge branch 'udsp-2.0.0-tzb' of https://github.com/hjtoday/boracay into udsp-2.0.0-tzb
+
+[33mcommit 30da36c9b116c172f79402be5c6b84ce1db8569c[m
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 12 08:45:56 2017 +0800
+
+    ImMetadata 0911
+
+[33mcommit 39430742be5cb36f07a1a9d56b5d57de48098919[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 11 19:23:46 2017 +0800
+
+    update
+
+[33mcommit e323966b84273f10ce9472b42c13f9d958e9453e[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 11 17:01:00 2017 +0800
+
+    update
+
+[33mcommit 645502ca1857f668beb42ef724b44dab2e87b221[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 11 16:01:21 2017 +0800
+
+    update
+
+[33mcommit 9a48390d5834d5f73111b0448f094315013bf80c[m
+Author: jiekong <13770677221@139.com>
+Date:   Mon Sep 11 15:45:35 2017 +0800
+
+    交互模型校验初步添加
+
+[33mcommit 25fae718b56365f3b788c18858200ecee33b6601[m
+Author: jiekong <13770677221@139.com>
+Date:   Mon Sep 11 14:05:46 2017 +0800
+
+    交互建模模型处理类
+
+[33mcommit f4e601a3e5049b5a40d76b86021b6c725a7c768e[m
+Author: jiekong <13770677221@139.com>
+Date:   Mon Sep 11 14:05:24 2017 +0800
+
+    交互建模模型处理类
+
+[33mcommit e0cdaf83f3de2748fdb73a4019a05f7b51695c59[m
+Author: jiekong <13770677221@139.com>
+Date:   Mon Sep 11 11:23:31 2017 +0800
+
+    交互建模
+
+[33mcommit 02106d7e45d5c32e632caffb716d5e7a30f609c5[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 11 11:22:34 2017 +0800
+
+    update
+
+[33mcommit ede31622e049685594b5feb4a7e75b348f411047[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 11 11:10:29 2017 +0800
+
+    update
+
+[33mcommit d2e63b9654f8e35d05671bca67af2b127bdfb728[m
+Author: hjtoday <972546183@qq.com>
+Date:   Mon Sep 11 09:04:21 2017 +0800
+
+    Update ClientFactory.java
+
+[33mcommit 499d9c3fdb611e2d400a14800743f3b270cc3f56[m
+Author: hjtoday <972546183@qq.com>
+Date:   Mon Sep 11 09:01:44 2017 +0800
+
+    Update ClientFactory.java
+
+[33mcommit f255fbb26476d1d0c35f905c964a594f136a5579[m
+Merge: 8b8b9cd 0522e8e
+Author: hjtoday <972546183@qq.com>
+Date:   Mon Sep 11 08:46:52 2017 +0800
+
+    Merge pull request #1 from junjiem/udsp-2.0.0-tzb
+    
+    update
+
+[33mcommit 0522e8e4cbb6d333f5ca573e4bd6f29183613a15[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 11 08:38:36 2017 +0800
+
+    update
+
+[33mcommit dd40899e80cc2c69c6a71ee92213b224b8cb42d6[m
+Author: jiekong <13770677221@139.com>
+Date:   Fri Sep 8 17:01:31 2017 +0800
+
+    跳转到目标元数据添加bug修改
+
+[33mcommit 95e7e5f95aabc0ff5360ece9ec14f667dc0c6a7f[m
+Author: jiekong <13770677221@139.com>
+Date:   Fri Sep 8 16:39:41 2017 +0800
+
+    跳转目标元数据修改
+
+[33mcommit 0b3c4282cd8e046f622c245877e5923341e5b24f[m
+Merge: 02509d8 9eeb9bc
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Fri Sep 8 15:59:03 2017 +0800
+
+    Merge pull request #6 from hjtoday/udsp-2.0.0-tzb
+    
+    合并
+
+[33mcommit 02509d8ef41ed7915fa4571f097c931e0e59cefe[m
+Author: jiekong <13770677221@139.com>
+Date:   Fri Sep 8 15:56:18 2017 +0800
+
+    交互建模修改
+
+[33mcommit 8b8b9cd0f1d5f28cc468cbef4bebef937e1c3f92[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Fri Sep 8 13:53:04 2017 +0800
+
+    update
+
+[33mcommit 9eeb9bc55f9a9cc4c9798c4763d2f7d145a4c5df[m
+Merge: be63f10 cabf4a2
+Author: hjtoday <972546183@qq.com>
+Date:   Fri Sep 8 10:44:31 2017 +0800
+
+    Merge branch 'udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit cabf4a2344b1f5fa9491f35d026873f2732340ef[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Fri Sep 8 10:36:29 2017 +0800
+
+    update
+
+[33mcommit be63f10f96d80e70793a52432731f29907b23c65[m
+Merge: 0e21f1c 8a6fad2
+Author: hjtoday <972546183@qq.com>
+Date:   Fri Sep 8 10:15:15 2017 +0800
+
+    Merge remote-tracking branch 'origin/udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+    
+    # Conflicts:
+    #       im/src/com/hex/bigdata/udsp/im/provider/util/MysqlSqlUtil.java
+
+[33mcommit 0e21f1ca1a36d11f9ae6d33a1d98f2f09a260e5a[m
+Author: hjtoday <972546183@qq.com>
+Date:   Fri Sep 8 10:12:38 2017 +0800
+
+    IM数据源 0908
+
+[33mcommit e4e9b59a84cbef87e393f73a3b399da352622643[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Fri Sep 8 10:10:53 2017 +0800
+
+    update
+
+[33mcommit 7bc383567671bf63881e0dbd64774157dc3a54aa[m
+Author: jiekong <13770677221@139.com>
+Date:   Fri Sep 8 08:50:41 2017 +0800
+
+    修改目标元数据添加，便于建模添加
+
+[33mcommit 8a6fad29443a8a7f7e17f100cd1df147e17f61d3[m
+Merge: 2317c32 c629aac
+Author: hjtoday <972546183@qq.com>
+Date:   Fri Sep 8 08:38:26 2017 +0800
+
+    Merge pull request #6 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 8334ff175d7d9efdfe8ff05d348d56c63ac5d30f[m
+Merge: 87a4a45 66669d3
+Author: jiekong <13770677221@139.com>
+Date:   Thu Sep 7 19:16:59 2017 +0800
+
+    Merge remote-tracking branch 'origin/udsp-2.0.0-tzb' into udsp-2.0.0-tzb
+
+[33mcommit 87a4a45898f7210d967922e8541c5432440a70d4[m
+Author: jiekong <13770677221@139.com>
+Date:   Thu Sep 7 19:16:10 2017 +0800
+
+    交互模型添加
+
+[33mcommit be5dcd94f142a93f3dfb42563599b33cae783140[m
+Author: jiekong <13770677221@139.com>
+Date:   Thu Sep 7 19:14:47 2017 +0800
+
+    更新
+
+[33mcommit 66669d30059f02f483dccd982549f5cb26562580[m
+Merge: 8e40e31 2317c32
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Thu Sep 7 19:10:08 2017 +0800
+
+    Merge pull request #5 from hjtoday/udsp-2.0.0-tzb
+    
+    合并
+
+[33mcommit c629aacd486ed4ac4139612405ed0de057a9de16[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Thu Sep 7 17:27:42 2017 +0800
+
+    update
+
+[33mcommit 2317c32ce570e9f96fb4bc001c0b368e5acc09db[m
+Author: hjtoday <972546183@qq.com>
+Date:   Thu Sep 7 17:23:23 2017 +0800
+
+    IM数据元0907
+
+[33mcommit f547eb7d4e2c253cd812e50e8e981f37a2f28231[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Thu Sep 7 13:02:49 2017 +0800
+
+    add md model
+
+[33mcommit cf5c479abde16906f4554bff0cfbae03ba5dc018[m
+Merge: 33673a1 35375ec
+Author: hjtoday <972546183@qq.com>
+Date:   Thu Sep 7 10:33:17 2017 +0800
+
+    Merge pull request #5 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 35375ec17a0f3a8490304f6c9eb28cd43b6291cb[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Thu Sep 7 10:01:09 2017 +0800
+
+    初始化
+
+[33mcommit 740ab4a55a959bc7ce1b4d36be8c0528405c300c[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Wed Sep 6 16:21:07 2017 +0800
+
+    update
+
+[33mcommit c7c91c560458afd293ce690d3f5a75ee52a0d5c0[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Wed Sep 6 16:17:00 2017 +0800
+
+    update
+
+[33mcommit fd0126654254f4f72023f72abd6a87034c437378[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Wed Sep 6 16:09:35 2017 +0800
+
+    update
+
+[33mcommit 98fb74ff262b2524a6ba7f41b43ba6124f7aaaf6[m
+Merge: 61593f9 33673a1
+Author: Junjie.M <118170653@qq.com>
+Date:   Wed Sep 6 15:58:59 2017 +0800
+
+    Merge pull request #1 from hjtoday/udsp-2.0.0-tzb
+    
+    IM数据源前台
+
+[33mcommit 33673a13d4a73e5ac52fc856ad8bfb11425330b2[m
+Author: hjtoday <972546183@qq.com>
+Date:   Wed Sep 6 15:55:01 2017 +0800
+
+    数据元前台修改0906
+
+[33mcommit 27db4fa5539e9954f0a66028f5eaeb99071193da[m
+Author: hjtoday <972546183@qq.com>
+Date:   Wed Sep 6 15:30:28 2017 +0800
+
+    JunjieM model修改
+
+[33mcommit 3eda7429fd777df083f3fafcbf2a2b881135e60c[m
+Merge: cc6d903 61593f9
+Author: Junjie.M <118170653@qq.com>
+Date:   Wed Sep 6 09:42:06 2017 +0800
+
+    Merge pull request #2 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit c270629b6f3b57fecd0e5fff8e25abdbd587f8b4[m
+Merge: 269e842 61593f9
+Author: hjtoday <972546183@qq.com>
+Date:   Wed Sep 6 09:41:24 2017 +0800
+
+    Merge pull request #4 from junjiem/udsp-2.0.0-tzb
+    
+    update
+
+[33mcommit 269e842b4ddafeb160a02f7a6668783869f0b236[m
+Merge: c2bbcd1 0e572c8
+Author: hjtoday <972546183@qq.com>
+Date:   Wed Sep 6 09:35:38 2017 +0800
+
+    Merge pull request #3 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 61593f9408d7ecd534adb39b529453c204415c06[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Wed Sep 6 09:33:24 2017 +0800
+
+    update
+
+[33mcommit 0e572c88ce44ccc99d3f7087b5491afcede36fce[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 5 23:21:06 2017 +0800
+
+    update
+
+[33mcommit c2bbcd1c315d77489c2b213d8865f66c0d637846[m
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 5 21:40:48 2017 +0800
+
+    ImMetadata0905
+
+[33mcommit 702eaae62a647d25b44653f234a4fbb21344a7df[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 5 21:39:56 2017 +0800
+
+    update
+
+[33mcommit 364e468a75edca1ce2aa1fea780d48f7545104b2[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 5 19:45:58 2017 +0800
+
+    update
+
+[33mcommit 2ecb2b01b0c27353ceeb7b33857535cbbc03e0b7[m
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 5 19:29:31 2017 +0800
+
+    IM元数据配置0905
+
+[33mcommit d666f91ceaa164545c5cb454ee3a88240c0d4ecd[m
+Merge: f50f117 5343a70
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 5 19:25:10 2017 +0800
+
+    Merge pull request #2 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 5343a70c23053680cf1c17ea52c7c2d0d11f8100[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 5 17:30:06 2017 +0800
+
+    update
+
+[33mcommit 8e40e31013c6606d333c2f5e2465e15d7ce373d8[m
+Merge: 1f3fa21 cc56048
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Tue Sep 5 17:26:37 2017 +0800
+
+    Merge pull request #3 from junjiem/udsp-2.0.0-tzb
+    
+    update
+
+[33mcommit cc56048308692398502f4814b0d6ca5608d71d86[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Tue Sep 5 17:24:53 2017 +0800
+
+    update
+
+[33mcommit 1f3fa21cda5fdbcdb1e31598244ab7ffbdf23e20[m
+Merge: 46a0495 08a6884
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Tue Sep 5 15:10:12 2017 +0800
+
+    Merge pull request #2 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit f50f117742f3e88086caff54ad3a5b02cbe8c024[m
+Merge: 61f452a 08a6884
+Author: hjtoday <972546183@qq.com>
+Date:   Tue Sep 5 12:13:43 2017 +0800
+
+    Merge pull request #1 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 08a6884a153420293b05303d5277c431f035bf35[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 16:18:58 2017 +0800
+
+    初始化
+
+[33mcommit d6b9946c129daa18304542679bed1ec97f28558f[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 15:58:14 2017 +0800
+
+    初始化
+
+[33mcommit 46a04955ad28c43bc9913d9e98eb0f99fa128d02[m
+Merge: cc6d903 90fb339
+Author: jintianjiekong <tian.jin@goupwith.com>
+Date:   Mon Sep 4 14:19:10 2017 +0800
+
+    Merge pull request #1 from junjiem/udsp-2.0.0-tzb
+    
+    Udsp 2.0.0 tzb
+
+[33mcommit 90fb339e9f13449b62e32b5469f74b5283053950[m[33m ([m[1;31morigin/udsp-2.0.0-tzb[m[33m, [m[1;32mudsp-2.0.0-tzb[m[33m)[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 12:26:14 2017 +0800
+
+    初始化
+
+[33mcommit 9d6ae0d90ec4bafcb7eb78a25341e4c1c9475e7f[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 11:18:51 2017 +0800
+
+    初始化
+
+[33mcommit ae2cae822d5797a3ac6832e03b9ee7a0cbfa76de[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 11:06:10 2017 +0800
+
+    初始化
+
+[33mcommit fc952f5c1a223e2c433078fc634027e637a4aa8a[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 11:03:02 2017 +0800
+
+    初始化
+
+[33mcommit 257590a2453ed294c1fca46007c5ed9c47d85efe[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 10:56:30 2017 +0800
+
+    初始化
+
+[33mcommit 61f452a77812206109eddbc503b9307d01099ba3[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 10:12:25 2017 +0800
+
+    初始占位
+
+[33mcommit e2a67c5219dbf250b0008f16e308fa59272f271a[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Mon Sep 4 10:00:20 2017 +0800
+
+    初始化
+
+[33mcommit cc6d903aad0b4c8aa5f0acf6b1105d9aea11d224[m[33m ([m[1;31morigin/udsp-2.0.0[m[33m, [m[1;31morigin/udsp-1.2.0-tzb[m[33m, [m[1;31morigin/udsp-1.2.0[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Sat Sep 2 09:47:05 2017 +0800
+
+    first commit
+
+[33mcommit 35ac897edc6d27f54da35cecbfc6ac3527165563[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Sat Sep 2 09:35:29 2017 +0800
+
+    first commit
+
+[33mcommit d9ff6de5220fa7d1e79cb87787c0b3e5ba29e878[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Sat Sep 2 08:28:06 2017 +0800
+
+    first commit
+
+[33mcommit 1c2b3126f83997639bb2ce3f7b44ea00c394b8c1[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Sat Sep 2 08:26:20 2017 +0800
+
+    first commit
+
+[33mcommit 6e5ac9b5ce85c478bf630919a444f2021d9d723e[m
+Author: Junjie.M <junjie.miao@goupwith.com>
+Date:   Thu Aug 31 19:30:20 2017 +0800
+
+    first commit
