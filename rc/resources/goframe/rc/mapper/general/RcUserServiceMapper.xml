@@ -1,119 +1,138 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.hex.bigdata.udsp.rc.dao.RcUserServiceMapper" >
-  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.rc.model.RcUserService" >
-    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
-    <result column="USER_ID" property="userId" jdbcType="VARCHAR" />
-    <result column="SERVICE_ID" property="serviceId" jdbcType="VARCHAR" />
-    <result column="IP_SECTION" property="ipSection" jdbcType="VARCHAR" />
-    <result column="MAX_SYNC_NUM" property="maxSyncNum" jdbcType="DECIMAL" />
-    <result column="MAX_ASYNC_NUM" property="maxAsyncNum" jdbcType="DECIMAL" />
-    <result column="DEL_FLG" property="delFlg" jdbcType="CHAR" />
-    <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR" />
-    <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR" />
-    <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR" />
-    <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR" />
-  </resultMap>
-<resultMap id="FullResultMap" type="com.hex.bigdata.udsp.rc.dto.RcUserServiceView" extends="BaseResultMap">
-  <result column="SERVICE_NAME" property="serviceName" jdbcType="VARCHAR" />
-  <result column="SERVICE_TYPE" property="serviceType" jdbcType="VARCHAR" />
-  <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
-</resultMap>
+<mapper namespace="com.hex.bigdata.udsp.rc.dao.RcUserServiceMapper">
+    <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.rc.model.RcUserService">
+        <id column="PK_ID" property="pkId" jdbcType="VARCHAR"/>
+        <result column="USER_ID" property="userId" jdbcType="VARCHAR"/>
+        <result column="SERVICE_ID" property="serviceId" jdbcType="VARCHAR"/>
+        <result column="IP_SECTION" property="ipSection" jdbcType="VARCHAR"/>
+        <result column="MAX_SYNC_NUM" property="maxSyncNum" jdbcType="DECIMAL"/>
+        <result column="MAX_ASYNC_NUM" property="maxAsyncNum" jdbcType="DECIMAL"/>
+        <result column="MAX_SYNC_WAIT_NUM" property="maxSyncWaitNum" jdbcType="DECIMAL"/>
+        <result column="MAX_ASYNC_WAIT_NUM" property="maxAsyncWaitNum" jdbcType="DECIMAL"/>
+        <result column="MAX_SYNC_WAIT_TIMEOUT" property="maxSyncWaitTimeout" jdbcType="DECIMAL"/>
+        <result column="MAX_ASYNC_WAIT_TIMEOUT" property="maxAsyncWaitTimeout" jdbcType="DECIMAL"/>
+        <result column="MAX_SYNC_EXECUTE_TIMEOUT" property="maxSyncExecuteTimeout" jdbcType="DECIMAL"/>
+        <result column="MAX_ASYNC_EXECUTE_TIMEOUT" property="maxAsyncExecuteTimeout" jdbcType="DECIMAL"/>
+        <result column="DEL_FLG" property="delFlg" jdbcType="CHAR"/>
+        <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR"/>
+        <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR"/>
+        <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR"/>
+        <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="FullResultMap" type="com.hex.bigdata.udsp.rc.dto.RcUserServiceView" extends="BaseResultMap">
+        <result column="SERVICE_NAME" property="serviceName" jdbcType="VARCHAR"/>
+        <result column="SERVICE_TYPE" property="serviceType" jdbcType="VARCHAR"/>
+        <result column="USER_NAME" property="userName" jdbcType="VARCHAR"/>
+    </resultMap>
 
-  <resultMap id="UserResultMap" type="com.hex.goframe.model.GFUser" >
-    <id column="ID" property="id" jdbcType="VARCHAR" />
-    <result column="EMP_ID" property="empId" jdbcType="VARCHAR" />
-    <result column="USER_ID" property="userId" jdbcType="VARCHAR" />
-    <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
-    <result column="PASSWORD" property="password" jdbcType="VARCHAR" />
-    <result column="STATUS" property="status" jdbcType="VARCHAR" />
-    <result column="MENU_TYPE" property="menuType" jdbcType="VARCHAR" />
-    <result column="CREATE_DATE" property="createDate" jdbcType="DATE" />
-    <result column="UPDATE_USERID" property="updateUserid" jdbcType="VARCHAR" />
-    <result column="APP_ID" property="appId" jdbcType="VARCHAR" />
-    <result column="USER_COMMENT" property="userComment" jdbcType="VARCHAR" />
-    <result column="VALID_STARTDATE" property="validStartdate" jdbcType="VARCHAR" />
-    <result column="VALID_ENDDATE" property="validEnddate" jdbcType="VARCHAR" />
-  </resultMap>
+    <resultMap id="UserResultMap" type="com.hex.goframe.model.GFUser">
+        <id column="ID" property="id" jdbcType="VARCHAR"/>
+        <result column="EMP_ID" property="empId" jdbcType="VARCHAR"/>
+        <result column="USER_ID" property="userId" jdbcType="VARCHAR"/>
+        <result column="USER_NAME" property="userName" jdbcType="VARCHAR"/>
+        <result column="PASSWORD" property="password" jdbcType="VARCHAR"/>
+        <result column="MENU_TYPE" property="menuType" jdbcType="VARCHAR"/>
+        <result column="CREATE_DATE" property="createDate" jdbcType="DATE"/>
+        <result column="UPDATE_USERID" property="updateUserid" jdbcType="VARCHAR"/>
+        <result column="APP_ID" property="appId" jdbcType="VARCHAR"/>
+        <result column="USER_COMMENT" property="userComment" jdbcType="VARCHAR"/>
+        <result column="VALID_STARTDATE" property="validStartdate" jdbcType="VARCHAR"/>
+        <result column="VALID_ENDDATE" property="validEnddate" jdbcType="VARCHAR"/>
+    </resultMap>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from RC_USER_SERVICE
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService" >
-    insert into RC_USER_SERVICE (PK_ID, USER_ID, SERVICE_ID, 
-      IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM,DEL_FLG,
-      CRT_USER, CRT_TIME, UPT_USER, 
-      UPT_TIME)
-    values (#{pkId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{serviceId,jdbcType=VARCHAR}, 
-      #{ipSection,jdbcType=VARCHAR}, #{maxSyncNum,jdbcType=DECIMAL}, #{maxAsyncNum,jdbcType=DECIMAL},#{delFlg,jdbcType=CHAR},
-      #{crtUser,jdbcType=VARCHAR}, #{crtTime,jdbcType=VARCHAR}, #{uptUser,jdbcType=VARCHAR}, 
-      #{uptTime,jdbcType=VARCHAR})
+    <insert id="insert" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService">
+    insert into RC_USER_SERVICE (PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM,
+    MAX_ASYNC_NUM,MAX_SYNC_WAIT_NUM,MAX_ASYNC_WAIT_NUM,MAX_SYNC_WAIT_TIMEOUT,MAX_ASYNC_WAIT_TIMEOUT,
+    MAX_SYNC_EXECUTE_TIMEOUT,MAX_ASYNC_EXECUTE_TIMEOUT,DEL_FLG,CRT_USER, CRT_TIME, UPT_USER, UPT_TIME)
+    values (#{pkId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{serviceId,jdbcType=VARCHAR}, #{ipSection,jdbcType=VARCHAR},
+     #{maxSyncNum,jdbcType=DECIMAL}, #{maxAsyncNum,jdbcType=DECIMAL},#{maxSyncWaitNum,jdbcType=DECIMAL},#{maxAsyncWaitNum,jdbcType=DECIMAL},
+     #{maxSyncWaitTimeout,jdbcType=DECIMAL},#{maxAsyncWaitTimeout,jdbcType=DECIMAL},#{maxSyncExecuteTimeout,jdbcType=DECIMAL},#{maxAsyncExecuteTimeout,jdbcType=DECIMAL},
+     #{delFlg,jdbcType=CHAR},#{crtUser,jdbcType=VARCHAR},#{crtTime,jdbcType=VARCHAR}, #{uptUser,jdbcType=VARCHAR}, #{uptTime,jdbcType=VARCHAR})
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService" >
+    <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService">
     update RC_USER_SERVICE
     set USER_ID = #{userId,jdbcType=VARCHAR},
       SERVICE_ID = #{serviceId,jdbcType=VARCHAR},
       IP_SECTION = #{ipSection,jdbcType=VARCHAR},
       MAX_SYNC_NUM = #{maxSyncNum,jdbcType=DECIMAL},
       MAX_ASYNC_NUM = #{maxAsyncNum,jdbcType=DECIMAL},
+      MAX_SYNC_WAIT_NUM = #{maxSyncWaitNum,jdbcType=DECIMAL},
+      MAX_ASYNC_WAIT_NUM = #{maxAsyncWaitNum,jdbcType=DECIMAL},
+      MAX_SYNC_WAIT_TIMEOUT = #{maxSyncWaitTimeout,jdbcType=DECIMAL},
+      MAX_ASYNC_WAIT_TIMEOUT = #{maxAsyncWaitTimeout,jdbcType=DECIMAL},
+      MAX_SYNC_EXECUTE_TIMEOUT = #{maxSyncExecuteTimeout,jdbcType=DECIMAL},
+      MAX_ASYNC_EXECUTE_TIMEOUT = #{maxAsyncExecuteTimeout,jdbcType=DECIMAL},
       DEL_FLG = #{delFlg,jdbcType=CHAR},
       CRT_USER = #{crtUser,jdbcType=VARCHAR},
       CRT_TIME = #{crtTime,jdbcType=VARCHAR},
       UPT_USER = #{uptUser,jdbcType=VARCHAR},
-      UPT_TIME = #{uptTime,jdbcType=VARCHAR}
+      UPT_TIME = #{uptTime,jdbcType=VARCHAR},
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </update>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM, MAX_SYNC_WAIT_NUM,MAX_ASYNC_WAIT_NUM,
+    MAX_SYNC_WAIT_TIMEOUT,MAX_ASYNC_WAIT_TIMEOUT,MAX_SYNC_EXECUTE_TIMEOUT,MAX_ASYNC_EXECUTE_TIMEOUT,DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME
     from RC_USER_SERVICE
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </select>
-  <select id="selectAll" resultMap="BaseResultMap" >
-    select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME
+    <select id="selectAll" resultMap="BaseResultMap">
+    select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM, MAX_SYNC_WAIT_NUM,MAX_ASYNC_WAIT_NUM,
+     MAX_SYNC_WAIT_TIMEOUT,MAX_ASYNC_WAIT_TIMEOUT,MAX_SYNC_EXECUTE_TIMEOUT,MAX_ASYNC_EXECUTE_TIMEOUT,DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME
     from RC_USER_SERVICE
     where DEL_FLG = '0'
   </select>
 
-  <!-- 逻辑删除-->
-  <update id="deleteByPrimaryKeyFake" parameterType="java.lang.String"  >
+    <!-- 逻辑删除-->
+    <update id="deleteByPrimaryKeyFake" parameterType="java.lang.String">
     update RC_USER_SERVICE
     set DEL_FLG = '1'
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </update>
 
-  <select id="selectPage" resultMap="FullResultMap" parameterType="com.hex.bigdata.udsp.rc.dto.RcUserServiceView">
-    select rcus.PK_ID, rcus.USER_ID, rcus.SERVICE_ID, rcus.IP_SECTION, rcus.MAX_SYNC_NUM, rcus.MAX_ASYNC_NUM,
-    rcus.DEL_FLG, rcus.CRT_USER, rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,rcs.NAME AS SERVICE_NAME,
-    rcs.TYPE AS SERVICE_TYPE,gfuser.user_name AS USER_NAME
-    from RC_USER_SERVICE rcus
-    LEFT JOIN T_GF_LOGINUSER gfuser ON  rcus.USER_ID=gfuser.USER_ID
-    LEFT JOIN RC_SERVICE rcs ON  rcus.SERVICE_ID=rcs.PK_ID
-    where rcus.DEL_FLG = '0'
-    <if test="serviceId!='' and serviceId!=null ">and rcus.SERVICE_ID = #{serviceId} </if>
-    <if test="serviceName!='' and serviceName!=null ">and rcs.NAME like '%'||#{serviceName}||'%'</if>
-    <if test="serviceType!='' and serviceType!=null ">and rcs.TYPE=#{serviceType}</if>
-    <if test="userName!='' and userName!=null ">and gfuser.user_name like '%'||#{userName}||'%'</if>
-    <if test="crtTimeStart!=null and crtTimeStart!='' ">and rcus.CRT_TIME >= #{crtTimeStart}</if>
-    <if test="crtTimeEnd!=null and crtTimeEnd!='' ">and #{crtTimeEnd} >= rcus.CRT_TIME</if>
-    <if test="uptTimeStart!=null and uptTimeStart!='' ">and rcus.UPT_TIME >= #{uptTimeStart}</if>
-    <if test="uptTimeEnd!=null and uptTimeEnd!='' ">and #{uptTimeEnd} >= rcus.UPT_TIME</if>
-    <if test="crtUser!='' and crtUser!=null ">and rcus.CRT_USER like '%'||#{crtUser}||'%'</if>
-    <if test="uptUser!='' and uptUser!=null ">and rcus.UPT_USER like '%'||#{uptUser}||'%'</if>
-    order by UPT_TIME desc, CRT_TIME desc, NAME asc
-  </select>
+    <select id="selectPage" resultMap="FullResultMap" parameterType="com.hex.bigdata.udsp.rc.dto.RcUserServiceView">
+        select rcus.PK_ID, rcus.USER_ID, rcus.SERVICE_ID, rcus.IP_SECTION, rcus.MAX_SYNC_NUM, rcus.MAX_ASYNC_NUM,
+        rcus.MAX_SYNC_WAIT_NUM,rcus.MAX_ASYNC_WAIT_NUM,
+        rcus.MAX_SYNC_WAIT_TIMEOUT,rcus.MAX_ASYNC_WAIT_TIMEOUT,rcus.MAX_SYNC_EXECUTE_TIMEOUT,
+        rcus.MAX_ASYNC_EXECUTE_TIMEOUT,rcus.DEL_FLG, rcus.CRT_USER, rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,rcs.NAME
+        AS SERVICE_NAME,
+        rcs.TYPE AS SERVICE_TYPE,gfuser.user_name AS USER_NAME
+        from RC_USER_SERVICE rcus
+        LEFT JOIN T_GF_LOGINUSER gfuser ON rcus.USER_ID=gfuser.USER_ID
+        LEFT JOIN RC_SERVICE rcs ON rcus.SERVICE_ID=rcs.PK_ID
+        where rcus.DEL_FLG = '0'
+        <if test="serviceId!='' and serviceId!=null ">and rcus.SERVICE_ID = #{serviceId}</if>
+        <if test="serviceName!='' and serviceName!=null ">and rcs.NAME like '%'||#{serviceName}||'%'</if>
+        <if test="serviceType!='' and serviceType!=null ">and rcs.TYPE=#{serviceType}</if>
+        <if test="userName!='' and userName!=null ">and gfuser.user_name like '%'||#{userName}||'%'</if>
+        <if test="crtTimeStart!=null and crtTimeStart!='' ">and rcus.CRT_TIME >= #{crtTimeStart}</if>
+        <if test="crtTimeEnd!=null and crtTimeEnd!='' ">and #{crtTimeEnd} >= rcus.CRT_TIME</if>
+        <if test="uptTimeStart!=null and uptTimeStart!='' ">and rcus.UPT_TIME >= #{uptTimeStart}</if>
+        <if test="uptTimeEnd!=null and uptTimeEnd!='' ">and #{uptTimeEnd} >= rcus.UPT_TIME</if>
+        <if test="crtUser!='' and crtUser!=null ">and rcus.CRT_USER like '%'||#{crtUser}||'%'</if>
+        <if test="uptUser!='' and uptUser!=null ">and rcus.UPT_USER like '%'||#{uptUser}||'%'</if>
+        order by UPT_TIME desc, CRT_TIME desc, NAME asc
+    </select>
 
-  <select id="selectRelation" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService" >
-    select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME
-    from RC_USER_SERVICE
-    where DEL_FLG = '0'
-    <if test="serviceId!='' and serviceId!=null ">and SERVICE_ID =#{serviceId}</if>
-    <if test="userId!='' and userId!=null ">and USER_ID=#{userId}</if>
-  </select>
+    <select id="selectRelation" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService">
+        select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM,
+        MAX_SYNC_WAIT_NUM,MAX_ASYNC_WAIT_NUM,
+        MAX_SYNC_WAIT_TIMEOUT,MAX_ASYNC_WAIT_TIMEOUT,MAX_SYNC_EXECUTE_TIMEOUT,MAX_ASYNC_EXECUTE_TIMEOUT,DEL_FLG,
+        CRT_USER, CRT_TIME,UPT_USER, UPT_TIME
+        from RC_USER_SERVICE
+        where DEL_FLG = '0'
+        <if test="serviceId!='' and serviceId!=null ">and SERVICE_ID =#{serviceId}</if>
+        <if test="userId!='' and userId!=null ">and USER_ID=#{userId}</if>
+    </select>
 
-  <select id="selectFullResultMap" resultMap="FullResultMap" parameterType="java.lang.String" >
+    <select id="selectFullResultMap" resultMap="FullResultMap" parameterType="java.lang.String">
     select rcus.PK_ID, rcus.USER_ID, rcus.SERVICE_ID, rcus.IP_SECTION, rcus.MAX_SYNC_NUM, rcus.MAX_ASYNC_NUM,
-    rcus.DEL_FLG, rcus.CRT_USER, rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,rcs.NAME AS SERVICE_NAME,
+    rcus.MAX_SYNC_WAIT_NUM,rcus.MAX_ASYNC_WAIT_NUM,rcus.MAX_SYNC_WAIT_TIMEOUT,rcus.MAX_ASYNC_WAIT_TIMEOUT,rcus.MAX_SYNC_EXECUTE_TIMEOUT,
+    rcus.MAX_ASYNC_EXECUTE_TIMEOUT,rcus.DEL_FLG, rcus.CRT_USER, rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,,rcs.NAME AS SERVICE_NAME,
     rcs.TYPE AS SERVICE_TYPE,gfuser.user_name AS USER_NAME
     from RC_USER_SERVICE rcus
     LEFT JOIN T_GF_LOGINUSER gfuser ON  rcus.USER_ID=gfuser.USER_ID
@@ -121,64 +140,67 @@
     where rcus.DEL_FLG = '0' and rcus.PK_ID =#{serviceId}
   </select>
 
-  <select id="selectNotRelationUsers" resultMap="UserResultMap" parameterType="java.util.Map">
-    select gfuser.ID,
-       gfuser.EMP_ID,
-       gfuser.USER_ID,
-       gfuser.USER_NAME,
-       gfuser.PASSWORD,
-       gfuser.STATUS,
-       gfuser.MENU_TYPE,
-       gfuser.CREATE_DATE,
-       gfuser.UPDATE_USERID,
-       gfuser.APP_ID,
-       gfuser.USER_COMMENT,
-       gfuser.VALID_STARTDATE,
-       gfuser.VALID_ENDDATE
-  from T_GF_LOGINUSER gfuser
- where gfuser.USER_ID not in
- (select distinct t.User_id
-          from RC_USER_SERVICE t
-         where t.DEL_FLG = '0' AND t.service_Id in
-    <foreach collection="serviceIds" index="index" item="item" open="(" close=")" separator=",">
-      #{item}
-    </foreach>
-    )
-    <if test="userName!='' and userName!=null ">AND  gfuser.USER_NAME like '%'||#{userName}||'%'</if>
-    <if test="userId!='' and userId!=null ">AND  gfuser.USER_ID like '%'||#{userId}||'%'</if>
+    <select id="selectNotRelationUsers" resultMap="UserResultMap" parameterType="java.util.Map">
+        select gfuser.ID,
+        gfuser.EMP_ID,
+        gfuser.USER_ID,
+        gfuser.USER_NAME,
+        gfuser.PASSWORD,
+        gfuser.STATUS,
+        gfuser.MENU_TYPE,
+        gfuser.CREATE_DATE,
+        gfuser.UPDATE_USERID,
+        gfuser.APP_ID,
+        gfuser.USER_COMMENT,
+        gfuser.VALID_STARTDATE,
+        gfuser.VALID_ENDDATE
+        from T_GF_LOGINUSER gfuser
+        where gfuser.USER_ID not in
+        (select distinct t.User_id
+        from RC_USER_SERVICE t
+        where t.DEL_FLG = '0' AND t.service_Id in
+        <foreach collection="serviceIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        )
+        <if test="userName!='' and userName!=null ">AND gfuser.USER_NAME like '%'||#{userName}||'%'</if>
+        <if test="userId!='' and userId!=null ">AND gfuser.USER_ID like '%'||#{userId}||'%'</if>
 
-  </select>
+    </select>
 
-  <select id="selectRelationUsers" resultMap="UserResultMap" parameterType="java.util.Map">
-    select distinct
-    gfuser.ID,
-    gfuser.EMP_ID,
-    gfuser.USER_ID,
-    gfuser.USER_NAME,
-    gfuser.PASSWORD,
-    gfuser.STATUS,
-    gfuser.MENU_TYPE,
-    gfuser.CREATE_DATE,
-    gfuser.UPDATE_USERID,
-    gfuser.APP_ID,
-    gfuser.USER_COMMENT,
-    gfuser.VALID_STARTDATE,
-    gfuser.VALID_ENDDATE
-    from T_GF_LOGINUSER gfuser
-    LEFT JOIN RC_USER_SERVICE t
-    ON t.USER_ID=gfuser.USER_ID
-    where t.DEL_FLG = '0'
-    AND t.service_Id in
-    <foreach collection="serviceIds" index="index" item="item" open="(" close=")" separator=",">
-      #{item}
-    </foreach>
-    <if test="userName!='' and userName!=null ">AND  gfuser.USER_NAME like '%'||#{userName}||'%'</if>
-    <if test="userId!='' and userId!=null ">AND  gfuser.USER_ID like '%'||#{userId}||'%'</if>
+    <select id="selectRelationUsers" resultMap="UserResultMap" parameterType="java.util.Map">
+        select distinct
+        gfuser.ID,
+        gfuser.EMP_ID,
+        gfuser.USER_ID,
+        gfuser.USER_NAME,
+        gfuser.PASSWORD,
+        gfuser.STATUS,
+        gfuser.MENU_TYPE,
+        gfuser.CREATE_DATE,
+        gfuser.UPDATE_USERID,
+        gfuser.APP_ID,
+        gfuser.USER_COMMENT,
+        gfuser.VALID_STARTDATE,
+        gfuser.VALID_ENDDATE
+        from T_GF_LOGINUSER gfuser
+        LEFT JOIN RC_USER_SERVICE t
+        ON t.USER_ID=gfuser.USER_ID
+        where t.DEL_FLG = '0'
+        AND t.service_Id in
+        <foreach collection="serviceIds" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="userName!='' and userName!=null ">AND gfuser.USER_NAME like '%'||#{userName}||'%'</if>
+        <if test="userId!='' and userId!=null ">AND gfuser.USER_ID like '%'||#{userId}||'%'</if>
 
-  </select>
+    </select>
 
-  <select id="selectByUserIdAndServiceId" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService" >
-    select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME
+    <select id="selectByUserIdAndServiceId" resultMap="BaseResultMap"
+            parameterType="com.hex.bigdata.udsp.rc.model.RcUserService">
+    select PK_ID, USER_ID, SERVICE_ID, IP_SECTION, MAX_SYNC_NUM, MAX_ASYNC_NUM,
+    MAX_SYNC_WAIT_NUM,MAX_ASYNC_WAIT_NUM,MAX_SYNC_WAIT_TIMEOUT,MAX_ASYNC_WAIT_TIMEOUT,MAX_SYNC_EXECUTE_TIMEOUT,MAX_ASYNC_EXECUTE_TIMEOUT,
+    DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME
     from RC_USER_SERVICE
     where DEL_FLG = '0'
     and USER_ID = #{userId,jdbcType=VARCHAR}
@@ -186,7 +208,7 @@
   </select>
 
     <!-- 逻辑删除根据服务注册删除关联的服务授权-->
-    <update id="deleteByServieId" parameterType="java.lang.String"  >
+    <update id="deleteByServieId" parameterType="java.lang.String">
         update RC_USER_SERVICE
         set DEL_FLG = '1'
         where DEL_FLG = '0'
@@ -194,18 +216,23 @@
     </update>
 
     <!-- 服务注册数据查看是否有服务授权数据-->
-    <select id="selectRelationByServiceId" resultMap="FullResultMap" parameterType="java.lang.String" >
-        select rcus.PK_ID, rcus.USER_ID, rcus.SERVICE_ID, rcus.IP_SECTION, rcus.MAX_SYNC_NUM, rcus.MAX_ASYNC_NUM, rcus.DEL_FLG, rcus.CRT_USER,
-        rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,rcs.NAME AS SERVICE_NAME
+    <select id="selectRelationByServiceId" resultMap="FullResultMap" parameterType="java.lang.String">
+        select rcus.PK_ID, rcus.USER_ID, rcus.SERVICE_ID, rcus.IP_SECTION, rcus.MAX_SYNC_NUM, rcus.MAX_ASYNC_NUM,
+        rcus.MAX_SYNC_WAIT_NUM,rcus.MAX_ASYNC_WAIT_NUM,rcus.MAX_SYNC_WAIT_TIMEOUT,rcus.MAX_ASYNC_WAIT_TIMEOUT,rcus.MAX_SYNC_EXECUTE_TIMEOUT,
+        rcus.MAX_ASYNC_EXECUTE_TIMEOUT,rcus.DEL_FLG, rcus.CRT_USER,rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,
+        rcs.NAME AS SERVICE_NAME
         from RC_USER_SERVICE rcus
         LEFT JOIN RC_SERVICE rcs ON rcus.SERVICE_ID = rcs.PK_ID
         where rcus.SERVICE_ID = #{serviceId} and rcus.DEL_FLG = '0'
 
     </select>
 
-  <select id="selectServicesByUserId" resultMap="FullResultMap" parameterType="com.hex.bigdata.udsp.rc.model.RcUserService" >
-    select rcus.PK_ID, rcus.USER_ID, rcus.SERVICE_ID, rcus.IP_SECTION, rcus.MAX_SYNC_NUM, rcus.MAX_ASYNC_NUM, rcus.DEL_FLG, rcus.CRT_USER,
-        rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,rcs.NAME AS SERVICE_NAME
+    <select id="selectServicesByUserId" resultMap="FullResultMap"
+            parameterType="com.hex.bigdata.udsp.rc.model.RcUserService">
+    select rcus.PK_ID, rcus.USER_ID, rcus.SERVICE_ID, rcus.IP_SECTION, rcus.MAX_SYNC_NUM, rcus.MAX_ASYNC_NUM,
+    rcus.MAX_SYNC_WAIT_NUM,rcus.MAX_ASYNC_WAIT_NUM,rcus.MAX_SYNC_WAIT_TIMEOUT,rcus.MAX_ASYNC_WAIT_TIMEOUT,rcus.MAX_SYNC_EXECUTE_TIMEOUT,
+    rcus.MAX_ASYNC_EXECUTE_TIMEOUT,rcus.DEL_FLG, rcus.CRT_USER,rcus.CRT_TIME, rcus.UPT_USER, rcus.UPT_TIME,
+    rcs.NAME AS SERVICE_NAME
         from RC_USER_SERVICE rcus
         LEFT JOIN RC_SERVICE rcs ON rcus.SERVICE_ID = rcs.PK_ID
         where rcus.USER_ID = #{userId} and rcus.DEL_FLG = '0'

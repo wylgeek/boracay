@@ -329,15 +329,11 @@ public class KafkaProvider implements Provider {
         int timeout = consumerRequest.getTimeout();
         List<Result> records = new ArrayList<Result>();
         long bef = System.currentTimeMillis();
-        List<Property> propertyList = consumerRequest.getConsumerApplication().getMatedata().getDatasource().getProperties();
-        for (Property property : propertyList) {
-            if ("consumer.timeout.ms".equals(property.getName())) {
-                property.setValue(Integer.toString(timeout));
-            }
-        }
+        Map<String, Property> propertyMap = consumerRequest.getConsumerApplication().getMatedata().getDatasource().getPropertyMap();
+        propertyMap.put("consumer.timeout.ms", new Property("consumer.timeout.ms", Integer.toString(timeout)));
         ConsumerResponse consumerResponse = new ConsumerResponse();
         consumerResponse.setConsumerRequest(consumerRequest);
-        KafkaConsumerDsConfig kafkaRtsConsumerDsConfig = new KafkaConsumerDsConfig(propertyList);
+        KafkaConsumerDsConfig kafkaRtsConsumerDsConfig = new KafkaConsumerDsConfig(propertyMap);
         ConsumerConnector consumer = Consumer.createJavaConsumerConnector(getCnsumerConfig(kafkaRtsConsumerDsConfig));
         int threadNum = kafkaRtsConsumerDsConfig.getThreadNum();
         try {
@@ -348,7 +344,7 @@ public class KafkaProvider implements Provider {
                 while (iterator.hasNext()) {
                     String message = new String(iterator.next().message());
                     Map<String, Object> md = new HashMap<>();
-                    logger.debug("kafka接收的信息为："+message);
+                    logger.debug("kafka接收的信息为：" + message);
                     md = JSONUtil.parseJSON2Map(message);
                     Result result = new Result();
                     result.putAll(md);

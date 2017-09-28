@@ -39,6 +39,11 @@ public class McCurrent implements Serializable {
      */
     private String host;
 
+    /**
+     * 任务在等待队列中id
+     */
+    private String waitQueueTaskId;
+
     public String getHost() {
         return host;
     }
@@ -141,5 +146,13 @@ public class McCurrent implements Serializable {
 
     public void setMaxCurrentNum(int maxCurrentNum) {
         this.maxCurrentNum = maxCurrentNum;
+    }
+
+    public String getWaitQueueTaskId() {
+        return waitQueueTaskId;
+    }
+
+    public void setWaitQueueTaskId(String waitQueueTaskId) {
+        this.waitQueueTaskId = waitQueueTaskId;
     }
 }

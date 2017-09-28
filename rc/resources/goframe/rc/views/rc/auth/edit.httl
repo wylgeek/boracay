@@ -18,7 +18,8 @@ ${extends("/goframe/function_layout.httl")}
                 <th class="nui-form-label"><label for="serviceId">服务名称：</label></th>
                 <td>
                     <div id="serviceId" class="nui-combobox" style="width:97%;"  popupWidth="400" textField="name" valueField="pkId"
-                         dataField="data" name="serviceId" multiSelect="false"   required="true" onvaluechanged="showSelectUsers" >
+                         dataField="data" name="serviceId" multiSelect="false" allowInput="true" required="true"
+                         onvaluechanged="showSelectUsers" >
                         <div property="columns">
                             <div header="名称" field="name"></div>
                             <div header="说明" field="describe"></div>
@@ -59,28 +60,53 @@ ${extends("/goframe/function_layout.httl")}
             <tr>
                 <th class="nui-form-label"><label for="ipSection">ip段：</label></th>
                 <td colspan="3">
-                    <input id="ipSection" name="ipSection" class="nui-textbox"  style="width:99%"
-                           emptyText="默认不拦截" />
-                </td>
-            </tr>
-
-            <tr>
-                <th class="nui-form-label"><label for="ipSectionText">ip模式说明：</label></th>
-                <td colspan="3">
-                    <input  id="ipSectionText" class="nui-textarea" style="height:60px; width:99%;"
-                            readonly="true" emptyText="支持模式，1、固定IP，如196.1.26.3；2、*号代替，如196.1.26.*、*.*.*.*；3、IP段范围196.1.*.[8,9-26]、196.1.26.[1-5,9-26]"/>
+                    <input  id="ipSection" class="nui-textarea" style="height:60px; width:99%;"
+                            emptyText="默认不拦截,支持模式，1、固定IP，如196.1.26.3；2、*号代替，如196.1.26.*、*.*.*.*；3、IP段范围196.1.*.[8,9-26]、196.1.26.[1-5,9-26]"/>
 
                 </td>
             </tr>
 
             <tr>
-                <th class="nui-form-label"><label for="maxSyncNum">最大同步并发数：</label></th>
+                <th class="nui-form-label"><label for="maxSyncNum">最大运行数（同步）：</label></th>
                 <td>
-                    <input id="maxSyncNum" name="maxSyncNum"  class="nui-textbox"  style="width:97%" required="true" vtype="int" />
+                    <input id="maxSyncNum" name="maxSyncNum"  class="nui-textbox"  style="width:97%" required="true" emptyText="100"  value="100" vtype="int" />
                 </td>
-                <th class="nui-form-label"><label for="maxAsyncNum">最大异步并发数：</label></th>
+                <th class="nui-form-label"><label for="maxAsyncNum">最大运行数（异步）：</label></th>
                 <td>
-                    <input id="maxAsyncNum" name="maxAsyncNum"  class="nui-textbox"  style="width:97%" required="true" vtype="int" />
+                    <input id="maxAsyncNum" name="maxAsyncNum"  class="nui-textbox"  style="width:97%" required="true" emptyText="100" value="100" vtype="int" />
+                </td>
+            </tr>
+
+            <tr>
+                <th class="nui-form-label"><label for="maxSyncWaitNum">等待队列大小（同步）：</label></th>
+                <td>
+                    <input id="maxSyncWaitNum" name="maxSyncWaitNum"  class="nui-textbox"  style="width:97%" required="true" emptyText="10" value="0" vtype="int" />
+                </td>
+                <th class="nui-form-label"><label for="maxAsyncWaitNum">等待队列大小（异步）：</label></th>
+                <td>
+                    <input id="maxAsyncWaitNum" name="maxAsyncWaitNum"  class="nui-textbox"  style="width:97%" required="true" emptyText="10" value="0" vtype="int" />
+                </td>
+            </tr>
+
+            <tr>
+                <th class="nui-form-label"><label for="maxSyncExecuteTimeout">运行超时时间（同步/单位：毫秒）：</label></th>
+                <td>
+                    <input id="maxSyncExecuteTimeout" name="maxSyncExecuteTimeout"  class="nui-textbox"  style="width:97%" required="true" emptyText="3000" value="3000" vtype="int" />
+                </td>
+                <th class="nui-form-label"><label for="maxSyncWaitTimeout">等待超时时间（同步/单位：毫秒）：</label></th>
+                <td>
+                    <input id="maxSyncWaitTimeout" name="maxSyncWaitTimeout"  class="nui-textbox"  style="width:97%" required="true" emptyText="3000"  value="3000" vtype="int" />
+                </td>
+            </tr>
+
+            <tr>
+                <th class="nui-form-label"><label for="maxAsyncExecuteTimeout">运行超时时间（异步/单位：毫秒）：</label></th>
+                <td>
+                    <input id="maxAsyncExecuteTimeout" name="maxAsyncExecuteTimeout"  class="nui-textbox"  style="width:97%" required="true" emptyText="600000" value="600000" vtype="int" />
+                </td>
+                <th class="nui-form-label"><label for="maxAsyncWaitTimeout">等待超时时间（异步/单位：毫秒）：</label></th>
+                <td>
+                    <input id="maxAsyncWaitTimeout" name="maxAsyncWaitTimeout"  class="nui-textbox"  style="width:97%" required="true" emptyText="600000"  value="600000" vtype="int" />
                 </td>
             </tr>
 

@@ -26,7 +26,7 @@ public class EhCache<T> implements Cache<T> {
     private CacheManager cacheManager;
 
     private boolean insert(String key, Object obj) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key) && obj != null) {
                 cacheManager.getCache(UDSP_EHCACHE_NAME).put(new Element(key, obj));
             }
@@ -35,7 +35,7 @@ public class EhCache<T> implements Cache<T> {
     }
 
     private boolean update(String key, Object obj) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key) && obj != null) {
                 net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
                 cache.remove(key);
@@ -46,7 +46,7 @@ public class EhCache<T> implements Cache<T> {
     }
 
     private boolean delete(String key) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key)) {
                 cacheManager.getCache(UDSP_EHCACHE_NAME).remove(key);
             }
@@ -55,7 +55,7 @@ public class EhCache<T> implements Cache<T> {
     }
 
     private Object select(String key) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key)) {
                 net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
                 Element element = cache.get(key);
@@ -109,7 +109,7 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public List<T> selectCacheLike(String likeKey) {
-        synchronized (likeKey) {
+        synchronized (likeKey.intern()) {
             net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
             Attribute<String> keyObject = cache.getSearchAttribute("key");
             Query query = cache.createQuery();
@@ -128,7 +128,7 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public boolean removeCacheLike(String likeKey) {
-        synchronized (likeKey) {
+        synchronized (likeKey.intern()) {
             net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
             Attribute<String> keyObject = cache.getSearchAttribute("key");
             Query query = cache.createQuery();
@@ -147,7 +147,7 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public boolean insertTimeoutCache(String key, T t, long timeout) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             Element element = new Element(key, t);
             element.setTimeToIdle((int) timeout / 1000);
             if (StringUtils.isNotBlank(key) && t != null) {

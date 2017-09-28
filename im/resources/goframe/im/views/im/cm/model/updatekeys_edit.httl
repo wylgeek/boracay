@@ -1,0 +1,213 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding: 5px 5px 0px 5px;">
+    <!-- 显示区 -->
+    <div style="padding-left:5px;padding-right:5px;">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <!-- 左边列表 -->
+                <td>
+                    <h4 style="margin:0;line-height:22px;font-size:12px;">字段列表：</h4>
+                    <div id="serachGrid" class="nui-datagrid" style="width:250px;height:280px;"
+                         pageStyle="padding:2px;" multiSelect="true" idField="pkId" showPager="false"
+                         url="${basePath}/im/md/col/select/${tMdId}">
+                        <div property="columns">
+                            <div type="checkcolumn"></div>
+                            <!--
+                            <div field="name" with="180" headerAlign="center" allowSort="true">字段名称</div>
+                            -->
+                            <div field="name" with="40%" headerAlign="center" allowSort="true">名称</div>
+                            <div field="type" with="20%" headerAlign="center" allowSort="true">类型</div>
+                            <div field="describe" with="40%" headerAlign="center" allowSort="true">描述</div>
+                        </div>
+                    </div>
+                </td>
+                <!-- 选择 -->
+                <td style="padding:5px;">
+                    <input type="button" value="选择" style="width:50px;" onclick="addSelected()" />
+                    <br />
+                </td>
+                <!-- 右边列表 -->
+                <td>
+                    <h4 style="margin:0;line-height:22px;font-size:12px;">已选字段：</h4>
+                    <div id="selectedList" class="nui-listbox" style="width:250px;height:280px;"
+                         multiSelect="true" showCheckBox="true" idField="pkId" >
+                        <div property="columns">
+                            <div field="name" with="180" headerAlign="center" allowSort="true">名称</div>
+                        </div>
+                    </div>
+                </td>
+                <!-- 操作 -->
+                <td style="padding:5px;">
+                    <input type="button" value="删除" style="width:50px;margin-bottom:2px;" onclick="removeSelecteds()" />
+                    <br />
+                    <input type="button" value="清空" style="width:50px;" onclick="removeAllSelecteds()" />
+                    <br />
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 按钮区 -->
+    <div style="padding:15px;text-align:center;">
+        <a class="nui-button" style="width:60px;margin-right:20px;" onclick="onOk" >确定</a>
+        <a class="nui-button" style="width:60px;" onclick="onCancel" >取消</a>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    /*nui.parse();
+    var win = nui.get("selectWindow");
+    var serachGrid = nui.get("serachGrid");
+    var selectedList = nui.get("selectedList");
+    var searchName = nui.get("searchName");
+    var searchComment = nui.get("searchComment");*/
+
+    var win ;
+    var serachGrid ;
+    var selectedList ;
+    var searchName ;
+    var searchComment;
+    /*require(['jquery', 'nui'], function ($, nui) {
+        debugger;
+        nui.parse();
+        win = nui.get("selectWindow");
+        serachGrid = nui.get("serachGrid");
+        selectedList = nui.get("selectedList");
+        searchName = nui.get("searchName");
+        searchComment = nui.get("searchComment");
+    });*/
+
+
+    // 父页面调用：设置数据
+    function SetData(data){
+        require(['jquery', 'nui'], function ($, nui) {
+            nui.parse();
+            win = nui.get("selectWindow");
+            serachGrid = nui.get("serachGrid");
+            selectedList = nui.get("selectedList");
+            searchName = nui.get("searchName");
+            searchComment = nui.get("searchComment");
+
+            serachGrid.deselectAll();
+            selectedList.removeAll();
+            serachGrid.load();
+            if(data!=null && data.trim()!=""){
+                data = nui.clone(data);
+                var values = data.split(",");
+                //console.warn(values);
+                // 查询字段集合
+                $.post("${basePath}/im/md/col/select/${tMdId}",{
+                },function(data){
+                    // 去重并判断字段是否存在
+                    var maps = {};
+                    //console.warn(data);
+                    for(var i=0,l=data.data.length; i<l; i++){
+                        var name = data.data[i].name;
+                        var dataKey = data.data[i].pkId;
+                        for(var j=0,len=values.length; j<len; j++){
+                            var key = values[j];
+                            if(dataKey == key){
+                                maps[key] = name;
+                            }
+                        }
+                    }
+                    //console.warn(maps);
+                    // 组织已选项
+                    var items = [];
+                    for(var key in maps){
+                        var value = maps[key];
+                        items.push({
+                            key : key,
+                            name : value
+                        });
+                    }
+                    selectedList.addItems(items);
+                });
+            }
+        });
+    }
+
+    // 父页面调用：获取数据
+    function GetData(){
+        var rows = selectedList.getData();
+        var values = [];
+        var keys = []
+        debugger;
+        for(var i=0,l=rows.length; i<l; i++){
+            values.push(rows[i].name);
+            keys.push(rows[i].key);
+        }
+        dataValue = values.join(",");
+        dataKey = keys.join(",");
+        //console.warn(data);
+        return {"values":dataValue,"keys":dataKey};
+    }
+
+    // 关闭窗口
+    function CloseWindow(action){
+        if(action=="close" && form1.isChanged()){
+            if(confirm("数据已改变,是否先保存?")){
+                return false;
+            }
+        }else if(window.CloseOwnerWindow){
+            return window.CloseOwnerWindow(action);
+        }else{
+            return window.close();
+        }
+    }
+
+    // 确定
+    function onOk(e){
+        CloseWindow("ok");
+    }
+
+    // 关闭
+    function onCancel(e){
+        CloseWindow("cancel");
+    }
+
+    // 添加选择项
+    function addSelected(){
+        var items = serachGrid.getSelecteds();
+
+        //把已选中的数据，用key-value缓存，以便进一步快速匹配
+        var maps = {};
+        var selecteds = selectedList.getData();
+        for(var i=0,l=selecteds.length; i<l; i++){
+            var selected = selecteds[i];
+            var key = selected.key;
+            var value = selected.name;
+            maps[key] = value;
+        }
+
+        //去重，并重新组织
+        var newItems = [];
+        for(var i=0,l=items.length; i<l; i++){
+            var item = items[i];
+            var key = item.pkId;
+            var value = item.name;
+            if(maps[key] == null){
+                newItems.push({
+                    key : key,
+                    name : value
+                });
+            }
+        }
+        //console.warn(newItems);
+        selectedList.addItems(newItems);
+    }
+
+    //删除已选项
+    function removeSelecteds(){
+        var items = selectedList.getSelecteds();
+        selectedList.removeItems(items);
+    }
+
+    //清空已选项
+    function removeAllSelecteds(){
+        selectedList.removeAll();
+    }
+</script>
+<!--#end-->

@@ -77,7 +77,7 @@ ${extends("/goframe/function_layout.httl")}
                 <div id="datagrid1" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
                      idField="pkId" multiSelect="true" allowCellEdit="true" allowCellSelect="true" sortMode="client"
                      showPager="false" editNextOnEnterKey="true" editNextRowCell="true" onselectionchanged="selected"
-                     url="${basePath}/com/props/select/${pkId}" >
+                     url="${basePath}/com/props/select/${pkId}">
                     <div property="columns">
                         <div type="checkcolumn" headerAlign="center" width="5"></div>
                         <div type="indexcolumn" headerAlign="center" width="8">位置</div>
@@ -87,7 +87,8 @@ ${extends("/goframe/function_layout.httl")}
                                    onbeforeshowpopup="propsNameBeforeShowPopup" vtype="maxLength:256" required="true"
                                    onvaluechanged="propsNameChanged" onvalidation="propsNameValidation"/>
                         </div>
-                        <div name="value" field="value" headerAlign="center" allowSort="true" width="30">数值<font color="#FF0000">（必填）</font>
+                        <div name="value" field="value" headerAlign="center" allowSort="true" width="30">数值<font
+                                color="#FF0000">（必填）</font>
                             <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
                         </div>
                         <div name="describe" field="describe" headerAlign="center" allowSort="true" width="40">说明
@@ -157,7 +158,7 @@ ${extends("/goframe/function_layout.httl")}
             contentType: 'application/json',
             success: function (result) {
                 //console.warn(result);
-                if(result.status == true) {
+                if (result.status == true) {
                     //var data = nui.decode(result.data);
                     form1.setData(result.data);
                     form1.setChanged(false);
@@ -171,9 +172,9 @@ ${extends("/goframe/function_layout.httl")}
      * 下拉框弹出前发生
      */
     var count = 0;
-    function propsNameBeforeShowPopup(e){
+    function propsNameBeforeShowPopup(e) {
         // --下拉选项变化--
-        if(count == 0) {
+        if (count == 0) {
             e.source.load("${basePath}/goframe/dict/getDictData?dictTypeId=${model}_DS_PROPS_" + typeObj.value);
             count++;
         }
@@ -223,7 +224,7 @@ ${extends("/goframe/function_layout.httl")}
                 if (e.value == rows[i].name) {
                     count++;
                 }
-                if(count == 1){
+                if (count == 1) {
                     e.errorText = "名称已存在";
                     e.isValid = false;
                     return false;
@@ -280,14 +281,14 @@ ${extends("/goframe/function_layout.httl")}
         var rows = grid1.getSelecteds();
         if (rows.length > 0) {
             //删除前检查
-            var model= "${model}";
+            var model = "${model}";
             var url = "";
             var checkResult;
-            if(model == "IQ"){
+            if (model == "IQ") {
                 url = "${basePath}/iq/dataResource/checkDatasourceUsed/${pkId}";
-            }else if(model == "OLQ"){
+            } else if (model == "OLQ") {
                 url = "${basePath}/rc/service/checkUsed/OLQ/${pkId}";
-            }else if(model == "RTS"){
+            } else if (model == "RTS") {
                 url = "${basePath}/rts/dataResource/checkDatasourceUsed/${pkId}";
             }
             $.ajax({
@@ -295,7 +296,7 @@ ${extends("/goframe/function_layout.httl")}
                 type: 'POST',
                 data: null,
                 cache: false,
-                async:false,
+                async: false,
                 contentType: 'application/json',
                 success: function (result) {
                     checkResult = result;
@@ -304,7 +305,7 @@ ${extends("/goframe/function_layout.httl")}
             if (!checkResult || checkResult.status == true) {
                 nui.alert(checkResult.message);
                 return;
-            }else{
+            } else {
                 grid1.removeRows(rows, true);
             }
         } else {
@@ -320,14 +321,14 @@ ${extends("/goframe/function_layout.httl")}
         if (!saveData) {
             return;
         }
-        var model= "${model}";
+        var model = "${model}";
         var url = "";
         var checkResult;
-        if(model == "IQ"){
+        if (model == "IQ") {
             url = "${basePath}/iq/dataResource/checkDatasourceUsed/${pkId}";
-        }else if(model == "OLQ"){
+        } else if (model == "OLQ") {
             url = "${basePath}/rc/service/checkUsed/OLQ/${pkId}";
-        }else if(model == "RTS"){
+        } else if (model == "RTS") {
             url = "${basePath}/rts/dataResource/checkDatasourceUsed/${pkId}";
         }
         $.ajax({
@@ -335,7 +336,7 @@ ${extends("/goframe/function_layout.httl")}
             type: 'POST',
             data: null,
             cache: false,
-            async:false,
+            async: false,
             contentType: 'application/json',
             success: function (result) {
                 checkResult = result;
@@ -345,7 +346,7 @@ ${extends("/goframe/function_layout.httl")}
         if (!checkResult || checkResult.status == true) {
             nui.alert(checkResult.message);
             return;
-        }else{
+        } else {
             var json = nui.encode(saveData);
             // --发送信息--
             form1.loading("正在保存中,请稍等...");
@@ -553,15 +554,16 @@ ${extends("/goframe/function_layout.httl")}
     }
 
     /**
-    *连接测试
-    */
-    function test(){
+     *连接测试
+     */
+    function test() {
         var saveData = getSaveData();
         if (!saveData) {
             return;
         }
         var json = nui.encode(saveData);
         // --发送信息--
+        form1.loading("正在测试中,请稍等...");
         $.ajax({
             url: "${basePath}/http/ds/test",
             type: 'POST',
@@ -569,7 +571,8 @@ ${extends("/goframe/function_layout.httl")}
             cache: false,
             contentType: 'application/json',
             success: function (result) {
-                 nui.alert(result.message);
+                form1.unmask();
+                nui.alert(result.message);
             }
         });
     }

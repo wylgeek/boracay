@@ -1,5 +1,6 @@
 package com.hex.bigdata.udsp.mc.service;
 
+import com.hex.bigdata.udsp.common.constant.CommonConstant;
 import com.hex.bigdata.udsp.common.lock.RedisDistributedLock;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.common.util.ObjectUtil;
@@ -8,6 +9,7 @@ import com.hex.bigdata.udsp.constant.ConsumerConstant;
 import com.hex.bigdata.udsp.mc.dao.McCurrentCountMapper;
 import com.hex.bigdata.udsp.mc.model.McCurrent;
 import com.hex.bigdata.udsp.mc.model.McCurrentCount;
+import com.hex.bigdata.udsp.mc.util.McCommonUtil;
 import com.hex.bigdata.udsp.model.ExternalRequest;
 import com.hex.bigdata.udsp.model.InnerRequest;
 import com.hex.bigdata.udsp.model.Request;
@@ -51,7 +53,7 @@ public class McCurrentCountService {
      */
     public boolean addAsyncCurrent(McCurrent mcCurrent) {
         String key = mcCurrent.getUserName() + ":" + mcCurrent.getAppId() + ":" + mcCurrent.getAppType() + ":" + mcCurrent.getSyncType();
-        synchronized (McCurrentCountService.class) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 McCurrentCount mcCurrentCount = this.select(key);
@@ -75,7 +77,7 @@ public class McCurrentCountService {
      */
     public boolean addSyncCurrent(McCurrent mcCurrent) {
         String key = mcCurrent.getUserName() + ":" + mcCurrent.getAppId() + ":" + mcCurrent.getAppType() + ":" + mcCurrent.getSyncType();
-        synchronized (McCurrentCountService.class) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 McCurrentCount mcCurrentCount = this.select(key);
@@ -99,7 +101,7 @@ public class McCurrentCountService {
      */
     public boolean reduceAsyncCurrent(McCurrent mcCurrent) {
         String key = mcCurrent.getUserName() + ":" + mcCurrent.getAppId() + ":" + mcCurrent.getAppType() + ":" + mcCurrent.getSyncType();
-        synchronized (McCurrentCountService.class) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 this.mcCurrentService.delete(mcCurrent.getPkId());
@@ -127,7 +129,7 @@ public class McCurrentCountService {
      */
     public boolean reduceSyncCurrent(McCurrent mcCurrent) {
         String key = mcCurrent.getUserName() + ":" + mcCurrent.getAppId() + ":" + mcCurrent.getAppType() + ":" + mcCurrent.getSyncType();
-        synchronized (McCurrentCountService.class) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 this.mcCurrentService.delete(mcCurrent.getPkId());
@@ -171,12 +173,12 @@ public class McCurrentCountService {
     private McCurrentCount initalByKey(String key) {
         String[] keys = key.split("\\:");
         McCurrentCount mcCurrentCount = new McCurrentCount();
-
-        mcCurrentCount.setUserId(keys[0]);
-        mcCurrentCount.setAppId(keys[1]);
-        mcCurrentCount.setAppType(keys[2]);
-        mcCurrentCount.setSyncType(keys[3]);
-
+        if (keys.length >= 4) {
+            mcCurrentCount.setUserId(keys[0]);
+            mcCurrentCount.setAppId(keys[1]);
+            mcCurrentCount.setAppType(keys[2]);
+            mcCurrentCount.setSyncType(keys[3]);
+        }
         return mcCurrentCount;
     }
 
@@ -196,13 +198,13 @@ public class McCurrentCountService {
             String key = userId + ":" + appId + ":" + appType + ":" + syncType;
             McCurrentCount mcCurrentCount = this.select(key);
             if (mcCurrentCount == null) {
-                McCurrent mcCurrent = this.getMcCurrent(request, maxCurrentNum);
+                McCurrent mcCurrent = McCommonUtil.getMcCurrent(request, maxCurrentNum);
                 this.addAsyncCurrent(mcCurrent);
                 this.mcCurrentService.insert(mcCurrent);
                 return mcCurrent;
             }
             if (mcCurrentCount.getCurrentAsyncNum() < maxCurrentNum) {
-                McCurrent mcCurrent = this.getMcCurrent(request, maxCurrentNum);
+                McCurrent mcCurrent = McCommonUtil.getMcCurrent(request, maxCurrentNum);
                 this.addAsyncCurrent(mcCurrent);
                 this.mcCurrentService.insert(mcCurrent);
                 return mcCurrent;
@@ -227,13 +229,13 @@ public class McCurrentCountService {
             String key = userId + ":" + appId + ":" + appType + ":" + syncType;
             McCurrentCount mcCurrentCount = this.select(key);
             if (mcCurrentCount == null) {
-                McCurrent mcCurrent = this.getMcCurrent(request, maxCurrentNum);
+                McCurrent mcCurrent = McCommonUtil.getMcCurrent(request, maxCurrentNum);
                 this.addSyncCurrent(mcCurrent);
                 this.mcCurrentService.insert(mcCurrent);
                 return mcCurrent;
             }
             if (mcCurrentCount.getCurrentSyncNum() < maxCurrentNum) {
-                McCurrent mcCurrent = this.getMcCurrent(request, maxCurrentNum);
+                McCurrent mcCurrent = McCommonUtil.getMcCurrent(request, maxCurrentNum);
                 this.addSyncCurrent(mcCurrent);
                 this.mcCurrentService.insert(mcCurrent);
                 return mcCurrent;
@@ -242,44 +244,40 @@ public class McCurrentCountService {
         }
     }
 
+
     /**
-     * 获取并发信息
+     * 检查并发
      *
-     * @param request
-     * @param maxCurrentNum
+     * @param mcCurrent 不为空
+     * @param mcCurrent
      * @return
      */
-    private McCurrent getMcCurrent(Request request, int maxCurrentNum) {
+    public boolean checkCurrent(McCurrent mcCurrent) {
         synchronized (McCurrentCountService.class) {
-            McCurrent mcCurrent = new McCurrent();
-            String consumeId = UdspCommonUtil.getConsumeId(JSONUtil.parseObj2JSON(request));
-            mcCurrent.setStartTime(format.format(new Date()));
-            mcCurrent.setServiceName(request.getServiceName());
-            mcCurrent.setUserName(request.getUdspUser());
-            mcCurrent.setAppType(request.getAppType());
-            mcCurrent.setAppName(request.getAppName());
-            mcCurrent.setRequestType(request.getRequestType());
-            mcCurrent.setPid(consumeId);
-            mcCurrent.setAppId(request.getAppId());
-            mcCurrent.setSyncType(request.getType().toUpperCase());
-            mcCurrent.setPkId(consumeId);
-            mcCurrent.setSyncType(request.getType().toUpperCase());
-            mcCurrent.setMaxCurrentNum(maxCurrentNum);
-            String requestContent = "";
-            if (ConsumerConstant.CONSUMER_REQUEST_TYPE_INNER.equalsIgnoreCase(request.getRequestType())) { // 内部请求
-                InnerRequest innerRequest = new InnerRequest();
-                ObjectUtil.copyObject(request, innerRequest);
-                requestContent = JSONUtil.parseObj2JSON(innerRequest);
-            } else if (ConsumerConstant.CONSUMER_REQUEST_TYPE_OUTER.equalsIgnoreCase(request.getRequestType())) { // 外部请求
-                ExternalRequest externalRequest = new ExternalRequest();
-                ObjectUtil.copyObject(request, externalRequest);
-                requestContent = JSONUtil.parseObj2JSON(externalRequest);
-            } else {
-                requestContent = JSONUtil.parseObj2JSON(request);
+            String key = this.getMcCountKey(mcCurrent);
+            McCurrentCount mcCurrentCount = this.select(key);
+            if (mcCurrentCount == null) {
+                return true;
             }
-            mcCurrent.setRequestContent(requestContent);
-            return mcCurrent;
+            if (CommonConstant.REQUEST_ASYNC.equalsIgnoreCase(mcCurrent.getSyncType())) {
+                if (mcCurrentCount.getCurrentAsyncNum() < mcCurrent.getMaxCurrentNum()) {
+                    return true;
+                }
+            } else {
+                if (mcCurrentCount.getCurrentSyncNum() < mcCurrent.getMaxCurrentNum()) {
+                    return true;
+                }
+            }
+            return false;
         }
+    }
+
+    private String getMcCountKey(McCurrent mcCurrent) {
+        String userId = mcCurrent.getUserName();
+        String appId = mcCurrent.getAppId();
+        String appType = mcCurrent.getAppType();
+        String syncType = mcCurrent.getSyncType().toUpperCase();
+        return userId + ":" + appId + ":" + appType + ":" + syncType;
     }
 
 }

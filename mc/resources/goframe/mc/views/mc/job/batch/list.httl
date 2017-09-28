@@ -1,0 +1,215 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(head)-->
+<link rel="stylesheet" href="${basePath}/s/css/udsp.css"/>
+<link rel="stylesheet" href="${basePath}/s/css/font-awesome.css"/>
+<!--#end-->
+
+<!--#macro(content)-->
+<style type="text/css">
+    #btnQuery > span {
+        width: 100px;
+    }
+</style>
+
+<div class="nui-toolbar">
+
+    <div class="panel-toolbar">
+        <table style="width:100%">
+            <tr>
+                <td style="white-space:nowrap;">
+                    <a class="nui-button" id="pull" iconCls="icon-search" onclick="moreOption">搜索︽</a>
+                    <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
+                </td>
+                <td style="text-align: right;">
+
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="panel-query search-condition" style="display:none;" id="query">
+        <div class="list">
+            <div id="form1">
+                <table style="width:100%">
+                    <tr>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">用户名：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="userName" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">服务名：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="serviceName" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">请求内容：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="requestContent" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">模型名：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="appName" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 100px;text-align: right">请求开始时间：</td>
+                        <td style="width: 25%">
+                            <input name="startTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
+                            -
+                            <input name="startTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
+                        </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">服务器：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="host" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">同步/异步：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="syncType" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   emptyText="全部" dictTypeId="UDSP_SYNC_TYPE" showNullItem="true" nullItemText="全部"
+                                   style="width:98%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align="center">
+                            <input class="nui-button" iconCls="icon-search" text="查询" onclick="search"/>
+                            <span style="display:inline-block;width:25px;"></span>
+                            <input class="nui-button" iconCls="icon-reset" text="重置" onclick="onFormReset('form1')"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="nui-fit" style="height: 100px;">
+    <div id="datagrid1" class="nui-datagrid" style="width:100%;height:100%;" sortMode="client"
+         url="${basePath}/mc/current/page" idField="pkId" allowResize="false"
+         sizeList="[10,20,50,100]" pageSize="20" multiSelect="true" dataField="data"
+         allowCellSelect="false" onrowdblclick="info">
+        <div property="columns">
+            <div type="checkcolumn" width="20"></div>
+            <div field="percentComplete" headerAlign="center" allowSort="true" renderer="renderPercentComplete">进度</div>
+            <div field="userName" headerAlign="center" allowSort="true">用户名</div>
+            <div field="serviceName" headerAlign="center" allowSort="true">服务名</div>
+            <div field="appType" headerAlign="center" allowSort="true" renderer="renderAppType">应用类型</div>
+            <div field="appName" headerAlign="center" allowSort="true">应用名</div>
+            <div field="syncType" headerAlign="center" allowSort="true" renderer="renderSyncType">同步/异步</div>
+            <div field="requestType" headerAlign="center" allowSort="true" renderer="renderRequestType">请求类型</div>
+            <div field="requestContent" headerAlign="center" allowSort="true">请求内容</div>
+            <div field="startTime" headerAlign="center" allowSort="true" renderer="timeFormat">请求开始时间</div>
+            <div field="host" headerAlign="center" allowSort="true">服务器</div>
+            <div field="pid" headerAlign="center" allowSort="true">线程ID</div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var grid1;
+
+    /**
+     * 按需加载资源文件
+     */
+    require(['jquery', 'nui'], function ($, nui) {
+        nui.parse();
+        grid1 = nui.get("datagrid1");
+        grid1.load();
+        $("#pull").hide();
+    });
+
+    /**
+     * 搜索按钮转换
+     */
+    function moreOption() {
+        $("#push").toggle();
+        $("#pull").toggle();
+        $("#query").toggle();
+        nui.layout(document.body);
+    }
+
+    /**
+     * 搜索
+     */
+    function search() {
+        var form = new nui.Form("#form1");
+        var data = form.getData(true, true);
+        grid1.load(data);
+    }
+
+    /**
+     * 双击查看详情
+     */
+    function info() {
+        var row = grid1.getSelected();
+        if (!row) {
+            nui.alert("请选择一条记录!");
+            return;
+        }
+        nui.open({
+            url: "${basePath}/goframe/p/mc.current.info/?pkId=" + row.pkId,
+            title: "并发信息详情",
+            width: 800,
+            height: 400,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+            }
+        });
+    }
+
+    /**
+     * 时间格式化
+     * @param e
+     */
+    function timeFormat(e) {
+        if (e.value) {
+            var date = new Date(e.value);
+            return nui.formatDate(date, "yyyy-MM-dd HH:mm:ss");
+        }
+    }
+
+    /**
+     * 转换应用类型
+     * @param e
+     * @returns {*}
+     */
+    function renderAppType(e) {
+        return nui.getDictText("UDSP_SERVICE_TYPE", e.row.appType);
+    }
+
+    /**
+     * 转换请求类型
+     * @param e
+     * @returns {*}
+     */
+    function renderRequestType(e) {
+        return nui.getDictText("UDSP_REQUEST_TYPE", e.row.requestType);
+    }
+
+    /**
+     * 转换同步/异步
+     * @returns {*}
+     */
+    function renderSyncType(e) {
+        if (e.row.syncType == "" || e.row.syncType == null) {
+            return "-";
+        }
+        return nui.getDictText("UDSP_SYNC_TYPE", e.row.syncType);
+    }
+
+    /**
+     * 转换进度百分比
+     * @returns {*}
+     */
+    function renderPercentComplete(e) {
+        return '<div class="progressbar">'
+            + '<div class="progressbar-percent" style="width:' + e.row.percentComplete + '%;"></div>'
+            + '<div class="progressbar-label">' + e.row.percentComplete + '%</div>'
+            + '</div>';
+    }
+</script>
+<!--#end-->

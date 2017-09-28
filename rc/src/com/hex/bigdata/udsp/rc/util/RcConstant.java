@@ -14,6 +14,10 @@ public class RcConstant {
      */
     public final static String UDSP_SERVICE_TYPE_IQ="IQ";
     /**
+     * 服务类型 - 交互建模
+     */
+    public final static String UDSP_SERVICE_TYPE_IM="IM";
+    /**
      *服务类型 - 联机查询
      */
     public final static String UDSP_SERVICE_TYPE_OLQ="OLQ";

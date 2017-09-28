@@ -11,6 +11,20 @@ public class Property {
 
     private String describe;
 
+    public Property() {
+    }
+
+    public Property(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public Property(String name, String value, String describe) {
+        this.name = name;
+        this.value = value;
+        this.describe = describe;
+    }
+
     public String getName() {
         return name;
     }

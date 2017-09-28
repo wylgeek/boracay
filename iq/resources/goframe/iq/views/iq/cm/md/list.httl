@@ -49,7 +49,7 @@ ${extends("/goframe/function_layout.httl")}
                         <td class="tit roleLabel" style="width: 100px;text-align: right">数据源：</td>
                         <td class="roleText" style="width: 25%">
                             <input id="dsId" name="dsId" class="nui-combobox" textField="name" valueField="pkId"
-                                   dataField="data" url="${basePath}/com/ds/select?model=${model}" allowInput="true"
+                                   dataField="data" url="${basePath}/com/ds/select?model=IQ" allowInput="true"
                                    showNullItem="true" emptyText="全部" nullItemText="全部" style="width:98%;"/>
                         </td>
                         <td class="tit roleLabel" style="width: 100px;text-align: right">说明：</td>
@@ -201,7 +201,7 @@ ${extends("/goframe/function_layout.httl")}
      */
     function add() {
         nui.open({
-            url: "${basePath}/goframe/p/iq.cm.md.add?model=${model}",
+            url: "${basePath}/goframe/p/iq.cm.md.add",
             title: "添加",
             width: 800,
             height: 600,
@@ -226,7 +226,7 @@ ${extends("/goframe/function_layout.httl")}
             return;
         }
         nui.open({
-            url: "${basePath}/goframe/p/iq.cm.md.edit?pkId=" + row.pkId + "&model=${model}",
+            url: "${basePath}/goframe/p/iq.cm.md.edit?pkId=" + row.pkId,
             title: "编辑",
             width: 800,
             height: 600,
@@ -296,7 +296,7 @@ ${extends("/goframe/function_layout.httl")}
             return;
         }
         nui.open({
-            url: "${basePath}/goframe/p/iq.cm.md.info/?pkId=" + row.pkId + "&model=${model}",
+            url: "${basePath}/goframe/p/iq.cm.md.info/?pkId=" + row.pkId,
             title: "详情-" + row.describe,
             width: 800,
             height: 500,
@@ -334,7 +334,7 @@ ${extends("/goframe/function_layout.httl")}
      */
     function showDatabaseInfo(dsId, dsName){
         nui.open({
-            url: "${basePath}/goframe/p/com.ds.info/?pkId=" + dsId + "&model=${model}",
+            url: "${basePath}/goframe/p/com.ds.info/?pkId=" + dsId + "&model=IQ",
             title: "详情-" + dsName,
             width: 800,
             height: 600,
@@ -344,7 +344,6 @@ ${extends("/goframe/function_layout.httl")}
             }
         });
     }
-
 
     // 开始上传文件
     function startUpload() {

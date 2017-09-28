@@ -22,7 +22,7 @@ ${extends("/goframe/function_layout.httl")}
                         <div id="olqDsId" class="nui-combobox" style="width:97%;" popupWidth="400" textField="name"
                              valueField="pkId"
                              url="${basePath}/olq/app/dslist" dataField="data" name="olqDsId" multiSelect="false"
-                             required="true">
+                             allowInput="true" required="true">
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>

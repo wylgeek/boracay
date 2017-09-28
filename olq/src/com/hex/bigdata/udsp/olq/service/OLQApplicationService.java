@@ -1,6 +1,7 @@
 package com.hex.bigdata.udsp.olq.service;
 
 import com.hex.bigdata.udsp.common.constant.ComExcelEnums;
+import com.hex.bigdata.udsp.common.constant.DatasourceModel;
 import com.hex.bigdata.udsp.common.constant.DatasourceType;
 import com.hex.bigdata.udsp.common.dto.ComDatasourceView;
 import com.hex.bigdata.udsp.common.model.ComDatasource;
@@ -324,7 +325,7 @@ public class OLQApplicationService extends BaseService {
             return new MessageResult(false, "数据源名称不能为空，请检查！");
         }
         //数据源名称
-        ComDatasource comDatasource = this.comDatasourceService.selectByModelAndName(DatasourceType.OLQ.getValue(),olqDsName);
+        ComDatasource comDatasource = this.comDatasourceService.selectByModelAndName(DatasourceModel.OLQ.getValue(),olqDsName);
         if (comDatasource == null) {
             return new MessageResult(false, "数据源名称对应的数据源不存在，请检查！");
         }
@@ -618,7 +619,7 @@ public class OLQApplicationService extends BaseService {
 
     public List<ComDatasource> selectOlqDataSource() {
         ComDatasourceView datasourceView = new ComDatasourceView();
-        datasourceView.setModel(DatasourceType.OLQ.getValue());
+        datasourceView.setModel(DatasourceModel.OLQ.getValue());
         List<ComDatasource> searchList = comDatasourceService.select(datasourceView);
         return searchList;
     }

@@ -13,7 +13,7 @@ ${extends("/goframe/function_layout.httl")}
                     <th class="nui-form-label"><label for="dsId">数据源：</label></th>
                     <td>
                         <input id="dsId" name="dsId" class="nui-combobox" valueField="pkId" textField="name"
-                               dataField="data" url="${basePath}/com/ds/select?model=${model}" style="width:97%" readonly="true"/>
+                               dataField="data" url="${basePath}/com/ds/select?model=IQ" style="width:97%" readonly="true"/>
                     </td>
                 </tr>
                 <tr>

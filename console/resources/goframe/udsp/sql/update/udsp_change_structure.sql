@@ -85,3 +85,37 @@ alter table RTS_METADATA_COLUMN add type varchar2(32) not null;
 -- Add comments to the columns 
 comment on column RTS_METADATA_COLUMN.type
   is '类型';
+
+-- 20170918 缓冲队列控制
+-- Add/modify columns
+alter table RC_USER_SERVICE add max_sync_wait_num NUMBER(10) default 10 not null;
+alter table RC_USER_SERVICE add max_async_wait_num NUMBER(10) default 10 not null;
+alter table RC_USER_SERVICE add max_wait_timeout NUMBER(10) default 3000 not null;
+alter table RC_USER_SERVICE add max_execute_timeout NUMBER(10) default 3000 not null;
+-- Add comments to the columns
+comment on column RC_USER_SERVICE.max_sync_wait_num
+  is '最大同步队列等待数';
+comment on column RC_USER_SERVICE.max_async_wait_num
+  is '最大异步队列等待数';
+comment on column RC_USER_SERVICE.max_wait_timeout
+  is '最大等待超时时间';
+comment on column RC_USER_SERVICE.max_execute_timeout
+  is '最大执行超时时间';
+-- 20170918 缓冲队列控制
+-- Drop columns
+alter table RC_USER_SERVICE drop column max_wait_timeout;
+alter table RC_USER_SERVICE drop column max_execute_timeout;
+-- Add/modify columns
+alter table RC_USER_SERVICE add max_sync_wait_timeout NUMBER(10) default 3000 not null;
+alter table RC_USER_SERVICE add max_async_wait_timeout NUMBER(10) default 3000 not null;
+alter table RC_USER_SERVICE add max_sync_execute_timeout NUMBER(10) default 3000 not null;
+alter table RC_USER_SERVICE add max_async_execute_timeout NUMBER(10) default 3000 not null;
+-- Add comments to the columns
+comment on column RC_USER_SERVICE.max_sync_wait_timeout
+  is '同步最大等待超时时间';
+comment on column RC_USER_SERVICE.max_async_wait_timeout
+  is '异步最大等待超时时间';
+comment on column RC_USER_SERVICE.max_sync_execute_timeout
+  is '同步最大执行超时时间';
+comment on column RC_USER_SERVICE.max_async_execute_timeout
+  is '异步最大执行超时时间';

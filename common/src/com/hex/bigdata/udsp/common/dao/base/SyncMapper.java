@@ -124,13 +124,13 @@ public abstract class SyncMapper<T> extends BaseMapper {
     public T select(String id) {
         String key = MD5Util.MD5_16(clazz) + ":" + id;
         Cache<T> cache = getCache();
-        T t = cache.selectCache(key);
-        if (t == null) {
-            t = selectExe(id);
-            if (t != null) {
+        /*T t = cache.selectCache(key);
+        if (t == null) {*/
+            T t  = selectExe(id);
+            /*if (t != null) {
                 cache.insertCache(key, t);
             }
-        }
+        }*/
         logger.debug("查询 Class=" + clazz + " PkId=" + id);
         return t;
     }

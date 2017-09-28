@@ -47,15 +47,19 @@ public class IqSyncService {
             response.setStatusCode(iqResponse.getStatusCode().getValue());
             List<Map<String, String>> records = new ArrayList<>();
             Map<String, String> map = null;
-            for (Result result : iqResponse.getRecords()) {
-                map = new HashMap<>();
-                for (Map.Entry<String, Object> entry : result.entrySet()) {
-                    map.put(entry.getKey(), result.getString(entry.getKey()));
+
+            List<Result> results = iqResponse.getRecords();
+            if (null != results && results.size() > 0) {
+                for (Result result : iqResponse.getRecords()) {
+                    map = new HashMap<>();
+                    for (Map.Entry<String, Object> entry : result.entrySet()) {
+                        map.put(entry.getKey(), result.getString(entry.getKey()));
+                    }
+                    records.add(map);
                 }
-                records.add(map);
+                response.setRecords(records);
+                //返回字段名称及类型
             }
-            response.setRecords(records);
-            //返回字段名称及类型
             response.setReturnColumns(iqResponse.getColumns());
         } catch (Exception e) {
             logger.error(e.getMessage());

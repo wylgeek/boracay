@@ -2,10 +2,9 @@ package com.hex.bigdata.udsp.common.provider.model;
 
 import com.hex.bigdata.udsp.common.model.ComDatasource;
 import com.hex.bigdata.udsp.common.model.ComProperties;
-import com.hex.goframe.util.Util;
+import com.hex.bigdata.udsp.common.util.PropertyUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.Map;
 /**
  * Created by junjiem on 2017-3-2.
  */
-public class Datasource {
+public class Datasource extends Base {
     private String name;
 
     private String describe;
@@ -24,29 +23,25 @@ public class Datasource {
 
     private String implClass;
 
-    private List<Property> properties; // 配置参数集合
-
-    private Map<String, Property> propertyMap;
-
     public Datasource(List<Property> properties) {
-        this.setProperties(properties);
+        super(properties);
     }
 
     public Datasource(Map<String, Property> propertieMap) {
-        this.setPropertyMap(propertieMap);
+        super(propertieMap);
     }
 
     public Datasource(ComDatasource comDatasource, List<ComProperties> comPropertieList) {
-        this.name = comDatasource.getName();
-        this.type = comDatasource.getType();
-        this.describe = comDatasource.getDescribe();
-        this.note = comDatasource.getNote();
-        this.implClass = comDatasource.getImplClass();
-        this.properties = convertToPropertyList(comPropertieList);
-        if (this.propertyMap == null)
-            this.propertyMap = new HashMap<String, Property>();
-        for (Property property : this.properties) {
-            this.propertyMap.put(property.getName(), property);
+        name = comDatasource.getName();
+        type = comDatasource.getType();
+        describe = comDatasource.getDescribe();
+        note = comDatasource.getNote();
+        implClass = comDatasource.getImplClass();
+        properties = PropertyUtil.convertToPropertyList(comPropertieList);
+        if (propertyMap == null)
+            propertyMap = new HashMap<>();
+        for (Property property : properties) {
+            propertyMap.put(property.getName(), property);
         }
     }
 
@@ -56,35 +51,6 @@ public class Datasource {
 
     public void setImplClass(String implClass) {
         this.implClass = implClass;
-    }
-
-    public Property getProperty(String key) {
-        Property property = this.propertyMap.get(key);
-        if (property == null) {
-            property = new Property();
-        }
-        return property;
-    }
-
-    public Map<String, Property> getPropertyMap() {
-        return propertyMap;
-    }
-
-    public void setPropertyMap(Map<String, Property> propertieMap) {
-        this.propertyMap = propertieMap;
-        if (this.properties == null)
-            this.properties = new ArrayList<Property>();
-        for (Map.Entry<String, Property> entry : propertieMap.entrySet()) {
-            properties.add(entry.getValue());
-        }
-    }
-
-    public String getId() {
-        StringBuffer sb = new StringBuffer();
-        for (Property property : properties) {
-            sb.append(property.getName() + "=" + property.getValue() + "\n");
-        }
-        return Util.MD5(sb.toString());
     }
 
     public String getName() {
@@ -121,34 +87,4 @@ public class Datasource {
         this.note = note;
     }
 
-    public List<Property> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(List<Property> properties) {
-        this.properties = properties;
-        if (this.propertyMap == null)
-            this.propertyMap = new HashMap<String, Property>();
-        for (Property property : properties) {
-            this.propertyMap.put(property.getName(), property);
-        }
-    }
-
-    /**
-     * ComProperties类型转换为Property类型
-     *
-     * @param comProperties
-     * @return
-     */
-    private static List<Property> convertToPropertyList(List<ComProperties> comProperties) {
-        List<Property> propertyList = new ArrayList<>();
-        for (ComProperties item : comProperties) {
-            Property property = new Property();
-            property.setName(item.getName());
-            property.setValue(item.getValue());
-            property.setDescribe(item.getDescribe());
-            propertyList.add(property);
-        }
-        return propertyList;
-    }
 }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.im.dao.ImModelFilterColMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.im.model.ImModelFilterCol" >
+    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+    <result column="MODEL_ID" property="modelId" jdbcType="VARCHAR" />
+    <result column="SEQ" property="seq" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIBE" property="describe" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="LENGTH" property="length" jdbcType="VARCHAR" />
+    <result column="IS_NEED" property="isNeed" jdbcType="CHAR" />
+    <result column="DEFAULT_VAL" property="defaultVal" jdbcType="VARCHAR" />
+    <result column="OPERATOR" property="operator" jdbcType="VARCHAR" />
+    <result column="LABEL" property="label" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from IM_MODEL_FILTER_COLUMN
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hex.bigdata.udsp.im.model.ImModelFilterCol" >
+    insert into IM_MODEL_FILTER_COLUMN (PK_ID, MODEL_ID, SEQ, 
+      NAME, DESCRIBE, TYPE, 
+      LENGTH, IS_NEED, DEFAULT_VAL, 
+      OPERATOR, LABEL)
+    values (#{pkId,jdbcType=VARCHAR}, #{modelId,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, 
+      #{name,jdbcType=VARCHAR}, #{describe,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{length,jdbcType=VARCHAR}, #{isNeed,jdbcType=CHAR}, #{defaultVal,jdbcType=VARCHAR}, 
+      #{operator,jdbcType=VARCHAR}, #{label,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.im.model.ImModelFilterCol" >
+    update IM_MODEL_FILTER_COLUMN
+    set MODEL_ID = #{modelId,jdbcType=VARCHAR},
+      SEQ = #{seq,jdbcType=DECIMAL},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESCRIBE = #{describe,jdbcType=VARCHAR},
+      TYPE = #{type,jdbcType=VARCHAR},
+      LENGTH = #{length,jdbcType=VARCHAR},
+      IS_NEED = #{isNeed,jdbcType=CHAR},
+      DEFAULT_VAL = #{defaultVal,jdbcType=VARCHAR},
+      OPERATOR = #{operator,jdbcType=VARCHAR},
+      LABEL = #{label,jdbcType=VARCHAR}
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, MODEL_ID, SEQ, NAME, DESCRIBE, TYPE, LENGTH, IS_NEED, DEFAULT_VAL, 
+    OPERATOR, LABEL
+    from IM_MODEL_FILTER_COLUMN
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select PK_ID, MODEL_ID, SEQ, NAME, DESCRIBE, TYPE, LENGTH, IS_NEED, DEFAULT_VAL, 
+    OPERATOR, LABEL
+    from IM_MODEL_FILTER_COLUMN
+  </select>
+
+  <select id="selectByMid" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select PK_ID, MODEL_ID, SEQ, NAME, DESCRIBE, TYPE, LENGTH, IS_NEED, DEFAULT_VAL,
+    OPERATOR, LABEL
+    from IM_MODEL_FILTER_COLUMN
+    where MODEL_ID = #{mid}
+    ORDER BY SEQ
+  </select>
+
+  <delete id="deleteByMid" parameterType="java.lang.String">
+      delete from  IM_MODEL_FILTER_COLUMN
+      where MODEL_ID = #{mid}
+  </delete>
+</mapper>

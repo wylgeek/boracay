@@ -31,7 +31,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public boolean insertCache(String key, T t) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key) && t != null) {
@@ -51,7 +51,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public boolean deleteCache(String key) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key)) {
@@ -68,7 +68,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public T selectCache(String key) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key)) {
@@ -83,7 +83,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public boolean insertListCache(String key, List<T> list) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key) && list != null && list.size() != 0) {
@@ -111,7 +111,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public <T> List<T> selectListCache(String key) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key)) {
@@ -130,7 +130,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public <T> List<T> selectCacheLike(String likeKey) {
-        synchronized (likeKey) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (likeKey.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(likeKey); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 Set<String> keys = redisTemplate.keys(likeKey + "*");
@@ -158,7 +158,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public boolean removeCacheLike(String likeKey) {
-        synchronized (likeKey) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (likeKey.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(likeKey); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 Set<String> keys = redisTemplate.keys(likeKey + "*");
@@ -178,7 +178,7 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public boolean insertTimeoutCache(String key, T t, long timeout) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
             redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 redisTemplate.opsForValue().set(key, t);

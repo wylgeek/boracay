@@ -35,6 +35,12 @@ ${extends("/goframe/function_layout.httl")}
                     #if(hasPermission("RC.service.list.auth"))
                     <a class="nui-button" iconCls="icon-add" plain="true" onclick="auth" enabled="false" id="auth">授权</a>
                     #end
+                    #if(hasPermission("RC.service.list.start"))
+                    <a class="nui-button" iconCls="icon-ok" plain="true" onclick="start_service" enabled="false" id="start_service">启用</a>
+                    #end
+                    #if(hasPermission("RC.service.list.stop"))
+                    <a class="nui-button" iconCls="icon-no" plain="true" onclick="stop_service" enabled="false" id="stop_service">停用</a>
+                    #end
                 </td>
             </tr>
         </table>
@@ -82,7 +88,15 @@ ${extends("/goframe/function_layout.httl")}
                             <input name="uptTimeEnd" class="nui-datepicker" allowInput="true"
                                    showTime="true" format="yyyy-MM-dd H:mm:ss" timeFormat="H:mm:ss" style="width: 46%"/>
                         </td>
+
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">服务状态：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input id="status" name="status"class="nui-dictcombobox nui-form-input"
+                                   valueField="dictId" emptyText="全部" showNullItem="true" nullItemText="全部"
+                                   textField="dictName" dictTypeId="RC_SERVICE_STATUS" style="width: 97%;" />
+                        </td>
                     </tr>
+
                     <tr>
                         <td colspan="6" align="center">
                             <input class="nui-button" iconCls="icon-search" text="查询" onclick="search"/>
@@ -136,6 +150,7 @@ ${extends("/goframe/function_layout.httl")}
             <!--<div field="appName" headerAlign="center" allowSort="true">应用类型</div>-->
 
             <div field="describe" headerAlign="center" allowSort="true">说明</div>
+            <div field="status" headerAlign="center" allowSort="true" renderer="renderServiceStatus">服务状态</div>
             <div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat">创建时间</div>
             <div field="uptTime" headerAlign="center" allowSort="true" renderer="timeFormat">更新时间</div>
             <div name="operation" headerAlign="center" align="center" allowSort="true" renderer="operation">服务授权情况</div>
@@ -192,14 +207,20 @@ ${extends("/goframe/function_layout.httl")}
             nui.get("edit").enable();
             nui.get("auth").enable();
             nui.get("remove").enable();
+            nui.get("start_service").enable();
+            nui.get("stop_service").enable();
         } else if (rows.length == 0) {
             nui.get("edit").disable();
             nui.get("auth").disable();
             nui.get("remove").disable();
+            nui.get("start_service").disable();
+            nui.get("stop_service").disable();
         } else {
             nui.get("edit").disable();
             nui.get("auth").disable();
             nui.get("remove").enable();
+            nui.get("start_service").enable();
+            nui.get("stop_service").enable();
         }
 
     }
@@ -364,6 +385,41 @@ ${extends("/goframe/function_layout.httl")}
     }
 
 
+    function start_service(){
+        change_serviceStatus("0");
+    }
+
+    function stop_service(){
+        change_serviceStatus("1");
+    }
+    
+    function change_serviceStatus(type) {
+        var rows = grid1.getSelecteds();
+        if (!rows) {
+            nui.alert("请至少选择一条记录!");
+            return;
+        }
+        var json = nui.encode(getRows(rows));
+        grid1.loading("正在修改服务状态,请稍等...");
+        $.ajax({
+            url: "${basePath}/rc/service/shangeStatus/"+type,
+            type: 'POST',
+            data: json,
+            cache: false,
+            contentType: 'application/json',
+            success: function (result) {
+                if (result.status == true) {
+                    nui.alert(result.message);
+                    grid1.reload();
+                } else {
+                    nui.alert(result.message, "错误提示");
+                    grid1.unmask();
+                }
+            }
+        });
+    }
+
+
     /**
      * 获取多行
      * @param rows
@@ -435,6 +491,10 @@ ${extends("/goframe/function_layout.httl")}
      */
     function renderServiceType(e) {
         return nui.getDictText("UDSP_SERVICE_TYPE", e.row.type);
+    }
+    
+    function  renderServiceStatus(e) {
+        return nui.getDictText("RC_SERVICE_STATUS", e.row.status);
     }
 
 

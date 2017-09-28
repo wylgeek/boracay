@@ -20,14 +20,13 @@ ${extends("/goframe/function_layout.httl")}
                     <th class="nui-form-label"><label for="dsId">数据源：</label></th>
                     <td>
                         <div id="dsId" class="nui-combobox" style="width:97%;"  popupWidth="400" textField="name" valueField="pkId"
-                             url="${basePath}/com/ds/select?model=${model}" dataField="data" name="dsId" multiSelect="false"   required="true">
+                             url="${basePath}/com/ds/select?model=RTS" dataField="data" name="dsId" multiSelect="false"
+                             allowInput="true" required="true">
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
                             </div>
                         </div>
-                        <!--<input class="mini-combobox" id="dsId" style="width: 97%" name="dsId"  textField="name" valueField="pkId"
-                               url="${basePath}/com/ds/select?model=${model}" dataField="data" emptyText="请选择" />-->
                     </td>
                 </tr>
                 <tr>

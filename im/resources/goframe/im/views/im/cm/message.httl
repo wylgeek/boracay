@@ -1,0 +1,39 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding: 5px 5px 0px 5px;">
+    <div id="form1">
+        <input id="jobInfoTmp.pkId" name="jobInfoTmp.pkId" class="nui-hidden" />
+        <table style="width:100%;height:100%;table-layout:fixed;" class="nui-form-table" >
+            <tr>
+                <td>
+                    <textarea id="message" name="message" class="mini-textarea" style="height:460px;width:585px;" readonly="readonly">
+                    </textarea>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center;spacing:5px;">
+                    <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">返回</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    // 父页面调用：初始化传值
+    function setData(message){
+        require(['jquery', 'nui'], function ($, nui) {
+            nui.parse();
+            var form1 = new nui.Form("form1");
+            form1.setData({"message":message});
+            form1.setChanged(true);
+        });
+    }
+
+    //返回
+    function cancel(){
+        CloseWindow("onCancel");
+    }
+</script>
+<!--#end-->

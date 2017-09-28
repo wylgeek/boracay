@@ -29,6 +29,10 @@ public class McCurrentService extends BaseService {
      * 并发信息的KEY
      */
     private static final String MC_CURRENT_KEY = "CURRENT";
+    /**
+     *
+     */
+    private static final String MC_WAIT_KEY = "WAIT";
 
     /**
      * 本机IP
@@ -47,6 +51,15 @@ public class McCurrentService extends BaseService {
         return "";
     }
 
+    @Transactional
+    public String insertWaitQueue(McCurrent mcCurrent) {
+        mcCurrent.setHost(HOST_KEY);
+        if (mcCurrentMapper.insert(MC_WAIT_KEY + ":" + HOST_KEY + ":" + mcCurrent.getPkId(), mcCurrent)) {
+            return mcCurrent.getPkId();
+        }
+        return "";
+    }
+
     /**
      * 删除本机器的并发记录
      *
@@ -56,6 +69,11 @@ public class McCurrentService extends BaseService {
     @Transactional
     public boolean delete(String pkId) {
         return mcCurrentMapper.delete(MC_CURRENT_KEY + ":" + HOST_KEY + ":" + pkId);
+    }
+
+    @Transactional
+    public boolean deleteWaitQueue(String pkId) {
+        return mcCurrentMapper.delete(MC_WAIT_KEY + ":" + HOST_KEY + ":" + pkId);
     }
 
     /**
@@ -70,12 +88,43 @@ public class McCurrentService extends BaseService {
         return mcCurrentMapper.delete(MC_CURRENT_KEY + ":" + hostKey + ":" + pkId);
     }
 
+    @Transactional
+    public boolean deleteWaitQueue(String hostKey, String pkId) {
+        return mcCurrentMapper.delete(MC_WAIT_KEY + ":" + hostKey + ":" + pkId);
+    }
+
     public McCurrent select(String pkId) {
         return mcCurrentMapper.select(MC_CURRENT_KEY + ":" + HOST_KEY + ":" + pkId);
     }
 
+    public McCurrent selectWaitQueue(String pkId) {
+        return mcCurrentMapper.select(MC_WAIT_KEY + ":" + HOST_KEY + ":" + pkId);
+    }
+
     public List<McCurrent> select(McCurrentView mcCurrentView) {
-        return this.selectJob(mcCurrentView);
+        return this.selectJob(mcCurrentView, MC_CURRENT_KEY);
+    }
+
+    /**
+     * 查询执行队列
+     *
+     * @param mcCurrentView
+     * @param page
+     * @return
+     */
+    public PageListResult select(McCurrentView mcCurrentView, Page page) {
+        return this.select(mcCurrentView, page, MC_CURRENT_KEY);
+    }
+
+    /**
+     * 查询缓存队列
+     *
+     * @param mcCurrentView
+     * @param page
+     * @return
+     */
+    public PageListResult selectWaitQueue(McCurrentView mcCurrentView, Page page) {
+        return this.select(mcCurrentView, page, MC_WAIT_KEY);
     }
 
     /**
@@ -85,8 +134,8 @@ public class McCurrentService extends BaseService {
      * @param page
      * @return
      */
-    public PageListResult select(McCurrentView mcCurrentView, Page page) {
-        List<McCurrent> mcCurrentList = select(mcCurrentView);
+    public PageListResult select(McCurrentView mcCurrentView, Page page, String selectType) {
+        List<McCurrent> mcCurrentList = selectJob(mcCurrentView, selectType);
         int pageIndex = page.getPageIndex();
         int pageSize = page.getPageSize();
         int befNum = pageSize * (pageIndex - 1); // 不需要显示的数据条数
@@ -116,7 +165,7 @@ public class McCurrentService extends BaseService {
      * @param mcCurrentView
      * @return
      */
-    public List<McCurrent> selectJob(McCurrentView mcCurrentView) {
+    public List<McCurrent> selectJob(McCurrentView mcCurrentView, String selectType) {
         String serviceName = mcCurrentView.getServiceName();
         String userName = mcCurrentView.getUserName();
         String requestContent = mcCurrentView.getRequestContent();
@@ -128,7 +177,7 @@ public class McCurrentService extends BaseService {
         //解决ConcurrentModificationException
         List<McCurrent> mcCurrentList = new CopyOnWriteArrayList<McCurrent>();
 
-        List<McCurrent> tempList = this.selectCacheLike(MC_CURRENT_KEY + ":");
+        List<McCurrent> tempList = this.selectCacheLike(selectType + ":");
         if (tempList == null || tempList.size() == 0) {
             return null;
         }

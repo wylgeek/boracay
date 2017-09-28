@@ -1,6 +1,8 @@
 package com.hex.bigdata.udsp.rc.service;
 
 import com.hex.bigdata.udsp.common.constant.ComExcelEnums;
+import com.hex.bigdata.udsp.common.constant.CommonConstant;
+import com.hex.bigdata.udsp.common.constant.DatasourceModel;
 import com.hex.bigdata.udsp.common.constant.DatasourceType;
 import com.hex.bigdata.udsp.common.dto.ComDatasourceView;
 import com.hex.bigdata.udsp.common.model.ComUploadExcelContent;
@@ -31,6 +33,7 @@ import com.hex.goframe.model.Page;
 import com.hex.goframe.util.DateUtil;
 import com.hex.goframe.util.FileUtil;
 import com.hex.goframe.util.Util;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -83,7 +86,7 @@ public class RcServiceService {
     private OLQApplicationService olqApplicationService;
 
 
-        /**
+    /**
      * 服务授权
      */
     @Autowired
@@ -195,7 +198,7 @@ public class RcServiceService {
     }
 
     /**
-     * 通过服务名获取服务信息
+     * 通过服务名获取服务信息（查询出启用状态的服务）
      * <p/>
      * （内存中有则从内存获取）
      *
@@ -253,7 +256,7 @@ public class RcServiceService {
             searchList = this.iqApplicationService.select(new IqApplicationView());
         } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ.equals(type)) {
             ComDatasourceView datasourceView = new ComDatasourceView();
-            datasourceView.setModel(DatasourceType.OLQ.getValue());
+            datasourceView.setModel(DatasourceModel.OLQ.getValue());
             searchList = comDatasourceService.select(datasourceView);
         } else if (RcConstant.UDSP_SERVICE_TYPE_MM.equals(type)) {
             searchList = mmApplicationService.selectAll();
@@ -261,9 +264,9 @@ public class RcServiceService {
             searchList = this.rtsProducerService.select(new RtsProducerView());
         } else if (RcConstant.UDSP_SERVICE_TYPE_RTS_CONSUMER.equals(type)) {
             searchList = this.rtsConsumerService.select(new RtsConsumerView());
-        } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ_APP.equals(type)){
+        } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ_APP.equals(type)) {
             searchList = this.olqApplicationService.selectAll();
-        }else {
+        } else {
             searchList = null;
         }
         return searchList;
@@ -303,8 +306,8 @@ public class RcServiceService {
                 message.append(rcService.getName()).append(",");
             }
         }
-        if (!checkFlg){
-            message.deleteCharAt(message.length()-1).append("等服务有对应的服务授权信息，不予删除！");
+        if (!checkFlg) {
+            message.deleteCharAt(message.length() - 1).append("等服务有对应的服务授权信息，不予删除！");
         }
         return new MessageResult(checkFlg, message.toString());
     }
@@ -323,14 +326,14 @@ public class RcServiceService {
 
     public Map<String, String> checkApplicationsUsed(String model, Map<String, String>[] applications) {
         Map<String, String> returnMap = null;
-        for(Map<String, String> application : applications ){
-            if(checkAppIdAndType(model,application.get("pkId"))){
+        for (Map<String, String> application : applications) {
+            if (checkAppIdAndType(model, application.get("pkId"))) {
                 returnMap = new HashMap<>(2);
-                returnMap.put("status","true");
-                if("OLQ".equals(model)){
-                    returnMap.put("message","名称为："+application.get("name")+"数据源已被应用！");
-                }else{
-                    returnMap.put("message","名称为："+application.get("name")+"应用已被注册！");
+                returnMap.put("status", "true");
+                if ("OLQ".equals(model)) {
+                    returnMap.put("message", "名称为：" + application.get("name") + "数据源已被应用！");
+                } else {
+                    returnMap.put("message", "名称为：" + application.get("name") + "应用已被注册！");
                 }
                 break;
             }
@@ -339,12 +342,35 @@ public class RcServiceService {
     }
 
     /**
+     * 改变服务状态
+     *
+     * @param rcServices
+     * @param status
+     * @return
+     */
+    @Transactional
+    public boolean statusChange(RcService[] rcServices, String status) {
+        boolean flag = true;
+        for (RcService item : rcServices) {
+            item = this.select(item.getPkId());
+            item.setStatus(status);
+            boolean delFlg = this.rcServiceMapper.update(item.getPkId(),item);
+            if (!delFlg) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+
+    /**
      * 数据源excel文件导入
+     *
      * @param uploadFilePath
      * @return
      */
     public Map<String, String> uploadExcel(String uploadFilePath) {
-        Map resultMap = new HashMap<String,String>(2);
+        Map resultMap = new HashMap<String, String>(2);
         File uploadFile = new File(uploadFilePath);
         FileInputStream in = null;
         try {
@@ -360,73 +386,86 @@ public class RcServiceService {
             HSSFSheet sheet;
             sheet = hfb.getSheetAt(0);
 
-            Map<String,List> uploadExcelModel = ExcelUploadhelper.getUploadExcelModel(sheet, dataSourceContent);
-            List<RcService> rcServices = (List<RcService>)uploadExcelModel.get("com.hex.bigdata.udsp.rc.model.RcService");
+            Map<String, List> uploadExcelModel = ExcelUploadhelper.getUploadExcelModel(sheet, dataSourceContent);
+            List<RcService> rcServices = (List<RcService>) uploadExcelModel.get("com.hex.bigdata.udsp.rc.model.RcService");
             String inseResult;
             String type;
             String serviceName;
             int i = 1;
-            for (RcService rcService : rcServices){
-                if(rcServiceMapper.selectByName(rcService.getName()) != null){
-                    resultMap.put("status","false");
-                    resultMap.put("message","第"+i+"个名称重复！");
+            for (RcService rcService : rcServices) {
+                if (rcServiceMapper.selectByName(rcService.getName()) != null) {
+                    resultMap.put("status", "false");
+                    resultMap.put("message", "第" + i + "个名称重复！");
                     break;
                 }
                 //跟新应用id
                 type = rcService.getType();
                 serviceName = rcService.getAppId();
                 if (RcConstant.UDSP_SERVICE_TYPE_IQ.equals(type)) {
-                    if(this.iqApplicationService.selectByName(serviceName) == null){
-                        resultMap.put("status","false");
-                        resultMap.put("message","第"+i+"个应用名称不存在！");
+                    if (this.iqApplicationService.selectByName(serviceName) == null) {
+                        resultMap.put("status", "false");
+                        resultMap.put("message", "第" + i + "个应用名称不存在！");
                         break;
                     }
                     rcService.setAppId(this.iqApplicationService.selectByName(serviceName).getPkId());
                 } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ.equals(type)) {
-                    if(comDatasourceService.selectByModelAndName("OLQ",serviceName) == null){
-                        resultMap.put("status","false");
-                        resultMap.put("message","第"+i+"个应用名称不存在！");
+                    if (comDatasourceService.selectByModelAndName("OLQ", serviceName) == null) {
+                        resultMap.put("status", "false");
+                        resultMap.put("message", "第" + i + "个应用名称不存在！");
                         break;
                     }
-                    rcService.setAppId(comDatasourceService.selectByModelAndName("OLQ",serviceName).getPkId());
+                    rcService.setAppId(comDatasourceService.selectByModelAndName("OLQ", serviceName).getPkId());
                 } else if (RcConstant.UDSP_SERVICE_TYPE_MM.equals(type)) {
-                    if(mmApplicationMapper.selectByName(serviceName) == null){
-                        resultMap.put("status","false");
-                        resultMap.put("message","第"+i+"个应用名称不存在！");
+                    if (mmApplicationMapper.selectByName(serviceName) == null) {
+                        resultMap.put("status", "false");
+                        resultMap.put("message", "第" + i + "个应用名称不存在！");
                         break;
                     }
                     rcService.setAppId(mmApplicationMapper.selectByName(serviceName).getPkId());
                 } else if (RcConstant.UDSP_SERVICE_TYPE_RTS_PRODUCER.equals(type)) {
-                    if(rtsProducerMapper.selectByName(serviceName) == null){
-                        resultMap.put("status","false");
-                        resultMap.put("message","第"+i+"个应用名称不存在！");
+                    if (rtsProducerMapper.selectByName(serviceName) == null) {
+                        resultMap.put("status", "false");
+                        resultMap.put("message", "第" + i + "个应用名称不存在！");
                         break;
                     }
                     rcService.setAppId(rtsProducerMapper.selectByName(serviceName).getPkId());
                 } else if (RcConstant.UDSP_SERVICE_TYPE_RTS_CONSUMER.equals(type)) {
-                    if(rtsConsumerMapper.selectByName(serviceName) == null){
-                        resultMap.put("status","false");
-                        resultMap.put("message","第"+i+"个应用名称不存在！");
+                    if (rtsConsumerMapper.selectByName(serviceName) == null) {
+                        resultMap.put("status", "false");
+                        resultMap.put("message", "第" + i + "个应用名称不存在！");
                         break;
                     }
                     rcService.setAppId(rtsConsumerMapper.selectByName(serviceName).getPkId());
                 }
-                inseResult = insert(rcService);
-                if(inseResult != null){
-                    resultMap.put("status","true");
-                }else{
-                    resultMap.put("status","false");
-                    resultMap.put("message","第"+i+"个保存失败！");
+                //如果服务状态为空则
+                if (StringUtils.isBlank(rcService.getStatus())) {
+                    rcService.setStatus(CommonConstant.SERVICE_STATUS_ENABLED);
+                } else if (CommonConstant.SERVICE_STATUS_ENABLED_TEXT.equals(rcService.getStatus())) {
+                    rcService.setStatus(CommonConstant.SERVICE_STATUS_ENABLED);
+                } else if (CommonConstant.SERVICE_STATUS_DISABLED_TEXT.equals(rcService.getStatus())) {
+                    rcService.setStatus(CommonConstant.SERVICE_STATUS_DISABLED);
+                } else {
+                    resultMap.put("status", "false");
+                    resultMap.put("message", "第" + i + "个服务状态填写不正确！");
                     break;
                 }
-                i ++;
+
+                inseResult = insert(rcService);
+                if (inseResult != null) {
+                    resultMap.put("status", "true");
+                } else {
+                    resultMap.put("status", "false");
+                    resultMap.put("message", "第" + i + "个保存失败！");
+                    break;
+                }
+                i++;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            resultMap.put("status","false");
-            resultMap.put("message","程序内部异常：" + e.getMessage());
-        }finally {
-            if(in != null){
+            resultMap.put("status", "false");
+            resultMap.put("message", "程序内部异常：" + e.getMessage());
+        } finally {
+            if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
@@ -449,7 +488,7 @@ public class RcServiceService {
         String templateFile = ExcelCopyUtils.templatePath + seprator + "downLoadTemplate_rcService.xls";
         // 下载地址
         String dirPath = CreateFileUtil.getLocalDirPath();
-        dirPath += seprator+"download_rcService_excel_"+ DateUtil.format(new Date(), "yyyyMMddHHmmss")+".xls";
+        dirPath += seprator + "download_rcService_excel_" + DateUtil.format(new Date(), "yyyyMMddHHmmss") + ".xls";
         // 获取模板文件第一个Sheet对象
         POIFSFileSystem sourceFile = null;
 
@@ -470,12 +509,12 @@ public class RcServiceService {
         int i = 1;
         String type;
         String serviceName;
-        for(RcService rcService : rcServices){
+        for (RcService rcService : rcServices) {
             //设置内容
-            RcService rcService1 = rcServiceMapper.select(rcService.getPkId());
+            RcService rcServiceTemp = rcServiceMapper.select(rcService.getPkId());
 
-            type = rcService.getType();
-            serviceName = rcService.getAppId();
+            type = rcServiceTemp.getType();
+            serviceName = rcServiceTemp.getAppId();
             if (RcConstant.UDSP_SERVICE_TYPE_IQ.equals(type)) {
                 rcService.setAppId(this.iqApplicationService.select(serviceName).getName());
             } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ.equals(type)) {
@@ -492,13 +531,19 @@ public class RcServiceService {
             cell = row.createCell(0);
             cell.setCellValue(i);
             cell = row.createCell(1);
-            cell.setCellValue(rcService1.getName());
+            cell.setCellValue(rcServiceTemp.getName());
             cell = row.createCell(2);
-            cell.setCellValue(rcService1.getType());
+            cell.setCellValue(rcServiceTemp.getType());
             cell = row.createCell(3);
-            cell.setCellValue(rcService1.getAppId());
+            cell.setCellValue(rcService.getAppId());
             cell = row.createCell(4);
-            cell.setCellValue(rcService1.getDescribe());
+            cell.setCellValue(rcServiceTemp.getDescribe());
+            cell = row.createCell(5);
+            if (CommonConstant.SERVICE_STATUS_ENABLED.equals(rcServiceTemp.getStatus())) {
+                cell.setCellValue(CommonConstant.SERVICE_STATUS_ENABLED_TEXT);
+            } else {
+                cell.setCellValue(CommonConstant.SERVICE_STATUS_DISABLED_TEXT);
+            }
             i++;
         }
         if (workbook != null) {
@@ -513,4 +558,6 @@ public class RcServiceService {
         }
         return null;
     }
+
+
 }

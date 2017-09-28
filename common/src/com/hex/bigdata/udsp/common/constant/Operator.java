@@ -1,5 +1,7 @@
 package com.hex.bigdata.udsp.common.constant;
 
+import org.apache.zookeeper.Op;
+
 /**
  * 操作符
  */
@@ -36,5 +38,41 @@ public enum Operator {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public static Operator getOperatorByValue(String value) {
+        Operator operator = null;
+        switch (value){
+            case "==":
+                operator = EQ;
+                break;
+            case  ">" :
+                operator = GT;
+                break;
+            case "<" :
+                operator = LT;
+                break;
+            case ">=" :
+                operator = GE;
+                break;
+            case "<=" :
+                operator = LE;
+                break;
+            case "!=" :
+                operator = NE;
+                break;
+            case "like" :
+                operator = LK;
+                break;
+            case "in" :
+                operator = IN;
+                break;
+            case "right like" :
+                operator = RLIKE;
+                break;
+            default:
+                operator = null;
+        }
+        return operator;
     }
 }

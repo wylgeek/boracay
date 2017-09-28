@@ -110,4 +110,58 @@ public class McCurrentController extends BaseController {
         return new MessageResult(status, message);
     }
 
+
+    /**
+     * 缓冲队列分页查询
+     * @param mcCurrentView
+     * @param page
+     * @return
+     */
+    @RequestMapping({"/waitQueuePage"})
+    @ResponseBody
+    public PageListResult waitQueuePage(McCurrentView mcCurrentView, Page page) {
+        logger.debug("select search=" + JSONUtil.parseObj2JSON(mcCurrentView) + " page=" + JSONUtil.parseObj2JSON(page));
+        PageListResult result = null;
+        try {
+            result = mcCurrentNewService.selectWaitQueue(mcCurrentView, page);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("系统异常：" + e);
+        }
+        return result;
+    }
+
+    /**
+     * 缓冲队列单个任务查询
+     * @param pkId
+     * @return
+     */
+    @RequestMapping({"/waitQueueSelectByPkId/{pkId}"})
+    @ResponseBody
+    public MessageResult waitQueueSelectByPkId(@PathVariable("pkId") String pkId) {
+        boolean status = true;
+        String message = "查询成功";
+        McCurrent mcCurrent = null;
+        if (StringUtils.isBlank(pkId)) {
+            status = false;
+            message = "请求参数为空";
+        } else {
+            try {
+                mcCurrent = mcCurrentNewService.selectWaitQueue(pkId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                status = false;
+                message = "系统异常：" + e;
+            }
+        }
+        if (status) {
+            logger.debug(message);
+        } else {
+            logger.error(message);
+        }
+        return new MessageResult(status, message, mcCurrent);
+    }
+
+
+
 }

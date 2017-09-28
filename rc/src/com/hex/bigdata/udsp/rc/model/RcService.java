@@ -23,6 +23,11 @@ public class RcService implements Serializable {
 
     private String uptTime;
 
+    /**
+     * 启停标志（0：启动，1：停用）
+     */
+    private String status;
+
     public String getPkId() {
         return pkId;
     }
@@ -101,5 +106,13 @@ public class RcService implements Serializable {
 
     public void setUptTime(String uptTime) {
         this.uptTime = uptTime;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

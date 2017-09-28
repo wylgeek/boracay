@@ -211,6 +211,34 @@ public class RcServiceController extends BaseController {
         return new MessageResult(status, message);
     }
 
+
+    @RequestMapping("/shangeStatus/{serviceStatus}")
+    @ResponseBody
+    public MessageResult serviceStatus(@PathVariable("serviceStatus") String serviceStatus,@RequestBody RcService[] rcServices) {
+        boolean status = true;
+        String message = "服务状态修改成功";
+        if (rcServices.length == 0) {
+            status = false;
+            message = "请求参数为空";
+        }
+        try {
+            if (!rcServiceService.statusChange(rcServices,serviceStatus)) {
+                status = false;
+                message = "服务状态修改失败";
+            }
+        } catch (Exception e) {
+            status = false;
+            message = "系统异常：" + e.getMessage();
+        }
+        if (status) {
+            logger.debug(message);
+        } else {
+            logger.warn(message);
+        }
+        return new MessageResult(status, message);
+    }
+
+
     @RequestMapping({"/selectApps/{type}"})
     @ResponseBody
     public MessageResult selectApps(@PathVariable("type") String type) {

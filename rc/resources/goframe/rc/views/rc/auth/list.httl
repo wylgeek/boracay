@@ -216,8 +216,8 @@ ${extends("/goframe/function_layout.httl")}
         nui.open({
             url: "${basePath}/goframe/p/rc.auth.add",
             title: "添加",
-            width: 680,
-            height: 360,
+            width: 900,
+            height: 420,
             onload: function () {
             },
             ondestroy: function (action) {
@@ -235,8 +235,8 @@ ${extends("/goframe/function_layout.httl")}
         nui.open({
             url: "${basePath}/goframe/p/rc.auth.addBatch",
             title: "添加",
-            width: 680,
-            height: 360,
+            width: 900,
+            height: 420,
             onload: function () {
             },
             ondestroy: function (action) {
@@ -260,8 +260,8 @@ ${extends("/goframe/function_layout.httl")}
         nui.open({
             url: "${basePath}/goframe/p/rc.auth.edit?pkId=" + row.pkId,
             title: "编辑",
-            width: 680,
-            height: 360,
+            width: 900,
+            height: 420,
             onload: function () {
             },
             ondestroy: function (action) {
@@ -327,8 +327,8 @@ ${extends("/goframe/function_layout.httl")}
         nui.open({
             url: "${basePath}/goframe/p/rc.auth.info/?pkId=" + pkId,
             title: title,
-            width: 680,
-            height: 360,
+            width: 900,
+            height: 480,
             onload: function () {
             },
             ondestroy: function (action) {
@@ -350,8 +350,8 @@ ${extends("/goframe/function_layout.httl")}
         nui.open({
             url: "${basePath}/goframe/p/rc.auth.info/?pkId=" + row.pkId,
             title: "详情-" + userName + "-" + serviceName + "服务",
-            width: 800,
-            height: 360,
+            width: 900,
+            height: 480,
             onload: function () {
             },
             ondestroy: function (action) {

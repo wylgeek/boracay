@@ -126,7 +126,7 @@ ${extends("/goframe/function_layout.httl")}
             <div type="checkcolumn" width="20"></div>
             <div field="name" headerAlign="center" allowSort="true">名称</div>
             <div field="describe" headerAlign="center" allowSort="true">说明</div>
-            <div field="dsName" headerAlign="center" allowSort="true" >数据源名称</div>
+            <div field="dsName" headerAlign="center" allowSort="true" renderer="dsRenderer">数据源</div>
             <div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat">创建时间</div>
             <div field="uptTime" headerAlign="center" allowSort="true" renderer="timeFormat">更新时间</div>
             <div field="note" headerAlign="center" allowSort="true">备注</div>
@@ -446,6 +446,33 @@ ${extends("/goframe/function_layout.httl")}
                     nui.alert("导出Excel失败", "系统提示");
                 }
                 grid1.unmask();
+            }
+        });
+    }
+
+    /**
+     * 数据源渲染
+     * @param e
+     * @returns {string}
+     */
+    function dsRenderer(e){
+        return "<a href='#' class='underline' onclick='showDatabaseInfo(\""+e.row.dsId+"\",\""+e.row.dsName+"\")'>"+e.row.dsName+"</a>";
+    }
+
+    /**
+     * 显示数据源信息
+     * @param pkId
+     * @param dbName
+     */
+    function showDatabaseInfo(dsId, dsName){
+        nui.open({
+            url: "${basePath}/goframe/p/com.ds.info/?pkId=" + dsId + "&model=OLQ",
+            title: "详情-" + dsName,
+            width: 800,
+            height: 600,
+            onload: function () {
+            },
+            ondestroy: function (action) {
             }
         });
     }

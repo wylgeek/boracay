@@ -656,7 +656,6 @@ public class RcUserServiceService extends BaseService {
         try {
             sourceFile = new POIFSFileSystem(new FileInputStream(
                     templateFile));
-
             sourceWork = new HSSFWorkbook(sourceFile);
             sourceSheet = sourceWork.getSheetAt(0);
             //创建表格
@@ -686,6 +685,18 @@ public class RcUserServiceService extends BaseService {
             cell.setCellValue(rcService1.getMaxSyncNum());
             cell = row.createCell(5);
             cell.setCellValue(rcService1.getMaxAsyncNum());
+            cell = row.createCell(6);
+            cell.setCellValue(rcService1.getMaxSyncWaitNum());
+            cell = row.createCell(7);
+            cell.setCellValue(rcService1.getMaxAsyncWaitNum());
+            cell = row.createCell(8);
+            cell.setCellValue(rcService1.getMaxSyncWaitTimeout());
+            cell = row.createCell(9);
+            cell.setCellValue(rcService1.getMaxAsyncWaitTimeout());
+            cell = row.createCell(10);
+            cell.setCellValue(rcService1.getMaxSyncExecuteTimeout());
+            cell = row.createCell(11);
+            cell.setCellValue(rcService1.getMaxAsyncExecuteTimeout());
             i++;
         }
         if (workbook != null) {

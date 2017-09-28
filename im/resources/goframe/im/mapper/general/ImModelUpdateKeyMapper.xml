@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.im.dao.ImModelUpdateKeyMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.im.model.ImModelUpdateKey" >
+    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+    <result column="COL_ID" property="colId" jdbcType="VARCHAR" />
+    <result column="MODEL_ID" property="modelId" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from IM_MODEL_UPDATE_KEY
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hex.bigdata.udsp.im.model.ImModelUpdateKey" >
+    insert into IM_MODEL_UPDATE_KEY (PK_ID, COL_ID, MODEL_ID
+      )
+    values (#{pkId,jdbcType=VARCHAR}, #{colId,jdbcType=VARCHAR}, #{modelId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.im.model.ImModelUpdateKey" >
+    update IM_MODEL_UPDATE_KEY
+    set COL_ID = #{colId,jdbcType=VARCHAR},
+      MODEL_ID = #{modelId,jdbcType=VARCHAR}
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, COL_ID, MODEL_ID
+    from IM_MODEL_UPDATE_KEY
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select PK_ID, COL_ID, MODEL_ID
+    from IM_MODEL_UPDATE_KEY
+  </select>
+
+  <delete id="deleteByMid" parameterType="java.lang.String">
+    DELETE  FROM IM_MODEL_UPDATE_KEY
+    WHERE MODEL_ID = #{mid}
+  </delete>
+</mapper>

@@ -14,15 +14,13 @@ ${extends("/goframe/function_layout.httl")}
                     <th class="nui-form-label"><label for="mdId">元数据：</label></th>
                     <td>
                         <div id="mdId" class="nui-combobox" style="width:97%;"  popupWidth="400" textField="name" valueField="pkId"
-                             url="${basePath}/iq/md/select" dataField="data" name="mdId" multiSelect="false"   required="true" onvaluechanged="mdIdChanged">
+                             url="${basePath}/iq/md/select" dataField="data" name="mdId" multiSelect="false" allowInput="true"
+                             required="true" onvaluechanged="mdIdChanged">
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
                             </div>
                         </div>
-                        <!--<input id="mdId" name="mdId" class="nui-combobox" valueField="pkId" textField="name"
-                               dataField="data" url="${basePath}/iq/md/select" allowInput="true"
-                               style="width:97%" onvaluechanged="mdIdChanged" required="true"/>-->
                     </td>
                 </tr>
                 <tr>
