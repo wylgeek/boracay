@@ -32,22 +32,21 @@ public class HttpTestRunable implements Runnable{
 
     @Override
     public void run() {
-        httpJsonTest_olpAsyncStart();
-        //httpJsonTest_olpAsyncStatus();
+        //httpJsonTest_olpAsyncStart();
+        httpJsonTest_olpSyncStatus();
     }
 
-    private void httpJsonTest_olpAsyncStatus(){
-        String url="http://10.1.40.134:8088/udsp/http//consume";
-        ExternalRequest externalRequest=new ExternalRequest();
-        externalRequest.setServiceName("core02");
-        externalRequest.setAppUser("CORE");
-        externalRequest.setEntity("STATUS");
-        externalRequest.setType("ASYNC");
+    private void httpJsonTest_olpSyncStatus(){
+        String url = "http://127.0.0.1:8088/udsp/http//consume";
+        ExternalRequest externalRequest = new ExternalRequest();
+        externalRequest.setServiceName("tomnic_mysql");
+        externalRequest.setAppUser("10071");
+        externalRequest.setEntity("START");
+        externalRequest.setType("SYNC");
 
-        externalRequest.setUdspUser("admin");
+        externalRequest.setUdspUser("tomnic");
         externalRequest.setToken("000000");
-        externalRequest.setAppUser("tomnic");
-        externalRequest.setConsumeId("79391dcf06be630a05243fbe03bec0be_76adea884bb649aba28b91c3e76de7a2");
+        externalRequest.setSql("select * from school.tb_user t");
         this.requestUdsp(externalRequest,url);
     }
 

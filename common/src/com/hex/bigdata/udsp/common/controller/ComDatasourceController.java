@@ -6,7 +6,6 @@ import com.hex.bigdata.udsp.common.model.ComDatasource;
 import com.hex.bigdata.udsp.common.service.ComDatasourceService;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.goframe.controller.BaseController;
-import com.hex.goframe.model.GFDict;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.model.PageListResult;
@@ -63,38 +62,6 @@ public class ComDatasourceController extends BaseController {
             logger.error("系统异常：" + e);
         }
         return new PageListResult(list);
-    }
-
-    /**
-     * 获取所有源数据源
-     * @return
-     */
-    @RequestMapping({"/selectAllSrc"})
-    @ResponseBody
-    public PageListResult selectAll() {
-        List<ComDatasource> list = null;
-        try {
-            list = comDatasourceService.selectAllSrc();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("系统异常：" + e);
-        }
-        return new PageListResult(list);
-    }
-
-    @ResponseBody
-    @RequestMapping({"selectParameters/{sourceId}"})
-    public List<GFDict> selectParameterBySourceId(@PathVariable("sourceId") String sourceId){
-
-        return comDatasourceService.selectParameterBySourceId(sourceId);
-    }
-
-
-    @ResponseBody
-    @RequestMapping({"checkSourceType/{sourceId}"})
-    public MessageResult  checkSourceType(@PathVariable("sourceId") String sourceId){
-
-        return new MessageResult(true, "",comDatasourceService.checkSourceType(sourceId));
     }
 
     @RequestMapping({"/insert"})
@@ -286,24 +253,6 @@ public class ComDatasourceController extends BaseController {
             e.printStackTrace();
         }
         return filePath;
-    }
-
-
-    /**
-     * 获取所有引擎数据源
-     * @return
-     */
-    @RequestMapping({"/selectEDs"})
-    @ResponseBody
-    public PageListResult selectEDs() {
-        List<ComDatasource> list = null;
-        try {
-            list = comDatasourceService.selectEDs();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("系统异常：" + e);
-        }
-        return new PageListResult(list);
     }
 
 }

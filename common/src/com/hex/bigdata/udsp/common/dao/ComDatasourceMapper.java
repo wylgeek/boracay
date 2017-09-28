@@ -3,7 +3,6 @@ package com.hex.bigdata.udsp.common.dao;
 import com.hex.bigdata.udsp.common.dao.base.SyncMapper;
 import com.hex.bigdata.udsp.common.dto.ComDatasourceView;
 import com.hex.bigdata.udsp.common.model.ComDatasource;
-import com.hex.goframe.model.GFDict;
 import com.hex.goframe.model.Page;
 import org.springframework.stereotype.Repository;
 
@@ -62,25 +61,5 @@ public class ComDatasourceMapper extends SyncMapper<ComDatasource> {
         comDatasource.setModel(model);
         comDatasource.setName(name);
         return this.sqlSessionTemplate.selectOne("com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.selectByModelAndName", comDatasource);
-    }
-
-    public List<GFDict> selectParameterBySourceId(String sourceId) {
-        return sqlSessionTemplate.selectList(
-                "com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.selectParameterBySourceId", sourceId);
-    }
-
-    public List<ComDatasource> selectAllSrc() {
-        return sqlSessionTemplate.selectList(
-                "com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.selectAllSrc");
-    }
-
-    public boolean checkSourceType(String sourceId) {
-
-        return sqlSessionTemplate.selectList(
-                "com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.checkSourceType",sourceId).size() > 0;
-    }
-
-    public List<ComDatasource> selectEDs() {
-        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.selectEDs");
     }
 }

@@ -15,19 +15,6 @@
     <result column="IMPL_CLASS" property="implClass" jdbcType="VARCHAR" />
     <result column="MODEL" property="model" jdbcType="VARCHAR" />
   </resultMap>
-
-  <resultMap id="GFDict" type="com.hex.goframe.model.GFDict" >
-    <id column="DICT_TYPE_ID" property="dictTypeId" jdbcType="VARCHAR" />
-    <result column="DICT_ID" property="dictId" jdbcType="VARCHAR" />
-    <result column="DICT_NAME" property="dictName" jdbcType="VARCHAR" />
-    <result column="STATUS" property="status" jdbcType="INTEGER" />
-    <result column="SORT_NO" property="sortNo" jdbcType="INTEGER" />
-    <result column="PARENT_ID" property="parentId" jdbcType="VARCHAR" />
-    <result column="SEQNO" property="seqno" jdbcType="VARCHAR" />
-    <result column="APPID" property="appid" jdbcType="VARCHAR" />
-    <result column="FILTER" property="filter" jdbcType="VARCHAR" />
-  </resultMap>
-
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from COM_DATASOURCE
     where PK_ID = #{pkId,jdbcType=VARCHAR}
@@ -72,88 +59,31 @@
     from COM_DATASOURCE
   </select>
   <select id="select" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.common.dto.ComDatasourceView" >
-    select A.PK_ID, A.NAME, A.DESCRIBE, A.TYPE, A.NOTE, A.DEL_FLG, A.CRT_USER, A.CRT_TIME, A.UPT_USER,
-    A.UPT_TIME, A.IMPL_CLASS, A.MODEL
-    from COM_DATASOURCE A
-    where A.DEL_FLG = '0'
-    <if test="pkId!='' and pkId!=null ">and A.PK_ID = #{pkId}</if>
-    <if test="name!='' and name!=null ">and A.NAME like '%' || #{name} || '%'</if>
-    <if test="describe!='' and describe!=null ">and A.DESCRIBE like '%' || #{describe} || '%'</if>
-    <if test="note!='' and note!=null ">and A.NOTE like '%' || #{note} || '%'</if>
-    <if test="type!='' and type!=null ">and A.TYPE = #{type}</if>
-    <if test="crtTimeStart!=null and crtTimeStart!='' ">and A.CRT_TIME >= #{crtTimeStart}</if>
-    <if test="crtTimeEnd!=null and crtTimeEnd!='' ">and #{crtTimeEnd} >= A.CRT_TIME</if>
-    <if test="uptTimeStart!=null and uptTimeStart!='' ">and A.UPT_TIME >= #{uptTimeStart}</if>
-    <if test="uptTimeEnd!=null and uptTimeEnd!='' ">and #{uptTimeEnd} >= A.UPT_TIME</if>
-    <if test="crtUser!='' and crtUser!=null ">and A.CRT_USER like '%' || #{crtUser} || '%'</if>
-    <if test="uptUser!='' and uptUser!=null ">and A.UPT_USER like '%' || #{uptUser} || '%'</if>
-    <if test="implClass!='' and implClass!=null ">and A.IMPL_CLASS like '%' #{implClass} || '%'</if>
-    <if test="model!='' and model!=null ">and A.MODEL = #{model}</if>
-    <if test="model=='IM' and imDsTypeDictId!='' and imDsTypeDictId!=null">
-      and exists (select 1 from t_gf_dict b where b.dict_type_id = #{imDsTypeDictId} and A.type = b.dict_id)
-    </if>
+    select PK_ID, NAME, DESCRIBE, TYPE, NOTE, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER,
+    UPT_TIME, IMPL_CLASS, MODEL
+    from COM_DATASOURCE
+    where DEL_FLG = '0'
+    <if test="pkId!='' and pkId!=null ">and PK_ID = #{pkId}</if>
+    <if test="name!='' and name!=null ">and NAME like '%' || #{name} || '%'</if>
+    <if test="describe!='' and describe!=null ">and DESCRIBE like '%' || #{describe} || '%'</if>
+    <if test="note!='' and note!=null ">and NOTE like '%' || #{note} || '%'</if>
+    <if test="type!='' and type!=null ">and TYPE = #{type}</if>
+    <if test="crtTimeStart!=null and crtTimeStart!='' ">and CRT_TIME >= #{crtTimeStart}</if>
+    <if test="crtTimeEnd!=null and crtTimeEnd!='' ">and #{crtTimeEnd} >= CRT_TIME</if>
+    <if test="uptTimeStart!=null and uptTimeStart!='' ">and UPT_TIME >= #{uptTimeStart}</if>
+    <if test="uptTimeEnd!=null and uptTimeEnd!='' ">and #{uptTimeEnd} >= UPT_TIME</if>
+    <if test="crtUser!='' and crtUser!=null ">and CRT_USER like '%' || #{crtUser} || '%'</if>
+    <if test="uptUser!='' and uptUser!=null ">and UPT_USER like '%' || #{uptUser} || '%'</if>
+    <if test="implClass!='' and implClass!=null ">and IMPL_CLASS like '%' #{implClass} || '%'</if>
+    <if test="model!='' and model!=null ">and MODEL = #{model}</if>
     order by UPT_TIME desc, CRT_TIME desc, NAME asc
   </select>
   <select id="selectByModelAndName" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.common.model.ComDatasource" >
-    select A.PK_ID, A.NAME, A.DESCRIBE, A.TYPE, A.NOTE, A.DEL_FLG, A.CRT_USER, A.CRT_TIME, A.UPT_USER,
-    A.UPT_TIME, A.IMPL_CLASS, A.MODEL
-    from COM_DATASOURCE A
-    where A.DEL_FLG = '0'
-    and A.MODEL = #{model,jdbcType=VARCHAR}
-    and A.NAME = #{name,jdbcType=VARCHAR}
-  </select>
-
-  <select id="selectParameterBySourceId" parameterType="java.lang.String" resultMap="GFDict">
-    SELECT GFD.*
-	FROM T_GF_DICT GFD
-	LEFT JOIN COM_DATASOURCE CD
-		ON GFD.DICT_TYPE_ID = 'IM_MODEL_PROPS_'||CD.TYPE
-	WHERE CD.PK_ID = #{sourceId}
-    and  EXISTS (
-        select 1
-    from  T_GF_DICT GFD1
-    where (GFD1.DICT_TYPE_ID = 'IM_DS_SOURCE_REALTIME_TYPE'
-    or GFD1.DICT_TYPE_ID =  'IM_DS_SOURCE_BATCH_TYPE')
-    and GFD1.DICT_ID = CD.TYPE
-    )
-  </select>
-
-  <select id="selectAllSrc" resultMap="BaseResultMap">
     select PK_ID, NAME, DESCRIBE, TYPE, NOTE, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER,
     UPT_TIME, IMPL_CLASS, MODEL
-    from COM_DATASOURCE CD
-    where CD.DEL_FLG = '0'
-    and CD.MODEL = 'IM'
-    and  EXISTS (
-    select 1
-    from  T_GF_DICT GFD1
-    where (GFD1.DICT_TYPE_ID = 'IM_DS_SOURCE_REALTIME_TYPE'
-    or GFD1.DICT_TYPE_ID =  'IM_DS_SOURCE_BATCH_TYPE')
-    and GFD1.DICT_ID = CD.TYPE
-    )
-  </select>
-
-
-  <select id="checkSourceType" resultMap="GFDict" parameterType="java.lang.String">
-    select *
-    from T_GF_DICT GFD1
-    left join COM_DATASOURCE CD
-    on CD.TYPE = GFD1.DICT_ID
-    where GFD1.DICT_TYPE_ID = 'IM_DS_SOURCE_REALTIME_TYPE'
-    and CD.PK_ID = #{sourceId}
-  </select>
-
-  <select id="selectEDs" resultMap="BaseResultMap">
-    select PK_ID, NAME, DESCRIBE, TYPE, NOTE, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER,
-    UPT_TIME, IMPL_CLASS, MODEL
-    from COM_DATASOURCE CD
-    where CD.DEL_FLG = '0'
-    and CD.MODEL = 'IM'
-    and  EXISTS (
-    select 1
-    from  T_GF_DICT GFD1
-    where GFD1.DICT_TYPE_ID = 'IM_MODEL_ENGINE_TYPE'
-    and GFD1.DICT_ID = CD.TYPE
-    )
+    from COM_DATASOURCE
+    where DEL_FLG = '0'
+    and MODEL = #{model,jdbcType=VARCHAR}
+    and NAME = #{name,jdbcType=VARCHAR}
   </select>
 </mapper>

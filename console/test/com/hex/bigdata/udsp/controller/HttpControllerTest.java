@@ -43,7 +43,7 @@ public class HttpControllerTest {
         //联机查询异步status
         //test.httpJsonTest_olpAsyncStatus();
         //联机查询同步start
-        test.httpJsonTest_olpSyncStart();
+        //test.httpJsonTest_olpSyncStart();
 
         //交互查询同步start
         //test.httpJsonTest_iqSyncStart();
@@ -62,7 +62,7 @@ public class HttpControllerTest {
         //test.httpJsonTest_mmAsyncStart();
         //模型调用-异步-status
         //test.httpJsonTest_mmAsyncStatus();
-        //test.forTest();
+        test.forTest();
 
         //联机查询应用异步start
         //test.httpJsonTest_olpAppAsyncStart();
@@ -116,10 +116,10 @@ public class HttpControllerTest {
 
     public void forTest() {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        ExecutorService executorService = Executors.newFixedThreadPool(200);
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 50000; i++) {
+        for (int i = 0; i < 1; i++) {
             executorService.submit(new HttpTestRunable());
 //            try {
 //                Thread.sleep(200);
@@ -181,9 +181,6 @@ public class HttpControllerTest {
         externalRequest.setData(data);
         this.requestUdsp(externalRequest, url);
     }
-
-
-
 
 
     /**
@@ -257,17 +254,17 @@ public class HttpControllerTest {
      * 联机查询同步start
      */
     public void httpJsonTest_olpSyncStart() {
-        String url = "http://127.0.0.1:8090/udsp/http//consume";
+        String url = "http://127.0.0.1:8088/udsp/http//consume";
         ExternalRequest externalRequest = new ExternalRequest();
-        externalRequest.setServiceName("olq_pub_query");
+        externalRequest.setServiceName("test_oracle_service");
         externalRequest.setAppUser("10071");
         externalRequest.setEntity("START");
         externalRequest.setType("SYNC");
 
         externalRequest.setUdspUser("tomnic");
         externalRequest.setToken("000000");
-        externalRequest.setSql("select * from pqdata.v_omdata_s42_fy_query limit 1");
-        for (int i=0 ; i<10;i++){
+        externalRequest.setSql("select * from OLQ_APPLICATION t");
+        for (int i = 0; i < 10; i++) {
             this.requestUdsp(externalRequest, url);
         }
     }
@@ -373,7 +370,6 @@ public class HttpControllerTest {
             e.printStackTrace();
         }
     }
-
 
 
     public String analysisResponse(HttpResponse httpResponse) {
