@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<project default="jar" basedir="." name="udsp.olq">
+    <!-- 设置属性 -->
+    <property name="project.name" value="udsp.olq"/>
+    <property name="project.version" value="3.0.1"/>
+    <property name="company.name" value="HexInfo"/>
+
+    <!-- 工程名称 -->
+    <property name="prj.root" value="./"/>
+    <property name="lib" value="../lib"/>
+    <property name="jar.dir" value="../../lib/olq"/>
+
+    <property name="build.bin" value="${prj.root}/bin"/>
+
+
+    <taskdef name="mybatisGenerator" classname="org.mybatis.generator.ant.GeneratorAntTask" classpath="${lib}/tools/mybatis-generator-core-1.3.2.jar"/>
+
+    <target name="mybatisGeneratorMysql">
+        <mybatisGenerator configfile="${prj.root}/resources/goframe/olq/mapper/generator.oracle.config.xml" overwrite="true"  >
+        </mybatisGenerator>
+    </target>
+
+    <!-- class path	 -->
+    <path id="project.classpath" description="设置classpath">
+        <fileset dir="${lib}" >
+            <include name="**/*.jar"/>
+            <exclude name="*-src.jar"/>
+            <exclude name="*-sources.jar"/>
+            <exclude name="*-javadoc.jar"/>
+        </fileset>
+    </path>
+
+
+
+    <target name="compile"  description="编译">
+        <echo message="编译"/>
+        <mkdir dir="${build.bin}"/>
+        <javac srcdir="${prj.root}/src" destdir="${build.bin}" source="1.6" target="1.6" debug="true" encoding="UTF-8">
+            <classpath refid="project.classpath"/>
+        </javac>
+
+        <copy todir="${build.bin}">
+            <fileset dir="${prj.root}/resources">
+                <include name="**/*" />
+                <exclude name="**/mapper/generator.*.xml" />
+            </fileset>
+        </copy>
+
+    </target>
+
+
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+
+        <pathconvert property="mf.classpath" pathsep=" ">
+            <path refid="project.classpath"/>
+            <mapper>
+                <chainedmapper>
+                    <flattenmapper/>
+                    <globmapper from="*" to="*"/>
+                </chainedmapper>
+            </mapper>
+        </pathconvert>
+
+
+
+        <jar jarfile="${jar.dir}/${project.name}.jar" basedir="${build.bin}">
+             <manifest>
+                 <attribute name="Version" value="${project.version}" />
+                 <attribute name="Author" value="Hex"/>
+                 <attribute name="Company" value="${company.name}" />
+                 <attribute name="Class-Path" value="${mf.classpath}"/>
+             </manifest>
+        </jar>
+
+        <deltree dir="${build.bin}"/>
+
+    </target>
+
+
+
+    <target name="clean" description="清理可再生文件">
+        <echo message="清理可再生文件"/>
+        <mkdir dir="${build.bin}"/>
+    </target>
+
+</project>
