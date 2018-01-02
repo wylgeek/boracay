@@ -30,6 +30,26 @@ public class MysqlSqlUtil {
     }
 
     /**
+     * 清空表数据
+     *
+     * @param tableName
+     * @return
+     */
+    public static String truncateTable(String tableName) {
+        return "TRUNCATE TABLE " + tableName;
+    }
+
+    /**
+     * 删除所有数据
+     *
+     * @param tableName
+     * @return
+     */
+    public static String deleteAll(String tableName) {
+        return "DELETE FROM " + tableName;
+    }
+
+    /**
      * 删除表
      *
      * @param ifExists

@@ -105,6 +105,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="length" headerAlign="center" allowSort="true" width="15">长度
                             <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
                         </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
+                        </div>
                         <div field="defaultVal" headerAlign="center" allowSort="true" width="15">默认值
                             <input property="editor" class="nui-textbox" vtype="maxLength:64"/>
                         </div>
@@ -167,6 +170,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="length" headerAlign="center" allowSort="true" width="15">长度
                             <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
                         </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
+                        </div>
                         <div field="stats" headerAlign="center" allowSort="true" width="20">统计函数
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
                                    dictTypeId="IQ_APP_RETURN_COL_STATS"/>
@@ -220,6 +226,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="type" headerAlign="center" allowSort="true" width="20">类型
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
                                    dictTypeId="IQ_MD_COL_DATA_TYPE" vtype="maxLength:32"/>
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
                         </div>
                         <div field="orderType" headerAlign="center" allowSort="true" width="20">排序
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
@@ -382,6 +391,7 @@ ${extends("/goframe/function_layout.httl")}
                         "name": data[i].name,
                         "describe": data[i].describe,
                         "length": data[i].length,
+                        "note":data[i].note,
                         "label": data[i].name,
                         "type": data[i].colType,
                         "operator": "==",
@@ -406,6 +416,7 @@ ${extends("/goframe/function_layout.httl")}
                         "name": data[i].name,
                         "describe": data[i].describe,
                         "length": data[i].length,
+                        "note":data[i].note,
                         "label": data[i].name,
                         "type": data[i].colType,
                         "stats": "none"
@@ -428,6 +439,7 @@ ${extends("/goframe/function_layout.httl")}
         var row = grid1.getSelected();
         row.describe = selected.describe;
         row.length = selected.length;
+        row.note = selected.note;
         row.label = selected.name;
         row.type = selected.colType;
         row.operator = "==";
@@ -441,6 +453,7 @@ ${extends("/goframe/function_layout.httl")}
         row.describe = selected.describe;
         row.label = selected.name;
         row.length = selected.length;
+        row.note = selected.note;
         row.type = selected.colType;
         row.stats = "none";
     }
@@ -450,6 +463,7 @@ ${extends("/goframe/function_layout.httl")}
         var row = grid3.getSelected();
         row.describe = selected.describe;
         row.type = selected.colType;
+        row.note = selected.note;
         row.orderType = "ASC";
     }
 
@@ -644,22 +658,7 @@ ${extends("/goframe/function_layout.httl")}
     function remove1() {
         var rows = grid1.getSelecteds();
         if (rows.length > 0) {
-            //删除前检查
-            $.ajax({
-                url: "${basePath}/rc/service/checkUsed/IQ/${pkId}",
-                type: 'POST',
-                data: null,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    if (result.status == true) {
-                        nui.alert(result.message);
-                        return;
-                    }else{
-                        grid1.removeRows(rows, true);
-                    }
-                }
-            });
+            grid1.removeRows(rows, true);
         } else {
             nui.alert("请至少选中一条记录!");
         }
@@ -667,23 +666,7 @@ ${extends("/goframe/function_layout.httl")}
     function remove2() {
         var rows = grid2.getSelecteds();
         if (rows.length > 0) {
-
-            //删除前检查
-            $.ajax({
-                url: "${basePath}/rc/service/checkUsed/IQ/${pkId}",
-                type: 'POST',
-                data: null,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    if (result.status == true) {
-                        nui.alert(result.message);
-                        return;
-                    }else{
-                        grid2.removeRows(rows, true);
-                    }
-                }
-            });
+            grid2.removeRows(rows, true);
         } else {
             nui.alert("请至少选中一条记录!");
         }
@@ -691,22 +674,7 @@ ${extends("/goframe/function_layout.httl")}
     function remove3() {
         var rows = grid3.getSelecteds();
         if (rows.length > 0) {
-            //删除前检查
-            $.ajax({
-                url: "${basePath}/rc/service/checkUsed/IQ/${pkId}",
-                type: 'POST',
-                data: null,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    if (result.status == true) {
-                        nui.alert(result.message);
-                        return;
-                    }else{
-                        grid3.removeRows(rows, true);
-                    }
-                }
-            });
+            grid3.removeRows(rows, true);
         } else {
             nui.alert("请至少选中一条记录!");
         }
@@ -721,50 +689,32 @@ ${extends("/goframe/function_layout.httl")}
             return;
         }
         var json = nui.encode(saveData);
-        var canUpdate = true;
-        //保存前检查
+        //按钮禁用
+        nui.get("saveButton").disable();
+        // --发送信息--
+        form1.loading("正在保存中,请稍等...");
         $.ajax({
-            url: "${basePath}/rc/service/checkUsed/IQ/${pkId}",
+            url: "${basePath}/iq/app/update",
             type: 'POST',
-            data: null,
+            data: json,
             cache: false,
-            async:false,
             contentType: 'application/json',
             success: function (result) {
                 if (result.status == true) {
                     nui.alert(result.message);
-                    canUpdate = false;
+                    CloseWindow("success");
+                } else {
+                    nui.alert(result.message, "系统提示", function (action) {
+                        if (action == "ok" || action == "close") {
+                            CloseWindow("failed");
+                        }
+                    });
                 }
+                form1.unmask();
+                //解除保存按钮禁用
+                nui.get("saveButton").enable();
             }
         });
-        if(canUpdate) {
-            //按钮禁用
-            nui.get("saveButton").disable();
-            // --发送信息--
-            form1.loading("正在保存中,请稍等...");
-            $.ajax({
-                url: "${basePath}/iq/app/update",
-                type: 'POST',
-                data: json,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    if (result.status == true) {
-                        nui.alert(result.message);
-                        CloseWindow("success");
-                    } else {
-                        nui.alert(result.message, "系统提示", function (action) {
-                            if (action == "ok" || action == "close") {
-                                CloseWindow("failed");
-                            }
-                        });
-                    }
-                    form1.unmask();
-                    //解除保存按钮禁用
-                    nui.get("saveButton").enable();
-                }
-            });
-        }
     }
 
     /**

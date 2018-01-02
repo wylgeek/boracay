@@ -19,6 +19,15 @@ public class BatchInfo implements Serializable {
     private String message; // 信息
     private String modelName; // 模型名称
     private String modelId; // 模型ID
+    private String requestContent; // 请求内容
+
+    public String getRequestContent() {
+        return requestContent;
+    }
+
+    public void setRequestContent(String requestContent) {
+        this.requestContent = requestContent;
+    }
 
     public String getModelId() {
         return modelId;

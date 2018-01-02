@@ -29,7 +29,6 @@
     </resultMap>
 
     <select id="selectUserStatis" resultMap="BaseResultMap"  parameterType="java.util.Map">
-
         select loginuser.ID,
         loginuser.EMP_ID,
         loginuser.USER_ID,
@@ -44,41 +43,42 @@
         loginuser.VALID_STARTDATE,
         loginuser.VALID_ENDDATE,
         case
-        when USER_STATIS.failed_count is null then
-        0
-        else
-        USER_STATIS.failed_count
+            when USER_STATIS.failed_count is null
+            then 0
+            else USER_STATIS.failed_count
         end as failed_count,
         case
-        when USER_STATIS.success_count is null then
-        0
-        else
-        USER_STATIS.success_count
+            when USER_STATIS.success_count is null
+            then 0
+            else USER_STATIS.success_count
         end as success_count
         from t_gf_loginuser loginuser
-        left join (select case
-        when mcselect1.USER_NAME is null then
-        mcselect2.USER_NAME
-        else
-        mcselect1.USER_NAME
-        end as USER_NAME,
-        mcselect1.failed_count,
-        mcselect2.success_count
-        from (select distinct mclog.USER_NAME,
-        count(mclog.status) as failed_count
-        from MC_CONSUME_LOG mclog
-        where mclog.status = '1'
-        and mclog.USER_NAME is not null
-        and mclog.SERVICE_NAME is not  null
-        group by mclog.USER_NAME, mclog.STATUS) mcselect1
-        full join (select distinct mclog.USER_NAME,
-        count(mclog.status) as success_count
-        from MC_CONSUME_LOG mclog
-        where mclog.status = '0'
-        and mclog.USER_NAME is not null
-        and mclog.SERVICE_NAME is not  null
-        group by mclog.USER_NAME, mclog.STATUS) mcselect2
-        on mcselect1.USER_NAME = mcselect2.USER_NAME) USER_STATIS
+        left join (
+            select
+            case
+                when mcselect1.USER_NAME is null
+                then mcselect2.USER_NAME
+                else mcselect1.USER_NAME
+            end as USER_NAME,
+            mcselect1.failed_count,
+            mcselect2.success_count
+            from (
+                select distinct mclog.USER_NAME,
+                count(mclog.status) as failed_count
+                from MC_CONSUME_LOG mclog
+                where mclog.status = '1'
+                group by mclog.USER_NAME, mclog.STATUS
+            ) mcselect1
+            full join (
+                select
+                distinct mclog.USER_NAME,
+                count(mclog.status) as success_count
+                from MC_CONSUME_LOG mclog
+                where mclog.status = '0'
+                group by mclog.USER_NAME, mclog.STATUS
+            ) mcselect2
+            on mcselect1.USER_NAME = mcselect2.USER_NAME
+        ) USER_STATIS
         on loginuser.user_id = USER_STATIS.user_name
         <where>
             <if test="userName!=null and userName!=''">
@@ -87,7 +87,7 @@
             <if test="userId!=null and userId!=''">
                 and loginuser.USER_ID like '%${userId}%'
             </if>
-        </where>;
+        </where>
     </select>
 
     <select id="userChart1Second" resultMap="McChartsViewResultMap" parameterType="com.hex.bigdata.udsp.mc.dto.McChartsView" >
@@ -95,8 +95,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and USER_NAME is not null
-        and SERVICE_NAME is not  null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,19), STATUS
@@ -107,8 +105,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and USER_NAME is not null
-        and SERVICE_NAME is not  null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,16), STATUS
@@ -119,8 +115,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and USER_NAME is not null
-        and SERVICE_NAME is not  null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,13), STATUS
@@ -131,8 +125,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and USER_NAME is not null
-        and SERVICE_NAME is not  null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,10), STATUS
@@ -144,8 +136,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and SERVICE_NAME is not null
-        and USER_NAME is not null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by SERVICE_NAME, STATUS
@@ -159,8 +149,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and SERVICE_NAME is not null
-        and USER_NAME is not null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,19), STATUS,USER_NAME,SERVICE_NAME
@@ -171,8 +159,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and SERVICE_NAME is not null
-        and USER_NAME is not null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,16), STATUS,USER_NAME,SERVICE_NAME
@@ -183,8 +169,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and SERVICE_NAME is not null
-        and USER_NAME is not null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,13), STATUS,USER_NAME,SERVICE_NAME
@@ -195,8 +179,6 @@
         from MC_CONSUME_LOG
         where REQUEST_END_TIME >= #{timeStart}
         and #{timeEnd} >= REQUEST_END_TIME
-        and SERVICE_NAME is not null
-        and USER_NAME is not null
         <if test="serviceName!=null and serviceName!=''"> AND SERVICE_NAME = #{serviceName} </if>
         <if test="userName!=null and userName!=''"> AND USER_NAME = #{userName} </if>
         group by substr(REQUEST_END_TIME,0,10), STATUS,USER_NAME,SERVICE_NAME

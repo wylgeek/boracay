@@ -293,12 +293,12 @@ public class ComDatasourceController extends BaseController {
      * 获取所有引擎数据源
      * @return
      */
-    @RequestMapping({"/selectEDs"})
+    @RequestMapping({"/selectEngineDs"})
     @ResponseBody
-    public PageListResult selectEDs() {
+    public PageListResult selectEngineDs() {
         List<ComDatasource> list = null;
         try {
-            list = comDatasourceService.selectEDs();
+            list = comDatasourceService.selectEngineDs();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("系统异常：" + e);

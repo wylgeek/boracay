@@ -283,22 +283,7 @@ ${extends("/goframe/function_layout.httl")}
     function remove() {
         var rows = grid1.getSelecteds();
         if (rows.length > 0) {
-            //删除前检查
-            $.ajax({
-                url: "${basePath}/rc/service/checkUsed/RTS_CONSUMER/${pkId}",
-                type: 'POST',
-                data: null,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    if (result.status == true) {
-                        nui.alert(result.message);
-                        return;
-                    }else{
-                        grid1.removeRows(rows, true);
-                    }
-                }
-            });
+            grid1.removeRows(rows, true);
         } else {
             nui.alert("请至少选中一条记录!");
         }
@@ -312,50 +297,32 @@ ${extends("/goframe/function_layout.httl")}
             return;
         }
         var json = nui.encode(saveData);
-        //保存前检查
-        var canUpdate = true;
+        // --发送信息--
+        form1.loading("正在保存中,请稍等...");
+        //禁用保存按钮
+        nui.get("saveButton").disable();
         $.ajax({
-            url: "${basePath}/rc/service/checkUsed/RTS_CONSUMER/${pkId}",
+            url: "${basePath}/rts/consumer/update",
             type: 'POST',
-            data: null,
+            data: json,
             cache: false,
-            async:false,
             contentType: 'application/json',
             success: function (result) {
                 if (result.status == true) {
                     nui.alert(result.message);
-                    canUpdate = false;
+                    CloseWindow("success");
+                } else {
+                    nui.alert(result.message, "系统提示", function (action) {
+                        if (action == "ok" || action == "close") {
+                            CloseWindow("failed");
+                        }
+                    });
                 }
+                form1.unmask();
+                //解除保存按钮禁用
+                nui.get("saveButton").enable();
             }
         });
-        if(canUpdate){
-            // --发送信息--
-            form1.loading("正在保存中,请稍等...");
-            //禁用保存按钮
-            nui.get("saveButton").disable();
-            $.ajax({
-                url: "${basePath}/rts/consumer/update",
-                type: 'POST',
-                data: json,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    if (result.status == true) {
-                        nui.alert(result.message);
-                        CloseWindow("success");
-                    } else {
-                        nui.alert(result.message, "系统提示", function (action) {
-                            if (action == "ok" || action == "close") {
-                                CloseWindow("failed");
-                            }
-                        });
-                    }
-                    form1.unmask();
-                    //解除保存按钮禁用
-                    nui.get("saveButton").enable();
-                }
-            });
-        }
     }
 
     /**

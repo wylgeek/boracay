@@ -3,24 +3,14 @@ package com.hex.bigdata.udsp.im.provider.impl.model.modeling;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Property;
 import com.hex.bigdata.udsp.im.provider.model.Model;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by JunjieM on 2017-9-6.
  */
 public class JdbcModel extends Model {
-    public JdbcModel() {
-    }
-
-    public JdbcModel(List<Property> properties) {
-        super(properties);
-    }
-
-    public JdbcModel(Map<String, Property> propertyMap) {
-        super(propertyMap);
-    }
 
     public JdbcModel(Model model) {
         super(model);
@@ -40,5 +30,12 @@ public class JdbcModel extends Model {
 
     public String getSelectSql() {
         return getProperty("select.sql").getValue();
+    }
+
+    public boolean getViolenceQuery() {
+        String value = getProperty("violence.query").getValue();
+        if (StringUtils.isBlank(value))
+            value = "true";
+        return Boolean.valueOf(value);
     }
 }

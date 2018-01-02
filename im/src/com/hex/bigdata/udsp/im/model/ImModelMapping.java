@@ -21,6 +21,12 @@ public class ImModelMapping implements Serializable {
 
     private String describe;
 
+    private String indexed;
+
+    private String primary;
+
+    private String stored;
+
     public String getPkId() {
         return pkId;
     }
@@ -91,5 +97,29 @@ public class ImModelMapping implements Serializable {
 
     public void setDescribe(String describe) {
         this.describe = describe;
+    }
+
+    public String getIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(String indexed) {
+        this.indexed = indexed;
+    }
+
+    public String getPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(String primary) {
+        this.primary = primary;
+    }
+
+    public String getStored() {
+        return stored;
+    }
+
+    public void setStored(String stored) {
+        this.stored = stored;
     }
 }

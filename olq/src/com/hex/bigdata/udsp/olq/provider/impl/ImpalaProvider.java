@@ -4,13 +4,15 @@ import com.hex.bigdata.udsp.common.constant.Status;
 import com.hex.bigdata.udsp.common.constant.StatusCode;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Page;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
-import com.hex.bigdata.udsp.olq.model.OLQQuerySql;
+import com.hex.bigdata.udsp.olq.provider.model.OlqQuerySql;
 import com.hex.bigdata.udsp.olq.provider.Provider;
 import com.hex.bigdata.udsp.olq.provider.impl.model.ImpalaDatasource;
-import com.hex.bigdata.udsp.olq.provider.model.OLQRequest;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponse;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponseFetch;
+import com.hex.bigdata.udsp.olq.provider.model.OlqRequest;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponse;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponseFetch;
+import com.hex.bigdata.udsp.olq.utils.OlqCommUtil;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -85,20 +87,11 @@ public class ImpalaProvider implements Provider {
         return conn;
     }
 
-    public void init(Datasource datasource) {
-        try {
-            ImpalaDatasource impalaDatasource = new ImpalaDatasource(datasource.getPropertyMap());
-            getConnection(impalaDatasource);
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    public OLQResponse execute(OLQRequest request) {
+    public OlqResponse execute(String consumeId, OlqRequest request) {
         logger.debug("request=" + JSONUtil.parseObj2JSON(request));
         long bef = System.currentTimeMillis();
 
-        OLQResponse response = new OLQResponse();
+        OlqResponse response = new OlqResponse();
         response.setRequest(request);
         Datasource datasource = request.getDatasource();
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
@@ -111,23 +104,27 @@ public class ImpalaProvider implements Provider {
         try {
             conn = getConnection(impalaDatasource);
             stmt = conn.createStatement();
+
+            OlqCommUtil.putStatement(consumeId, stmt);
+
             //获取查询信息
-            OLQQuerySql olqQuerySql = request.getOlqQuerySql();
-            if (olqQuerySql.getPage() == null){
+            OlqQuerySql olqQuerySql = getPageSql(request.getSql(), request.getPage());
+            if (olqQuerySql.getPage() == null) {
                 rs = stmt.executeQuery(olqQuerySql.getOriginalSql());
-            }else {
+            } else {
                 rs = stmt.executeQuery(olqQuerySql.getPageSql());
             }
+
             rs.setFetchSize(1000);
             ResultSetMetaData rsmd = rs.getMetaData();
-            response.setMetadata(rsmd);
+            //response.setMetadata(rsmd);
             int columnCount = rsmd.getColumnCount();
             int max_num_size = impalaDatasource.getMaxNum();
             while (rs.next()) {
                 map = new LinkedHashMap<String, String>();
                 for (int i = 1; i <= columnCount; i++) {
                     //map.put(rsmd.getColumnName(i), rs.getString(i));
-                    map.put(rsmd.getColumnLabel(i), rs.getString(i));
+                    map.put(rsmd.getColumnLabel(i), rs.getString(i) == null ? "" : JSONUtil.encode(rs.getString(i)));
                 }
                 list.add(map);
                 count++;
@@ -137,10 +134,10 @@ public class ImpalaProvider implements Provider {
             }
             //查询的记录数总数
             String totalSql = olqQuerySql.getTotalSql();
-            if (StringUtils.isNotBlank(totalSql)){
+            if (StringUtils.isNotBlank(totalSql)) {
                 rs = stmt.executeQuery(totalSql);
                 int totalCount = 0;
-                if (rs.next()){
+                if (rs.next()) {
                     totalCount = rs.getInt(1);
                 }
                 //设置总记录数
@@ -149,8 +146,10 @@ public class ImpalaProvider implements Provider {
             }
             response.setStatus(Status.SUCCESS);
             response.setStatusCode(StatusCode.SUCCESS);
+            //设置返回列信息
+            response.setColumns(OlqCommUtil.putColumnIntoMap(rsmd));
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            logger.error(ExceptionUtil.getMessage(e));
             response.setStatus(Status.DEFEAT);
             response.setStatusCode(StatusCode.DEFEAT);
             response.setMessage(e.getMessage());
@@ -159,23 +158,24 @@ public class ImpalaProvider implements Provider {
                 try {
                     rs.close();
                 } catch (SQLException e) {
-                    logger.error(e.getMessage());
+                    e.printStackTrace();
                 }
             }
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    logger.error(e.getMessage());
+                    e.printStackTrace();
                 }
             }
             if (conn != null) {
                 try {
                     conn.close();
                 } catch (SQLException e) {
-                    logger.error(e.getMessage());
+                    e.printStackTrace();
                 }
             }
+            OlqCommUtil.removeStatement(consumeId);
         }
 
         long now = System.currentTimeMillis();
@@ -187,17 +187,6 @@ public class ImpalaProvider implements Provider {
 
         logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
         return response;
-    }
-
-    public synchronized void close(Datasource datasource) {
-        BasicDataSource dataSource = dataSourcePool.remove(datasource.getId());
-        if (dataSource != null) {
-            try {
-                dataSource.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public boolean testDatasource(Datasource datasource) {
@@ -213,13 +202,13 @@ public class ImpalaProvider implements Provider {
             }
         } catch (Exception e) {
             canConnection = false;
-            logger.error(e.getMessage());
+            logger.error(ExceptionUtil.getMessage(e));
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error(e.getMessage());
+                    logger.error(ExceptionUtil.getMessage(e));
                 }
             }
         }
@@ -227,11 +216,11 @@ public class ImpalaProvider implements Provider {
     }
 
     @Override
-    public OLQResponseFetch executeFetch(OLQRequest request) {
+    public OlqResponseFetch executeFetch(String consumeId, OlqRequest request) {
         logger.debug("request=" + JSONUtil.parseObj2JSON(request));
         long bef = System.currentTimeMillis();
 
-        OLQResponseFetch response = new OLQResponseFetch();
+        OlqResponseFetch response = new OlqResponseFetch();
         response.setRequest(request);
 
         Datasource datasource = request.getDatasource();
@@ -243,8 +232,15 @@ public class ImpalaProvider implements Provider {
         try {
             conn = getConnection(impalaDatasource);
             stmt = conn.createStatement();
-            OLQQuerySql olqQuerySql = request.getOlqQuerySql();
-            rs = stmt.executeQuery(olqQuerySql.getOriginalSql());
+
+            OlqCommUtil.putStatement(consumeId, stmt);
+
+            OlqQuerySql olqQuerySql = getPageSql(request.getSql(), request.getPage());
+            if (olqQuerySql.getPage() == null) {
+                rs = stmt.executeQuery(olqQuerySql.getOriginalSql());
+            } else {
+                rs = stmt.executeQuery(olqQuerySql.getPageSql());
+            }
             rs.setFetchSize(1000);
             response.setStatus(Status.SUCCESS);
             response.setStatusCode(StatusCode.SUCCESS);
@@ -266,9 +262,8 @@ public class ImpalaProvider implements Provider {
         return response;
     }
 
-    @Override
-    public OLQQuerySql getPageSql(String sql, Page page) {
-        OLQQuerySql olqQuerySql = new OLQQuerySql(sql);
+    private OlqQuerySql getPageSql(String sql, Page page) {
+        OlqQuerySql olqQuerySql = new OlqQuerySql(sql);
         if (page == null) {
             return olqQuerySql;
         }
@@ -279,27 +274,21 @@ public class ImpalaProvider implements Provider {
         Integer startRow = (pageIndex - 1) * pageSize;
         StringBuffer pageSqlBuffer = new StringBuffer("SELECT * FROM (");
         pageSqlBuffer.append(sql);
-        pageSqlBuffer.append(" )t ORDER BY 1 limit ");
+        pageSqlBuffer.append(" ) UDSP_VIEW ORDER BY 1 LIMIT ");
         pageSqlBuffer.append(pageSize);
-        pageSqlBuffer.append(" offset ");
+        pageSqlBuffer.append(" OFFSET ");
         pageSqlBuffer.append(startRow);
         olqQuerySql.setPageSql(pageSqlBuffer.toString());
         //总记录数查询SQL组装
-        StringBuffer totalSqlBuffer = new StringBuffer("select count(*) from (");
+        StringBuffer totalSqlBuffer = new StringBuffer("SELECT COUNT(1) FROM (");
         totalSqlBuffer.append(sql);
-        totalSqlBuffer.append(")t");
+        totalSqlBuffer.append(") UDSP_VIEW");
         olqQuerySql.setTotalSql(totalSqlBuffer.toString());
         //page设置
         olqQuerySql.setPage(page);
+        logger.debug("配置的源SQL:\n" + olqQuerySql.getOriginalSql());
+        logger.debug("分页查询SQL:\n" + olqQuerySql.getPageSql());
+        logger.debug("查询总数SQL:\n" + olqQuerySql.getTotalSql());
         return olqQuerySql;
-    }
-
-    public static void main(String[] args) {
-        String sql = "SELECT * FROM OMDATA.S01_SJYMB JYM";
-        Page page = new Page();
-        page.setPageIndex(1);
-        page.setPageSize(20);
-        ImpalaProvider impalaProvider = new ImpalaProvider();
-        System.out.println(impalaProvider.getPageSql(sql, page));
     }
 }

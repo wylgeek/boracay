@@ -1,6 +1,5 @@
 package com.hex.bigdata.udsp.mm.controller;
 
-import com.hex.bigdata.udsp.common.model.ComDatasource;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.mm.dto.MmCollocateParamView;
 import com.hex.bigdata.udsp.mm.dto.ModelInfoView;

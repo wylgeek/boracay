@@ -8,12 +8,12 @@ ${extends("/goframe/function_layout.httl")}
                 <tr>
                     <th class="nui-form-label"><label for="name">名称：</label></th>
                     <td>
-                        <input id="name" name="name" class="nui-textbox" style="width: 97%" readonly="true" />
+                        <input id="name" name="name" class="nui-textbox" style="width: 99%" readonly="true" />
                     </td>
                     <th class="nui-form-label"><label for="dsId">数据源：</label></th>
                     <td>
                         <input id="dsId" name="dsId" class="nui-combobox" valueField="pkId" textField="name"
-                               dataField="data" url="${basePath}/com/ds/select?model=IQ" style="width:97%" readonly="true"/>
+                               dataField="data" url="${basePath}/com/ds/select?model=IQ" style="width:99%" readonly="true"/>
                     </td>
                 </tr>
                 <tr>

@@ -15,6 +15,10 @@ public class RealtimeTotalInfoDto {
     private String updateTime; // 更新信息的时间
     private String modelName; // 模型名称
     private String modelId; // 模型ID
+    private String requestContent; // 请求内容
+    private long consumerNum = 0; // 消费获取条数
+    private long meetNum = 0; // 筛选后的条数
+    private long storeNum = 0; // 执行成功条数
 
     public String getId() {
         return id;
@@ -102,5 +106,37 @@ public class RealtimeTotalInfoDto {
 
     public void setModelId(String modelId) {
         this.modelId = modelId;
+    }
+
+    public String getRequestContent() {
+        return requestContent;
+    }
+
+    public void setRequestContent(String requestContent) {
+        this.requestContent = requestContent;
+    }
+
+    public long getConsumerNum() {
+        return consumerNum;
+    }
+
+    public void setConsumerNum(long consumerNum) {
+        this.consumerNum = consumerNum;
+    }
+
+    public long getMeetNum() {
+        return meetNum;
+    }
+
+    public void setMeetNum(long meetNum) {
+        this.meetNum = meetNum;
+    }
+
+    public long getStoreNum() {
+        return storeNum;
+    }
+
+    public void setStoreNum(long storeNum) {
+        this.storeNum = storeNum;
     }
 }

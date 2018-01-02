@@ -12,6 +12,87 @@ import java.util.List;
  * Created by JunjieM on 2017-9-25.
  */
 public class SqlUtil {
+
+    /**
+     * 查询表
+     *
+     * @param selectColumns
+     * @param selectTableName
+     * @param whereProperties
+     * @return
+     */
+    public static String select(List<String> selectColumns,
+                                String selectTableName, List<WhereProperty> whereProperties) {
+        return "SELECT " + getSelectColumns(selectColumns) + "\n FROM "
+                + selectTableName + getWhere(whereProperties);
+    }
+
+    /**
+     * 查询SQL
+     *
+     * @param selectColumns
+     * @param selectSql
+     * @param whereProperties
+     * @return
+     */
+    public static String select2(List<String> selectColumns,
+                                 String selectSql, List<WhereProperty> whereProperties) {
+        return "SELECT " + getSelectColumns2(selectColumns) + "\n FROM (\n"
+                + selectSql + "\n) UDSP_VIEW " + getWhere2(whereProperties);
+    }
+
+    private static String getWhere2(List<WhereProperty> whereProperties) {
+        String sql = "";
+        String name = null;
+        String value = null;
+        DataType type = null;
+        Operator operator = null;
+        int count = 0;
+        if (whereProperties != null && whereProperties.size() != 0) {
+            for (WhereProperty whereProperty : whereProperties) {
+                name = whereProperty.getName();
+                value = whereProperty.getValue();
+                type = whereProperty.getType();
+                operator = whereProperty.getOperator();
+                if (StringUtils.isBlank(name) || StringUtils.isBlank(value) || operator == null)
+                    continue;
+                sql += (count == 0 ? "\n WHERE " : " AND ");
+                sql += "UDSP_VIEW." + name + SqlUtil.getCondition(value, type, operator);
+                count++;
+            }
+        }
+        return sql;
+    }
+
+    private static String getSelectColumns2(List<String> columns) {
+        return getColumns(columns, " UDSP_VIEW.* ");
+    }
+
+    private static String getSelectColumns(List<String> columns) {
+        return getColumns(columns, " * ");
+    }
+
+    private static String getColumns(List<String> columns, String sql) {
+        if (columns != null && columns.size() != 0) {
+            sql = "";
+            for (int i = 0; i < columns.size(); i++) {
+                sql += (i == 0 ? "" : ",");
+                sql += columns.get(i);
+            }
+        }
+        return sql;
+    }
+
+    /**
+     * 清空表数据
+     *
+     * @param tableName
+     * @return
+     */
+    public static String truncateTable(String tableName) {
+        return "TRUNCATE TABLE " + tableName;
+    }
+
     public static String getCondition(String value, DataType type, Operator operator) {
         String str = "";
         if (DataType.INT == type || DataType.TINYINT == type || DataType.DOUBLE == type
@@ -111,7 +192,6 @@ public class SqlUtil {
         Operator operator = null;
         int count = 0;
         if (whereProperties != null && whereProperties.size() != 0) {
-            sql = "\n WHERE ";
             for (WhereProperty whereProperty : whereProperties) {
                 name = whereProperty.getName();
                 value = whereProperty.getValue();
@@ -119,8 +199,8 @@ public class SqlUtil {
                 operator = whereProperty.getOperator();
                 if (StringUtils.isBlank(name) || StringUtils.isBlank(value) || operator == null)
                     continue;
-                sql += (count == 0 ? "" : " AND ");
-                sql += name + " = " + SqlUtil.getCondition(value, dataType, operator);
+                sql += (count == 0 ? "\n WHERE " : " AND ");
+                sql += name + SqlUtil.getCondition(value, dataType, operator);
                 count++;
             }
         }
@@ -129,16 +209,13 @@ public class SqlUtil {
 
     public static String getIntoValues(List<ValueColumn> valueColumns) {
         String sql = "";
-        DataType dataType = null;
-        String value = null;
-        int count = 0;
+        ValueColumn valueColumn = null;
         if (valueColumns != null && valueColumns.size() != 0) {
             sql = " (";
-            for (ValueColumn column : valueColumns) {
-                dataType = column.getDataType();
-                value = column.getValue();
-                sql += (count == 0 ? "" : ", ");
-                sql += getValue(dataType, value);
+            for (int i = 0; i < valueColumns.size(); i++) {
+                valueColumn = valueColumns.get(i);
+                sql += (i == 0 ? "" : ", ");
+                sql += getValue(valueColumn.getDataType(), valueColumn.getValue());
             }
             sql += ")";
         }
@@ -147,14 +224,11 @@ public class SqlUtil {
 
     public static String getIntoNames(List<ValueColumn> valueColumns) {
         String sql = "";
-        String colName = null;
-        int count = 0;
         if (valueColumns != null && valueColumns.size() != 0) {
             sql = " (";
-            for (ValueColumn column : valueColumns) {
-                colName = column.getColName();
-                sql += (count == 0 ? "" : ", ");
-                sql += colName;
+            for (int i = 0; i < valueColumns.size(); i++) {
+                sql += (i == 0 ? "" : ", ");
+                sql += valueColumns.get(i).getColName();
             }
             sql += ")";
         }

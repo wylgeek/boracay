@@ -17,6 +17,8 @@ public class IqAppOrderCol implements Serializable {
 
     private String orderType;
 
+    private String note;
+
     public String getPkId() {
         return pkId;
     }
@@ -71,5 +73,13 @@ public class IqAppOrderCol implements Serializable {
 
     public void setOrderType(String orderType) {
         this.orderType = orderType;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

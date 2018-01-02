@@ -1,29 +1,15 @@
 package com.hex.bigdata.udsp.im.provider.impl.model.datasource;
 
-import com.hex.bigdata.udsp.common.model.ComDatasource;
-import com.hex.bigdata.udsp.common.model.ComProperties;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
-import com.hex.bigdata.udsp.common.provider.model.Property;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by JunjieM on 2017-9-6.
  */
 public class JdbcDatasource extends Datasource {
 
-    public JdbcDatasource(List<Property> properties) {
-        super(properties);
-    }
-
-    public JdbcDatasource(Map<String, Property> propertieMap) {
-        super(propertieMap);
-    }
-
-    public JdbcDatasource(ComDatasource comDatasource, List<ComProperties> comPropertieList) {
-        super(comDatasource, comPropertieList);
+    public JdbcDatasource(Datasource datasource) {
+        super(datasource);
     }
 
     public String getDriverClass() {
@@ -94,5 +80,13 @@ public class JdbcDatasource extends Datasource {
 
     public String getTestOnReturn() {
         return getProperty("test.on.return").getValue();
+    }
+
+    public String getRemarksReporting() {
+        return getProperty("remarks.reporting").getValue();
+    }
+
+    public String getUserInformationSchema() {
+        return getProperty("user.information.schema").getValue();
     }
 }

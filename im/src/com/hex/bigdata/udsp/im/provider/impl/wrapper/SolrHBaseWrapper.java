@@ -5,6 +5,7 @@ import com.hex.bigdata.udsp.im.provider.RealtimeTargetProvider;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.ValueColumn;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.WhereProperty;
 import com.hex.bigdata.udsp.im.provider.model.Metadata;
+import com.hex.bigdata.udsp.im.provider.model.Model;
 import com.hex.bigdata.udsp.im.provider.model.ModelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +57,11 @@ public abstract class SolrHBaseWrapper extends Wrapper implements BatchTargetPro
     }
 
     @Override
-    protected List<String> getInsertColumns(List<ModelMapping> modelMappings, Metadata metadata) {
+    protected void emptyDatas(Metadata metadata) throws Exception {
         try {
             throw new Exception("不支持该方法");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 }

@@ -206,6 +206,40 @@ public class McChartsController extends BaseController {
         return new PageListResult(list);
     }
 
+    @RequestMapping({"/chart7"})
+    @ResponseBody
+    public PageListResult chart7(String datetime, String interval) {
+        logger.debug("select datetime=" + datetime + " interval=" + interval);
+        List<McChartsView> list = null;
+        try {
+            Date dtEnd = getDate(datetime);
+            String dtEndStr = ymdhmsFormat.format(dtEnd);
+            String dtStartStr = ymdhmsFormat.format(new Date(dtEnd.getTime() - Long.valueOf(interval) * 60 * 1000));
+            list = mcChartsService.chart7(dtStartStr, dtEndStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("系统异常：" + e);
+        }
+        return new PageListResult(list);
+    }
+
+    @RequestMapping({"/chart8"})
+    @ResponseBody
+    public PageListResult chart8(String datetime, String interval) {
+        logger.debug("select datetime=" + datetime + " interval=" + interval);
+        List<McChartsView> list = null;
+        try {
+            Date dtEnd = getDate(datetime);
+            String dtEndStr = ymdhmsFormat.format(dtEnd);
+            String dtStartStr = ymdhmsFormat.format(new Date(dtEnd.getTime() - Long.valueOf(interval) * 60 * 1000));
+            list = mcChartsService.chart8(dtStartStr, dtEndStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("系统异常：" + e);
+        }
+        return new PageListResult(list);
+    }
+
     @RequestMapping({"/nowtime"})
     @ResponseBody
     public MessageResult nowtime() {

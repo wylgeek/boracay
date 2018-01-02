@@ -3,18 +3,19 @@ package com.hex.bigdata.udsp.rc.service;
 import com.hex.bigdata.udsp.common.constant.ComExcelEnums;
 import com.hex.bigdata.udsp.common.constant.CommonConstant;
 import com.hex.bigdata.udsp.common.constant.DatasourceModel;
-import com.hex.bigdata.udsp.common.constant.DatasourceType;
 import com.hex.bigdata.udsp.common.dto.ComDatasourceView;
 import com.hex.bigdata.udsp.common.model.ComUploadExcelContent;
 import com.hex.bigdata.udsp.common.service.ComDatasourceService;
 import com.hex.bigdata.udsp.common.util.CreateFileUtil;
 import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
 import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
+import com.hex.bigdata.udsp.im.service.ImModelService;
 import com.hex.bigdata.udsp.iq.dto.IqApplicationView;
 import com.hex.bigdata.udsp.iq.service.IqApplicationService;
 import com.hex.bigdata.udsp.mm.dao.MmApplicationMapper;
 import com.hex.bigdata.udsp.mm.service.MmApplicationService;
-import com.hex.bigdata.udsp.olq.service.OLQApplicationService;
+import com.hex.bigdata.udsp.olq.service.OlqApplicationService;
 import com.hex.bigdata.udsp.rc.dao.RcServiceForAppTypeAndAppIdMapper;
 import com.hex.bigdata.udsp.rc.dao.RcServiceForServiceNameMapper;
 import com.hex.bigdata.udsp.rc.dao.RcServiceMapper;
@@ -34,8 +35,6 @@ import com.hex.goframe.util.DateUtil;
 import com.hex.goframe.util.FileUtil;
 import com.hex.goframe.util.Util;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -83,7 +82,9 @@ public class RcServiceService {
     @Autowired
     private RtsConsumerMapper rtsConsumerMapper;
     @Autowired
-    private OLQApplicationService olqApplicationService;
+    private OlqApplicationService olqApplicationService;
+    @Autowired
+    private ImModelService imModelService;
 
 
     /**
@@ -96,6 +97,7 @@ public class RcServiceService {
     public String insert(RcService rcService) {
         String pkId = Util.uuid();
         rcService.setPkId(pkId);
+        rcService.setStatus(CommonConstant.SERVICE_STATUS_ENABLED);
         if (rcServiceMapper.insert(pkId, rcService)) {
             /*
             同时按照不同ID保存到内存中
@@ -266,6 +268,8 @@ public class RcServiceService {
             searchList = this.rtsConsumerService.select(new RtsConsumerView());
         } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ_APP.equals(type)) {
             searchList = this.olqApplicationService.selectAll();
+        } else if (RcConstant.UDSP_SERVICE_TYPE_IM.equals(type)) {
+            searchList = this.imModelService.selectAll();
         } else {
             searchList = null;
         }
@@ -319,26 +323,19 @@ public class RcServiceService {
      * @param appId
      * @return
      */
-    public boolean checkAppIdAndType(String type, String appId) {
-        RcService rcService = this.rcServiceMapper.selectRcServiceByAppIdAndType(type, appId);
-        return rcService != null;
+    public boolean checkAppUsed(String type, String appId) {
+        return this.rcServiceMapper.selectByAppTypeAndAppId(type, appId) != null;
     }
 
-    public Map<String, String> checkApplicationsUsed(String model, Map<String, String>[] applications) {
-        Map<String, String> returnMap = null;
-        for (Map<String, String> application : applications) {
-            if (checkAppIdAndType(model, application.get("pkId"))) {
-                returnMap = new HashMap<>(2);
-                returnMap.put("status", "true");
-                if ("OLQ".equals(model)) {
-                    returnMap.put("message", "名称为：" + application.get("name") + "数据源已被应用！");
-                } else {
-                    returnMap.put("message", "名称为：" + application.get("name") + "应用已被注册！");
-                }
-                break;
-            }
-        }
-        return returnMap;
+    /**
+     * 根据应用名称和应用类型查找启用的服务注册信息
+     *
+     * @param type
+     * @param appId
+     * @return
+     */
+    public boolean checkAppUsedAndStart(String type, String appId) {
+        return this.rcServiceMapper.selectStartByAppTypeAndAppId(type, appId) != null;
     }
 
     /**
@@ -354,7 +351,7 @@ public class RcServiceService {
         for (RcService item : rcServices) {
             item = this.select(item.getPkId());
             item.setStatus(status);
-            boolean delFlg = this.rcServiceMapper.update(item.getPkId(),item);
+            boolean delFlg = this.rcServiceMapper.update(item.getPkId(), item);
             if (!delFlg) {
                 flag = false;
                 break;

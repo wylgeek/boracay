@@ -10,7 +10,10 @@ import com.hex.bigdata.metadata.db.util.Function;
 import com.hex.bigdata.metadata.db.util.JdbcUtil;
 import org.apache.commons.lang.StringUtils;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -44,6 +47,7 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
     }
 
     private String getCurrentDbName(Connection conn, String sql) throws SQLException {
+        System.out.println(sql);
         return JdbcUtil.execSqlAndConvertRs2List(conn, sql, new Function<ResultSet, String>() {
             @Override
             public String call(ResultSet rs) throws SQLException {
@@ -82,6 +86,7 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
     }
 
     private List<Database> getDatabases(Connection conn, String sql) throws SQLException {
+        System.out.println(sql);
         return JdbcUtil.execSqlAndConvertRs2List(conn, sql, new Function<ResultSet, Database>() {
             @Override
             public Database call(ResultSet rs) throws SQLException {
@@ -92,9 +97,9 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
                 int count = metadata.getColumnCount();
                 for (int i = 1; i <= count; i++) {
                     String columnLabel = metadata.getColumnLabel(i);
-                    if (Constant.DB_NAME.equals(columnLabel)) {
+                    if (Constant.DB_NAME.equalsIgnoreCase(columnLabel)) {
                         dbName = rs.getString(Constant.DB_NAME);
-                    } else if (Constant.DB_COMMENT.equals(columnLabel)) {
+                    } else if (Constant.DB_COMMENT.equalsIgnoreCase(columnLabel)) {
                         dbComment = rs.getString(Constant.DB_COMMENT);
                     }
                 }
@@ -110,6 +115,7 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
     }
 
     private List<Table> getTables(Connection conn, String sql) throws SQLException {
+        System.out.println(sql);
         return JdbcUtil.execSqlAndConvertRs2List(conn, sql, new Function<ResultSet, Table>() {
             @Override
             public Table call(ResultSet rs) throws SQLException {
@@ -120,9 +126,9 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
                 int count = metadata.getColumnCount();
                 for (int i = 1; i <= count; i++) {
                     String columnLabel = metadata.getColumnLabel(i);
-                    if (Constant.TB_NAME.equals(columnLabel)) {
+                    if (Constant.TB_NAME.equalsIgnoreCase(columnLabel)) {
                         tableName = rs.getString(Constant.TB_NAME);
-                    } else if (Constant.TB_COMMENT.equals(columnLabel)) {
+                    } else if (Constant.TB_COMMENT.equalsIgnoreCase(columnLabel)) {
                         tableComment = rs.getString(Constant.TB_COMMENT);
                     }
                 }
@@ -138,6 +144,7 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
     }
 
     private List<Column> getColumns(Connection conn, String sql) throws SQLException {
+        System.out.println(sql);
         return JdbcUtil.execSqlAndConvertRs2List(conn, sql, new Function<ResultSet, Column>() {
             @Override
             public Column call(ResultSet rs) throws SQLException {
@@ -156,35 +163,35 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
                 int count = metadata.getColumnCount();
                 for (int i = 1; i <= count; i++) {
                     String columnLabel = metadata.getColumnLabel(i);
-                    if (Constant.COL_SEQ.equals(columnLabel)) {
+                    if (Constant.COL_SEQ.equalsIgnoreCase(columnLabel)) {
                         colSeq = rs.getInt(Constant.COL_SEQ);
-                    } else if (Constant.COL_NAME.equals(columnLabel)) {
+                    } else if (Constant.COL_NAME.equalsIgnoreCase(columnLabel)) {
                         colName = rs.getString(Constant.COL_NAME);
-                    } else if (Constant.COL_COMMENT.equals(columnLabel)) {
+                    } else if (Constant.COL_COMMENT.equalsIgnoreCase(columnLabel)) {
                         colComment = rs.getString(Constant.COL_COMMENT);
-                    } else if (Constant.COL_DATA_TYPE.equals(columnLabel)) {
+                    } else if (Constant.COL_DATA_TYPE.equalsIgnoreCase(columnLabel)) {
                         colType = rs.getString(Constant.COL_DATA_TYPE);
-                    } else if (Constant.COL_IS_NULLABLE.equals(columnLabel)) {
+                    } else if (Constant.COL_IS_NULLABLE.equalsIgnoreCase(columnLabel)) {
                         isNullable = rs.getString(Constant.COL_IS_NULLABLE);
-                    } else if (Constant.COL_PK_SEQ.equals(columnLabel)) {
+                    } else if (Constant.COL_PK_SEQ.equalsIgnoreCase(columnLabel)) {
                         colPkSeq = rs.getInt(Constant.COL_PK_SEQ);
-                    } else if (Constant.COL_PK_SEQ.equals(columnLabel)) {
+                    } else if (Constant.COL_PF_SEQ.equalsIgnoreCase(columnLabel)) {
                         colPfSeq = rs.getInt(Constant.COL_PF_SEQ);
-                    } else if (Constant.COL_DATA_LENGTH.equals(columnLabel)) {
+                    } else if (Constant.COL_DATA_LENGTH.equalsIgnoreCase(columnLabel)) {
                         try {
                             length = rs.getInt(Constant.COL_DATA_LENGTH);
                         } catch (SQLException e) {
                             //e.printStackTrace();
                             length = 0;
                         }
-                    } else if (Constant.COL_DATA_PRECISION.equals(columnLabel)) {
+                    } else if (Constant.COL_DATA_PRECISION.equalsIgnoreCase(columnLabel)) {
                         precision = rs.getInt(Constant.COL_DATA_PRECISION);
-                    } else if (Constant.COL_DATA_SCALE.equals(columnLabel)) {
+                    } else if (Constant.COL_DATA_SCALE.equalsIgnoreCase(columnLabel)) {
                         scale = rs.getInt(Constant.COL_DATA_SCALE);
                     }
                 }
                 // 字段位置
-                if (colSeq != 0) {
+                if (colSeq > 0) {
                     col.setSeq(colSeq);
                 }
                 // 字段名称
@@ -197,7 +204,11 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
                 }
                 // 字段类型
                 if (StringUtils.isNotEmpty(colType)) {
-                    col.setType(colType);
+                    if (colType.contains("(") && colType.contains(")")) {
+                        col.setType(colType.split("\\(")[0]);
+                    } else {
+                        col.setType(colType);
+                    }
                 }
                 // 是否允许为空
                 if (StringUtils.isNotEmpty(isNullable)) {
@@ -218,7 +229,11 @@ public abstract class BaseJdbcSqlHelper extends BaseHelper implements JdbcSqlHel
                 } else if (precision == 0 && scale > 0 && length > 0 && scale <= length) {
                     colLength = String.valueOf(scale);
                 }
-                col.setLength(colLength);
+                if (StringUtils.isNotBlank(colLength)) {
+                    col.setLength(colLength);
+                } else if (colType.contains("(") && colType.contains(")")) {
+                    col.setLength(colType.split("\\(")[1].split("\\)")[0]);
+                }
                 // 主键字段位置
                 if (colPkSeq > 0) {
                     col.setPrimaryKeyN(colPkSeq);

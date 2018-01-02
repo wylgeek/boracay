@@ -4,121 +4,199 @@ import com.hex.bigdata.udsp.client.factory.ConsumerClientFactory;
 import com.hex.bigdata.udsp.client.impl.OlqClient;
 import com.hex.bigdata.udsp.client.impl.SqlClient;
 import com.hex.bigdata.udsp.constant.SdkConstant;
+import com.hex.bigdata.udsp.constant.StatusCode;
+import com.hex.bigdata.udsp.model.Page;
 import com.hex.bigdata.udsp.model.request.OlqRequest;
 import com.hex.bigdata.udsp.model.request.SqlRequest;
 import com.hex.bigdata.udsp.model.request.StatusRequest;
 import com.hex.bigdata.udsp.model.response.pack.AsyncPackResponse;
 import com.hex.bigdata.udsp.model.response.pack.StatusPackResponse;
 import com.hex.bigdata.udsp.model.response.pack.SyncPackResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * SQL客户端查询DEMO
- * Created with IntelliJ IDEA
- * Author: tomnic.wang
- * DATE:2017/7/20
- * TIME:20:03
+ * 交互查询调用示例
  */
 public class SqlClientDemo {
-    public static void main(String[] args) {
-        SqlClientDemo demo = new SqlClientDemo();
+    /**
+     * 日志记录
+     */
+    private static Logger logger = LogManager.getLogger(SqlClientDemo.class);
 
-        //SQL客户端查询异步start
-        //demo.asyncStartTest();
-        //SQL客户端查询异步status
-        //demo.syncStatustTest();
-        //SQL客户端查询同步start
-        demo.syncStartTest();
+    /**
+     * SQL客户端查询同步start
+     */
+    private void syncStart() {
+        //创建自定义客户端
+//        String url = "http://127.0.0.1:8088/udsp/http/consume";
+//        SqlClient client = ConsumerClientFactory.createCustomClient(SqlClient.class, url);
+        //创建默认客户端,根据udsp.config.properties配置文件获取地址
+        SqlClient client = ConsumerClientFactory.createCustomClient(SqlClient.class);
 
+        //创建请求实体
+        SqlRequest request = new SqlRequest();
+        //基础参数设置-设置调用服务的名称
+        request.setServiceName("core02");
+        //基础参数设置-上层应用系统使用者工号
+        request.setAppUser("10097");
+        //基础参数设置-设置调用start接口
+        request.setEntity(SdkConstant.CONSUMER_ENTITY_START);
+        //基础参数设置-设置同步调用，同步调用为sync，异步调用为async
+        request.setType(SdkConstant.CONSUMER_TYPE_SYNC);
+
+        //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
+        request.setUdspUser("test");
+        request.setToken("000000");
+
+        //设置业务参数-查询SQL
+        request.setSql("select * from cmdata.c01_cd_acct limit 1");
+
+        //调用并获取返回结果
+        SyncPackResponse response = client.syncStart(request);
+
+        // 拆包响应对象
+        if (response == null) {
+            logger.error("客户端异常");
+        } else {
+            if (StatusCode.SUCCESS == response.getStatusCode()) {
+                // 耗时
+                logger.debug("耗时：" + response.getConsumeTime());
+                // 消费ID
+                logger.debug("消费ID：" + response.getConsumeId());
+                // 字段信息
+                LinkedHashMap<String, String> returnColumns = response.getReturnColumns();
+                for (Map.Entry<String, String> entry : returnColumns.entrySet()) {
+                    logger.debug("名称：" + entry.getKey() + "，类型：" + entry.getValue());
+                }
+                // 数据信息
+                List<Map<String, String>> records = response.getRecords();
+                for (Map<String, String> record : records) {
+                    for (Map.Entry<String, String> entry : record.entrySet()) {
+                        logger.debug("名称：" + entry.getKey() + "，值：" + entry.getValue());
+                    }
+                }
+            } else {
+                logger.error("状态：" + response.getStatus());
+                logger.error("状态码：" + response.getStatusCode());
+                logger.error("错误码：" + response.getErrorCode());
+                logger.error("错误信息：" + response.getMessage());
+            }
+        }
     }
 
     /**
      * SQL客户端查询异步start
      */
-    private void asyncStartTest() {
-        //udsp请求url
-        String url = "http://127.0.0.1:8088/udsp/http/consume";
+    private void asyncStart() {
         //创建自定义客户端
-        SqlClient sqlClient = ConsumerClientFactory.createCustomClient(SqlClient.class, url);
-        //创建默认客户端,根据sdk.config.properties配置文件获取地址
-        //SqlClient sqlClient=ConsumerClientFactory.createOlqDefaultClient();
+//        String url = "http://127.0.0.1:8088/udsp/http/consume";
+//        SqlClient client = ConsumerClientFactory.createCustomClient(SqlClient.class, url);
+        //创建默认客户端,根据udsp.config.properties配置文件获取地址
+        SqlClient client = ConsumerClientFactory.createCustomClient(SqlClient.class);
+
         //创建请求实体
-        SqlRequest sqlRequest = new SqlRequest();
+        SqlRequest request = new SqlRequest();
         //基础参数设置-设置调用服务的名称
-        sqlRequest.setServiceName("core02");
+        request.setServiceName("core02");
         //基础参数设置-上层应用系统使用者工号
-        sqlRequest.setAppUser("10097");
+        request.setAppUser("10097");
         //基础参数设置-设置调用start接口
-        sqlRequest.setEntity(SdkConstant.CONSUMER_ENTITY_START);
+        request.setEntity(SdkConstant.CONSUMER_ENTITY_START);
         //基础参数设置-设置异步调用，同步调用为sync，异步调用为async
-        sqlRequest.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
+        request.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
         //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
-        sqlRequest.setUdspUser("test");
-        sqlRequest.setToken("000000");
+        request.setUdspUser("test");
+        request.setToken("000000");
         //设置业务参数-查询SQL
-        sqlRequest.setSql("select * from cmdata.c01_cd_acct limit 1");
+        request.setSql("select * from cmdata.c01_cd_acct limit 1");
+
         //调用并获取返回结果
-        AsyncPackResponse asyncPackResponse = sqlClient.asyncStart(sqlRequest);
-    }
+        AsyncPackResponse response = client.asyncStart(request);
 
-    /**
-     * SQL客户端查询同步start
-     */
-    private void syncStartTest() {
-        //udsp请求url
-        String url = "http://127.0.0.1:8088/udsp/http/consume";
-        //创建自定义客户端
-        SqlClient sqlClient = ConsumerClientFactory.createCustomClient(SqlClient.class, url);
-        //创建默认客户端,根据sdk.config.properties配置文件获取地址
-        //SqlClient sqlClient=ConsumerClientFactory.createOlqDefaultClient();
-        //创建请求实体
-        SqlRequest sqlRequest = new SqlRequest();
-        //基础参数设置-设置调用服务的名称
-        sqlRequest.setServiceName("core02");
-        //基础参数设置-上层应用系统使用者工号
-        sqlRequest.setAppUser("10097");
-        //基础参数设置-设置调用start接口
-        sqlRequest.setEntity(SdkConstant.CONSUMER_ENTITY_START);
-        //基础参数设置-设置同步调用，同步调用为sync，异步调用为async
-        sqlRequest.setType(SdkConstant.CONSUMER_TYPE_SYNC);
-
-        //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
-        sqlRequest.setUdspUser("test");
-        sqlRequest.setToken("000000");
-
-        //设置业务参数-查询SQL
-        sqlRequest.setSql("select * from cmdata.c01_cd_acct limit 1");
-        //调用并获取返回结果
-        SyncPackResponse syncPackResponse = sqlClient.syncStart(sqlRequest);
+        // 拆包响应对象
+        if (response == null) {
+            logger.error("客户端异常");
+        } else {
+            if (StatusCode.SUCCESS == response.getStatusCode()) {
+                // 耗时
+                logger.debug("耗时：" + response.getConsumeTime());
+                // 消费ID
+                logger.debug("消费ID：" + response.getConsumeId());
+                // 生成文件的FTP路径
+                logger.debug("生成文件的FTP路径：" + response.getResponseContent());
+                /**
+                 * 成功说明异步任务已经调起
+                 */
+                // 可以继续循环执行查看状态的操作
+            } else {
+                logger.error("状态：" + response.getStatus());
+                logger.error("状态码：" + response.getStatusCode());
+                logger.error("错误码：" + response.getErrorCode());
+                logger.error("错误信息：" + response.getMessage());
+            }
+        }
     }
 
     /**
      * SQL客户端查询异步status
      */
-    private void syncStatustTest() {
-        //udsp请求url
-        String url = "http://127.0.0.1:8088/udsp/http/consume";
+    private void asyncStatus() {
         //创建自定义客户端
-        SqlClient sqlClient = ConsumerClientFactory.createCustomClient(SqlClient.class, url);
-        //创建默认客户端,根据sdk.config.properties配置文件获取地址
-        //SqlClient sqlClient=ConsumerClientFactory.createOlqDefaultClient();
+//        String url = "http://127.0.0.1:8088/udsp/http/consume";
+//        SqlClient client = ConsumerClientFactory.createCustomClient(SqlClient.class, url);
+        //创建默认客户端,根据udsp.config.properties配置文件获取地址
+        SqlClient client = ConsumerClientFactory.createCustomClient(SqlClient.class);
+
         //创建请求实体
-        StatusRequest statusRequest = new StatusRequest();
+        StatusRequest request = new StatusRequest();
         //基础参数设置-设置调用服务的名称
-        statusRequest.setServiceName("smart01");
+        request.setServiceName("smart01");
         //基础参数设置-上层应用系统使用者工号
-        statusRequest.setAppUser("10097");
+        request.setAppUser("10097");
         //基础参数设置-设置调用status接口
-        statusRequest.setEntity(SdkConstant.CONSUMER_ENTITY_STATUS);
+        request.setEntity(SdkConstant.CONSUMER_ENTITY_STATUS);
         //基础参数设置-设置同步调用，同步调用为sync，异步调用为async
-        statusRequest.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
+        request.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
 
         //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
-        statusRequest.setUdspUser("test");
-        statusRequest.setToken("000000");
+        request.setUdspUser("test");
+        request.setToken("000000");
 
         //设置业务参数-消费id
-        statusRequest.setConsumeId("a7f85c82a1c290c9316b7fa07a7a627");
+        request.setConsumeId("a7f85c82a1c290c9316b7fa07a7a627");
+
         //调用并获取返回结果
-        StatusPackResponse statusPackResponse = sqlClient.asyncStatus(statusRequest);
+        StatusPackResponse response = client.asyncStatus(request);
+
+        // 拆包响应对象
+        if (response == null) {
+            logger.error("客户端异常");
+        } else {
+            if (StatusCode.SUCCESS == response.getStatusCode()) {
+                logger.info("异步消费完成");
+                // 可以继续执行FTP下载文件的操作
+            }
+            if (StatusCode.RUNING == response.getStatusCode()) {
+                logger.info("异步消费正在执行");
+                // 可以继续执行查看状态的操作
+            } else {
+                logger.error("状态：" + response.getStatus());
+                logger.error("状态码：" + response.getStatusCode());
+                logger.error("错误码：" + response.getErrorCode());
+                logger.error("错误信息：" + response.getMessage());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SqlClientDemo demo = new SqlClientDemo();
+        demo.asyncStart();
+        demo.asyncStatus();
+        demo.syncStart();
     }
 }

@@ -3,14 +3,14 @@ package com.hex.bigdata.udsp.olq.service;
 import com.hex.bigdata.udsp.common.model.ComDatasource;
 import com.hex.bigdata.udsp.common.model.ComProperties;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
+import com.hex.bigdata.udsp.common.provider.model.Page;
 import com.hex.bigdata.udsp.common.service.ComDatasourceService;
 import com.hex.bigdata.udsp.common.service.ComPropertiesService;
 import com.hex.bigdata.udsp.common.util.ObjectUtil;
-import com.hex.bigdata.udsp.olq.model.OLQQuerySql;
 import com.hex.bigdata.udsp.olq.provider.Provider;
-import com.hex.bigdata.udsp.olq.provider.model.OLQRequest;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponse;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponseFetch;
+import com.hex.bigdata.udsp.olq.provider.model.OlqRequest;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponse;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponseFetch;
 import com.hex.goframe.dao.GFDictMapper;
 import com.hex.goframe.model.GFDict;
 import com.hex.goframe.service.BaseService;
@@ -18,9 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 
@@ -31,59 +28,28 @@ import java.util.List;
 public class OlqProviderService extends BaseService {
     @Autowired
     private ComDatasourceService comDatasourceService;
+
     @Autowired
     private ComPropertiesService comPropertiesService;
+
     @Autowired
     private GFDictMapper gfDictMapper;
 
-
     /**
      * 查询
      *
-     * @param dsId
-     * @param olqQuerySql
-     * @return
-     */
-    public OLQResponse select(String dsId, OLQQuerySql olqQuerySql) {
-        Datasource datasource = getDatasource(dsId);
-        OLQRequest request = new OLQRequest(datasource, olqQuerySql);
-        Provider provider = getProviderImpl(datasource);
-        OLQResponse response = provider.execute(request);
-        response.setColumns(this.putColumnIntoMap(response.getMetadata()));
-        return response;
-    }
-
-    /**
-     * 查询
-     *
+     * @param consumeId
      * @param dsId
      * @param sql
+     * @param page
      * @return
      */
-    public OLQResponse select(String dsId, String sql) {
+    public OlqResponse select(String consumeId, String dsId, String sql, Page page) {
         Datasource datasource = getDatasource(dsId);
-        OLQRequest request = new OLQRequest(datasource, new OLQQuerySql(sql));
+        OlqRequest request = new OlqRequest(datasource, sql, page);
         Provider provider = getProviderImpl(datasource);
-        OLQResponse response = provider.execute(request);
+        OlqResponse response = provider.execute(consumeId, request);
         return response;
-    }
-
-
-    /**
-     * 元数据列信息插入到Map
-     * @param rsmd
-     * @return
-     */
-    private LinkedHashMap<String,String> putColumnIntoMap(ResultSetMetaData rsmd){
-        LinkedHashMap<String,String> columnMap = new LinkedHashMap<>();
-        try {
-            for (int i = 1; i <= rsmd.getColumnCount() ; i++) {
-                columnMap.put(rsmd.getColumnName(i),rsmd.getColumnTypeName(i));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return columnMap;
     }
 
     /**
@@ -91,13 +57,14 @@ public class OlqProviderService extends BaseService {
      *
      * @param dsId
      * @param sql
+     * @param page
      * @return
      */
-    public OLQResponseFetch selectFetch(String dsId, String sql) {
+    public OlqResponseFetch selectFetch(String consumeId, String dsId, String sql, Page page) {
         Datasource datasource = getDatasource(dsId);
-        OLQRequest request = new OLQRequest(datasource, new OLQQuerySql(sql));
+        OlqRequest request = new OlqRequest(datasource, sql, page);
         Provider provider = getProviderImpl(datasource);
-        OLQResponseFetch response = provider.executeFetch(request);
+        OlqResponseFetch response = provider.executeFetch(consumeId, request);
         return response;
     }
 
@@ -132,20 +99,6 @@ public class OlqProviderService extends BaseService {
      * @return
      */
     private Provider getProviderImpl(Datasource datasource) {
-        String implClass = datasource.getImplClass();
-        if (StringUtils.isBlank(implClass)) {
-            GFDict gfDict = gfDictMapper.selectByPrimaryKey("OLQ_IMPL_CLASS", datasource.getType());
-            implClass = gfDict.getDictName();
-        }
-        return (Provider) ObjectUtil.newInstance(implClass);
-    }
-
-    /**
-     * 得到生产接口的实例
-     * @param datasource
-     * @return
-     */
-    public Provider getProviderImpl(ComDatasource datasource) {
         String implClass = datasource.getImplClass();
         if (StringUtils.isBlank(implClass)) {
             GFDict gfDict = gfDictMapper.selectByPrimaryKey("OLQ_IMPL_CLASS", datasource.getType());

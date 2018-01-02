@@ -64,4 +64,12 @@ public class ConsumerConstant {
 
     public static final String CONSUME_RTS_DATASTREAM="dataStream";
 
+    /**
+     * 服务启停状态参数-启动
+     */
+    public static final String SERVICE_STATUS_START="0";
+    /**
+     * 服务启停状态参数-停用
+     */
+    public static final String SERVICE_STATUS_STOP="1";
 }

@@ -21,7 +21,7 @@ public interface BatchTargetProvider extends TargetProvider, BatchProvider {
      * @return
      * @throws Exception
      */
-    boolean createTargetEngineSchema(Model model) throws Exception;
+    void createTargetEngineSchema(Model model) throws Exception;
 
     /**
      * 删除目标引擎Schema
@@ -30,5 +30,5 @@ public interface BatchTargetProvider extends TargetProvider, BatchProvider {
      * @return
      * @throws Exception
      */
-    boolean dropTargetEngineSchema(Model model) throws Exception;
+    void dropTargetEngineSchema(Model model) throws Exception;
 }

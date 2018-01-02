@@ -1,6 +1,8 @@
 package com.hex.bigdata.udsp.im.provider.impl.wrapper;
 
 import com.hex.bigdata.udsp.common.constant.DataType;
+import com.hex.bigdata.udsp.common.util.CharUtil;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.im.provider.BatchTargetProvider;
 import com.hex.bigdata.udsp.im.provider.RealtimeTargetProvider;
@@ -12,6 +14,7 @@ import com.hex.bigdata.udsp.im.provider.impl.util.HBaseUtil;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.*;
 import com.hex.bigdata.udsp.im.provider.model.Metadata;
 import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
+import com.hex.bigdata.udsp.im.provider.model.Model;
 import com.hex.bigdata.udsp.im.provider.model.ModelMapping;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,12 +70,16 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
 
     @Override
     protected List<String> getSelectColumns(List<ModelMapping> modelMappings, Metadata metadata) {
+        if (modelMappings == null || modelMappings.size() == 0)
+            return null;
         List<String> selectColumns = new ArrayList<>();
         HBaseMetadata hBaseMetadata = new HBaseMetadata(metadata);
         String fqDataType = hBaseMetadata.getFqDataType();
         String fqDsvSeprator = hBaseMetadata.getFqDsvSeprator();
         // 按照目标元数据字段升序
-        Collections.sort(modelMappings, new Comparator<ModelMapping>() {
+        List<ModelMapping> newModelMappings = new ArrayList<>();
+        newModelMappings.addAll(modelMappings);
+        Collections.sort(newModelMappings, new Comparator<ModelMapping>() {
             @Override
             public int compare(ModelMapping o1, ModelMapping o2) {
                 return o1.getMetadataCol().getSeq().compareTo(o2.getMetadataCol().getSeq());
@@ -83,73 +90,72 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
          */
         String val = "";
         List<MetadataCol> vals = new ArrayList<>();
-        for (ModelMapping mapping : modelMappings) {
+        for (ModelMapping mapping : newModelMappings) {
             String sName = mapping.getName();
             MetadataCol mdCol = mapping.getMetadataCol();
-            boolean stored = mdCol.isStored();
+            String tName = mdCol.getName();
+            mdCol.setNote(tName);
             mdCol.setName(sName);
-            if (stored) vals.add(mdCol);
+            if (mdCol.isStored()) vals.add(mdCol);
         }
         if ("json".equalsIgnoreCase(fqDataType)) {
             val = getJsonValueSql(vals);
         } else {
             val = getDsvValueSql(vals, fqDsvSeprator);
         }
-        selectColumns.add(val);
+        logger.debug("VALUE=>" + val);
         /*
          根据目标元数据字段信息获取key值
          */
         int count = 0;
-        for (ModelMapping mapping : modelMappings) {
-            MetadataCol mdCol = mapping.getMetadataCol();
-            boolean primary = mdCol.isPrimary();
-            if (primary) count++;
+        for (ModelMapping mapping : newModelMappings) {
+            if (mapping.getMetadataCol().isPrimary()) count++;
         }
         String key = null;
         if (count == 0) { // 没有主键
             List<MetadataCol> dts = new ArrayList<>();
             List<MetadataCol> keys = new ArrayList<>();
-            for (ModelMapping mapping : modelMappings) {
-                String sName = mapping.getName();
+            for (ModelMapping mapping : newModelMappings) {
                 MetadataCol mdCol = mapping.getMetadataCol();
-                DataType tType = mdCol.getType();
-                boolean indexed = mdCol.isIndexed();
-                if (indexed) {
-                    mdCol.setName(sName);
-                    if (DataType.TIMESTAMP == tType) {
+                if (mdCol.isIndexed()) {
+                    mdCol.setName(mapping.getName());
+                    if (DataType.TIMESTAMP == mdCol.getType()) {
                         dts.add(mdCol);
                     } else {
                         keys.add(mdCol);
                     }
                 }
             }
-            if (StringUtils.isBlank(key)) {
-                key = getKeySql(keys, dts, vals);
-            }
+            key = getKeySql(keys, dts, vals);
         } else if (count == 1) { // 一个主键
-            for (ModelMapping mapping : modelMappings) {
+            for (ModelMapping mapping : newModelMappings) {
                 String sName = mapping.getName();
                 MetadataCol mdCol = mapping.getMetadataCol();
                 boolean primary = mdCol.isPrimary();
                 if (primary) {
-                    key = "CAST(" + sName + " AS STRING) AS KEY";
+                    key = "NVL(CAST(" + sName + " AS STRING),'') AS KEY";
                     break;
                 }
             }
         } else { // 多个主键
             key = "SUBSTR(SYS_MD5(CONCAT_WS('|',";
-            for (int i = 0; i < modelMappings.size(); i++) {
-                String sName = modelMappings.get(i).getName();
-                MetadataCol mdCol = modelMappings.get(i).getMetadataCol();
+            for (int i = 0, k = 0; i < newModelMappings.size(); i++) {
+                String sName = newModelMappings.get(i).getName();
+                MetadataCol mdCol = newModelMappings.get(i).getMetadataCol();
                 boolean primary = mdCol.isPrimary();
                 if (primary) {
-                    key += (i == 0 ? "NVL(CAST(" + sName + " AS STRING),'')"
+                    key += (k == 0 ? "NVL(CAST(" + sName + " AS STRING),'')"
                             : ",NVL(CAST(" + sName + " AS STRING),'')");
+                    k++;
                 }
             }
             key += ")),9,16) AS KEY";
         }
+        logger.debug("KEY=>" + key);
+
         selectColumns.add(key);
+        selectColumns.add(val);
+
         return selectColumns;
     }
 
@@ -157,7 +163,7 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
         if ((keys == null || keys.size() == 0) && (dts == null || dts.size() == 0)) {
             throw new IllegalArgumentException("keys和dts不能同时为空");
         }
-        String sql = "\nCONCAT_WS('|',";
+        String sql = "\nCONCAT_WS('|'";
         // 哈希头
         sql += getHashStrSql(keys);
         // 普通字段
@@ -167,9 +173,8 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
                 String name = mdCol.getName();
                 String length = mdCol.getLength();
                 int len = getLen(length);
-                String space = (len <= 0 ? "" : ",SPACE(" + len + "-LENGTH(CAST(" + name + " AS STRING))");
-                sql += (i == 0 ? "\nCONCAT(CAST(" + name + " AS STRING)" + space + ")"
-                        : "\n,CONCAT(CAST(" + name + " AS STRING)" + space + ")");
+                String space = (len <= 0 ? "" : ",SPACE(" + len + "-LENGTH(CAST(" + name + " AS STRING)))");
+                sql += "\n,CONCAT(CAST(" + name + " AS STRING)" + space + ")";
             }
         }
         // 日期字段
@@ -179,33 +184,39 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
                 String name = mdCol.getName();
                 String length = mdCol.getLength();
                 int len = getLen(length);
-                sql += (keys.size() == 0 ? "" : ",");
-                if (len == 10) {
-                    sql += "SUBSTR(" + name + ",1,10)";
+                sql += (keys.size() == 0 ? "\n" : "\n,");
+                if (len == 19) {
+                    sql += "SUBSTR(REGEXP_REPLACE(CAST(" + name + " AS STRING),'/','-'),1,19)";
+                } else if (len == 17) {
+                    sql += "SUBSTR(REGEXP_REPLACE(REGEXP_REPLACE(CAST(" + name + " AS STRING),'/','-'),'-',''),1,17))";
+                } else if (len == 10) {
+                    sql += "SUBSTR(REGEXP_REPLACE(CAST(" + name + " AS STRING),'/','-'),1,10)";
                 } else if (len == 8) {
-                    sql += "SUBSTR(REGEXP_REPLACE(REGEXP_REPLACE(" + name + ",'-',''),'/',''),1,8))";
+                    sql += "SUBSTR(REGEXP_REPLACE(REGEXP_REPLACE(CAST(" + name + " AS STRING),'/','-'),'-',''),1,8))";
                 } else {
-                    sql += name;
+                    sql += "REGEXP_REPLACE(CAST(" + name + " AS STRING),'/','-')";
                 }
             }
         }
         // 哈希尾
-        sql += getHashStrSql(vals);
-        sql += ") AS KEY";
+        if (vals.size() > 0) {
+            sql += getHashStrSql(vals);
+        }
+        sql += "\n) AS KEY";
         return sql;
     }
 
     private String getHashStrSql(List<MetadataCol> list) {
         String sql = "";
         if (list != null && list.size() > 0) {
-            sql = "\nSUBSTR(SYS_MD5(CONCAT_WS('|',";
+            sql = "\n,SUBSTR(SYS_MD5(CONCAT_WS('|',";
             for (int i = 0; i < list.size(); i++) {
                 MetadataCol mdCol = list.get(i);
                 String name = mdCol.getName();
                 sql += (i == 0 ? "NVL(CAST(" + name + " AS STRING),'')"
                         : ",NVL(CAST(" + name + " AS STRING),'')");
             }
-            sql += ")),9,16),";
+            sql += ")),9,16)";
         }
         return sql;
     }
@@ -216,7 +227,7 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
             try {
                 len = Integer.valueOf(length);
             } catch (Exception e) {
-                logger.debug(e.getMessage());
+                logger.debug(ExceptionUtil.getMessage(e));
             }
         }
         return len;
@@ -224,12 +235,15 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
 
     private String getJsonValueSql(List<MetadataCol> vals) {
         if (vals == null || vals.size() == 0) {
-            throw new IllegalArgumentException("vals不能为空");
+            throw new IllegalArgumentException("HBase至少要有一个或多个存储字段！");
         }
         String sql = "\nJSON_WS(";
         for (int i = 0; i < vals.size(); i++) {
-            sql += (i == 0 ? "\nNVL(CAST(" + vals.get(i).getName() + " AS STRING),'')"
-                    : "\n,NVL(CAST(" + vals.get(i).getName() + " AS STRING),'')");
+            MetadataCol metadataCol = vals.get(i);
+            String sName = metadataCol.getName();
+            String tName = metadataCol.getNote();
+            sql += (i == 0 ? "\n'" + tName + "',NVL(CAST(" + sName + " AS STRING),'')"
+                    : "\n,'" + tName + "',NVL(CAST(" + sName + " AS STRING),'')");
         }
         sql += "\n) AS VAL";
         return sql;
@@ -237,28 +251,24 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
 
     private String getDsvValueSql(List<MetadataCol> vals, String seprator) {
         if (vals == null || vals.size() == 0) {
-            throw new IllegalArgumentException("vals不能为空");
+            throw new IllegalArgumentException("HBase至少要有一个或多个存储字段！");
         }
         String sql = "\nCONCAT_WS('" + seprator + "'";
         for (int i = 0; i < vals.size(); i++) {
-            sql += "\n,NVL(CAST(" + vals.get(i).getName() + " AS STRING),'')";
+            MetadataCol metadataCol = vals.get(i);
+            String sName = metadataCol.getName();
+            sql += "\n,NVL(CAST(" + sName + " AS STRING),'')";
         }
         sql += "\n) AS VAL";
         return sql;
     }
 
     @Override
-    protected List<String> getInsertColumns(List<ModelMapping> modelMappings, Metadata metadata) {
-        List<java.lang.String> insertColumns = new ArrayList<>();
-        insertColumns.add("KEY");
-        insertColumns.add("VAL");
-        return insertColumns;
-    }
-
-    @Override
     protected void insertInto(Metadata metadata, List<ModelMapping> modelMappings, List<ValueColumn> valueColumns) throws Exception {
+        checkModelMappings(modelMappings);
+
         String tableName = metadata.getTbName();
-        HBaseDatasource hBaseDatasource = new HBaseDatasource(metadata.getDatasource().getPropertyMap());
+        HBaseDatasource hBaseDatasource = new HBaseDatasource(metadata.getDatasource());
         HBaseMetadata hBaseMetadata = new HBaseMetadata(metadata);
         String fqDataType = hBaseMetadata.getFqDataType();
         String fqDsvSeprator = hBaseMetadata.getFqDsvSeprator();
@@ -282,72 +292,74 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
         String value = "";
         List<MetadataCol> vals = new ArrayList<>();
         for (ModelMapping mapping : modelMappings) {
-            String sName = mapping.getName();
             MetadataCol mdCol = mapping.getMetadataCol();
-            boolean stored = mdCol.isStored();
-            mdCol.setName(sName);
-            if (stored) vals.add(mdCol);
+            if (mdCol.isStored()) vals.add(mdCol);
         }
         if ("json".equalsIgnoreCase(fqDataType)) {
             value = getJsonValue(vals, valueMap);
         } else {
             value = getDsvValue(vals, fqDsvSeprator, valueMap);
         }
+        logger.debug("VALUE=>" + value);
         /*
          根据目标元数据字段信息获取key值
          */
         int count = 0;
         for (ModelMapping mapping : modelMappings) {
-            MetadataCol mdCol = mapping.getMetadataCol();
-            boolean primary = mdCol.isPrimary();
-            if (primary) count++;
+            if (mapping.getMetadataCol().isPrimary()) count++;
         }
-        String rowkey = "";
+        String key = "";
         if (count == 0) { // 没有主键
             List<MetadataCol> dts = new ArrayList<>();
             List<MetadataCol> keys = new ArrayList<>();
             for (ModelMapping mapping : modelMappings) {
-                String sName = mapping.getName();
                 MetadataCol mdCol = mapping.getMetadataCol();
-                DataType tType = mdCol.getType();
-                boolean indexed = mdCol.isIndexed();
-                if (indexed) {
-                    mdCol.setName(sName);
-                    if (DataType.TIMESTAMP == tType) {
+                if (mdCol.isIndexed()) {
+                    if (DataType.TIMESTAMP == mdCol.getType()) {
                         dts.add(mdCol);
                     } else {
                         keys.add(mdCol);
                     }
                 }
             }
-            if (StringUtils.isBlank(rowkey)) {
-                rowkey = getKey(keys, dts, vals, valueMap);
-            }
+            key = getKey(keys, dts, vals, valueMap);
         } else if (count == 1) { // 一个主键
             for (ModelMapping mapping : modelMappings) {
-                String sName = mapping.getName();
                 MetadataCol mdCol = mapping.getMetadataCol();
-                boolean primary = mdCol.isPrimary();
-                if (primary) {
-                    rowkey = valueMap.get(sName);
+                if (mdCol.isPrimary()) {
+                    key = valueMap.get(mdCol.getName());
                     break;
                 }
             }
         } else { // 多个主键
-            rowkey = "";
+            key = "";
             for (int i = 0; i < modelMappings.size(); i++) {
-                String sName = modelMappings.get(i).getName();
                 MetadataCol mdCol = modelMappings.get(i).getMetadataCol();
-                boolean primary = mdCol.isPrimary();
-                if (primary) {
-                    rowkey += (i == 0 ? "" : "|");
-                    rowkey += valueMap.get(sName);
+                if (mdCol.isPrimary()) {
+                    key += (i == 0 ? "" : "|");
+                    key += valueMap.get(mdCol.getName());
                 }
             }
-            rowkey = md5_16(rowkey);
+            key = md5_16(key);
         }
+        logger.debug("KEY=>" + key);
+        HBaseUtil.put(hBaseDatasource, tableName, key, family, qualifier, value);
+    }
 
-        HBaseUtil.put(hBaseDatasource, tableName, rowkey, family, qualifier, value);
+    private void checkModelMappings(List<ModelMapping> modelMappings) {
+        boolean flg = false;
+        for (ModelMapping modelMapping : modelMappings) {
+            if (modelMapping.getMetadataCol().isPrimary()) {
+                flg = true;
+                break;
+            } else if (modelMapping.getMetadataCol().isIndexed()) {
+                flg = true;
+                break;
+            }
+        }
+        if (!flg) {
+            throw new IllegalArgumentException("【映射字段】的目标字段必须要有至少一个主键或者索引字段！");
+        }
     }
 
     private String getKey(List<MetadataCol> keys, List<MetadataCol> dts, List<MetadataCol> vals, Map<String, String> valueMap) {
@@ -366,6 +378,7 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
                 MetadataCol mdCol = keys.get(i);
                 String name = mdCol.getName();
                 String value = valueMap.get(name);
+                if (value == null) value = "";
                 int len = getLen(mdCol.getLength());
                 str += (i == 0 ? "" : "|");
                 str += (len <= 0 ? value : realValue(value, len));
@@ -379,14 +392,15 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
                 MetadataCol mdCol = dts.get(i);
                 String name = mdCol.getName();
                 String value = valueMap.get(name);
+                if (value == null) value = "";
                 int len = getLen(mdCol.getLength());
                 str += (i == 0 ? "" : "|");
-                if (len == 10) {
+                if (len == 10 && value.length() > 10) {
                     str += value.substring(0, 10);
-                } else if (len == 8) {
+                } else if (len == 8 && value.length() > 8) {
                     str += replaceDateStr(value).substring(0, 8);
                 } else {
-                    str += name;
+                    str += value;
                 }
             }
         }
@@ -394,7 +408,6 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
         // 哈希尾
         str = getHashStr(vals, valueMap);
         if (StringUtils.isNotBlank(str)) list.add(str);
-
         return StringUtils.join(list, "|");
     }
 
@@ -446,7 +459,7 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
 
     private String getJsonValue(List<MetadataCol> vals, Map<String, String> valueMap) {
         if (vals == null || vals.size() == 0) {
-            throw new IllegalArgumentException("vals不能为空");
+            throw new IllegalArgumentException("HBase至少要有一个或多个存储字段！");
         }
         Map<String, String> map = new HashMap<>();
         for (MetadataCol col : vals) {
@@ -456,15 +469,15 @@ public abstract class HBaseWrapper extends Wrapper implements BatchTargetProvide
         return JSONUtil.parseMap2JSON(map);
     }
 
-    private String getDsvValue(List<MetadataCol> vals, String seprator, Map<String, String> valueMap) {
+    private String getDsvValue(List<MetadataCol> vals, String seprator, Map<String, String> valueMap) throws Exception {
         if (vals == null || vals.size() == 0) {
-            throw new IllegalArgumentException("vals不能为空");
+            throw new IllegalArgumentException("HBase至少要有一个或多个存储字段！");
         }
         List<String> list = new ArrayList<>();
         for (MetadataCol col : vals) {
             list.add(valueMap.get(col.getName()));
         }
-        return StringUtils.join(list, seprator);
+        return StringUtils.join(list, CharUtil.ascii2Char(seprator));
     }
 
     @Override

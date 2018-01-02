@@ -40,13 +40,14 @@ public class BatchJobController {
      * @param pkId 模型的主键
      * @return
      */
+    @Deprecated
     @RequestMapping(value = "start/{pkId}")
     @ResponseBody
-    public MessageResult start(@PathVariable("pkId") String pkId,@RequestBody ModelFilterCol[] modelFilterCols) {
+    public MessageResult start(@PathVariable("pkId") String pkId, @RequestBody ModelFilterCol[] modelFilterCols) {
         boolean status = true;
         String message = "批量作业构建成功！";
         try {
-            Model model = imModelService.getModel(pkId,modelFilterCols);
+            Model model = imModelService.getModel(pkId, modelFilterCols);
             batchJobService.start(model);
         } catch (Exception e) {
             e.printStackTrace();

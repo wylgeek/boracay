@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.olq.dao.OlqApplicationMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.olq.model.OlqApplication" >
+    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+    <result column="OLQ_SQL" property="olqSql" jdbcType="VARCHAR" />
+    <result column="OLQ_DS_ID" property="olqDsId" jdbcType="VARCHAR" />
+    <result column="MAX_NUM" property="maxNum" jdbcType="DECIMAL" />
+    <result column="DEL_FLG" property="delFlg" jdbcType="CHAR" />
+    <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR" />
+    <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR" />
+    <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR" />
+    <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR" />
+    <result column="NOTE" property="note" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIBE" property="describe" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="FullResultMap" type="com.hex.bigdata.udsp.olq.dto.OlqApplicationView" extends="BaseResultMap">
+    <result column="DS_ID" property="dsId" jdbcType="VARCHAR" />
+    <result column="DS_NAME" property="dsName" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from OLQ_APPLICATION
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByPrimaryKeyFake" parameterType="java.lang.String" >
+    update OLQ_APPLICATION set DEL_FLG = '1' where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <insert id="insert" parameterType="com.hex.bigdata.udsp.olq.model.OlqApplication" >
+    insert into OLQ_APPLICATION (PK_ID, OLQ_SQL,
+      OLQ_DS_ID, MAX_NUM, DEL_FLG, 
+      CRT_USER, CRT_TIME, UPT_USER, 
+      UPT_TIME, NOTE, NAME, DESCRIBE)
+    values (#{pkId,jdbcType=VARCHAR}, #{olqSql,jdbcType=VARCHAR},
+      #{olqDsId,jdbcType=VARCHAR}, #{maxNum,jdbcType=DECIMAL}, #{delFlg,jdbcType=CHAR}, 
+      #{crtUser,jdbcType=VARCHAR}, #{crtTime,jdbcType=VARCHAR}, #{uptUser,jdbcType=VARCHAR}, 
+      #{uptTime,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+      #{describe,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.olq.model.OlqApplication" >
+    update OLQ_APPLICATION
+    set
+      OLQ_SQL = #{olqSql,jdbcType=VARCHAR},
+      OLQ_DS_ID = #{olqDsId,jdbcType=VARCHAR},
+      MAX_NUM = #{maxNum,jdbcType=DECIMAL},
+      DEL_FLG = #{delFlg,jdbcType=CHAR},
+      CRT_USER = #{crtUser,jdbcType=VARCHAR},
+      CRT_TIME = #{crtTime,jdbcType=VARCHAR},
+      UPT_USER = #{uptUser,jdbcType=VARCHAR},
+      UPT_TIME = #{uptTime,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      describe = #{describe,jdbcType=VARCHAR}
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select olq.PK_ID, olq.OLQ_SQL, olq.OLQ_DS_ID, olq.MAX_NUM, olq.DEL_FLG, olq.CRT_USER, olq.CRT_TIME,
+    olq.UPT_USER, olq.UPT_TIME, olq.NOTE, olq.NAME, olq.DESCRIBE
+    from OLQ_APPLICATION olq
+    where olq.DEL_FLG = '0'
+    AND olq.PK_ID = #{pkId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select PK_ID, OLQ_SQL, OLQ_DS_ID, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME,
+    UPT_USER, UPT_TIME, NOTE, NAME, DESCRIBE
+    from OLQ_APPLICATION
+    where DEL_FLG = '0'
+  </select>
+  <select id="selectPage" resultMap="FullResultMap" parameterType="com.hex.bigdata.udsp.olq.dto.OlqApplicationView">
+    select olq.PK_ID, olq.OLQ_SQL, olq.OLQ_DS_ID, olq.MAX_NUM, olq.DEL_FLG, olq.CRT_USER, olq.CRT_TIME,
+    olq.UPT_USER, olq.UPT_TIME, olq.NOTE, olq.NAME, olq.DESCRIBE, ds.name DS_NAME, ds.PK_ID DS_ID
+    from OLQ_APPLICATION olq
+    LEFT JOIN COM_DATASOURCE ds
+    ON olq.OLQ_DS_ID = ds.PK_ID
+    where olq.DEL_FLG = '0'
+    <if test="pkId!='' and pkId!=null ">and olq.PK_ID = #{pkId}</if>
+    <if test="name!='' and name!=null ">and  olq.NAME like '%'||#{name}||'%'</if>
+    <if test="describe!='' and describe!=null ">and olq.DESCRIBE like '%'||#{describe}||'%'</if>
+    <if test="note!='' and note!=null ">and olq.NOTE like '%'||#{note}||'%'</if>
+    <if test="olqDsId!='' and olqDsId!=null ">and olq.OLQ_DS_ID = #{olqDsId}</if>
+    <if test="dsName!='' and dsName!=null ">and ds.NAME like '%'||#{dsName}||'%'</if>
+    <if test="crtTimeStart!=null and crtTimeStart!='' ">and olq.CRT_TIME >= #{crtTimeStart}</if>
+    <if test="crtTimeEnd!=null and crtTimeEnd!='' ">and #{crtTimeEnd} >= olq.CRT_TIME</if>
+    <if test="uptTimeStart!=null and uptTimeStart!='' ">and olq.UPT_TIME >= #{uptTimeStart}</if>
+    <if test="uptTimeEnd!=null and uptTimeEnd!='' ">and #{uptTimeEnd} >= olq.UPT_TIME</if>
+    <if test="crtUser!='' and crtUser!=null ">and olq.CRT_USER like '%'||#{crtUser}||'%'</if>
+    <if test="uptUser!='' and uptUser!=null ">and olq.UPT_USER like '%'||#{uptUser}||'%'</if>
+    order by olq.UPT_TIME desc, olq.CRT_TIME desc, olq.NAME asc
+  </select>
+
+  <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, OLQ_SQL, OLQ_DS_ID, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME,
+    UPT_USER, UPT_TIME, NOTE, NAME, DESCRIBE
+    from OLQ_APPLICATION
+    where DEL_FLG = '0' AND NAME = #{name,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

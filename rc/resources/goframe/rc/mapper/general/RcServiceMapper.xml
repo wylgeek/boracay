@@ -119,6 +119,14 @@
     and APP_ID = #{appId,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectStartByAppTypeAndAppId" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.rc.model.RcService" >
+    select PK_ID, NAME, DESCRIBE, TYPE, APP_ID, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, UPT_TIME, STATUS
+    from RC_SERVICE
+    where DEL_FLG = '0' and STATUS = '0'
+    and TYPE = #{type,jdbcType=VARCHAR}
+    and APP_ID = #{appId,jdbcType=VARCHAR}
+  </select>
+
   <update id="updateStatus" parameterType="com.hex.bigdata.udsp.rc.model.RcService" >
     update RC_SERVICE
     set STATUS = #{status,jdbcType=CHAR}

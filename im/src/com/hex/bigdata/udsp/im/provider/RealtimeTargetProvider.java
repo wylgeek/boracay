@@ -10,9 +10,10 @@ public interface RealtimeTargetProvider extends TargetProvider, RealtimeProvider
     /**
      * 实时构建
      *
+     * @param key
      * @param model
      * @throws Exception
      */
-    void buildRealtime(Model model) throws Exception;
+    void buildRealtime(String key, Model model) throws Exception;
 
 }

@@ -12,7 +12,7 @@ import java.util.Properties;
 public class SdkClientConfig {
     public static String consumeUrl;
     static {
-        loadConf("sdk.config.properties");
+        loadConf("udsp.config.properties");
     }
     public static void loadConf(String configFilePath) {
         InputStream in = null;

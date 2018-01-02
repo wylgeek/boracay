@@ -143,7 +143,7 @@
     and CD.PK_ID = #{sourceId}
   </select>
 
-  <select id="selectEDs" resultMap="BaseResultMap">
+  <select id="selectEngineDs" resultMap="BaseResultMap">
     select PK_ID, NAME, DESCRIBE, TYPE, NOTE, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER,
     UPT_TIME, IMPL_CLASS, MODEL
     from COM_DATASOURCE CD

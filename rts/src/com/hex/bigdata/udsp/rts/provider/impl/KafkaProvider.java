@@ -5,6 +5,7 @@ import com.hex.bigdata.udsp.common.constant.StatusCode;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Property;
 import com.hex.bigdata.udsp.common.provider.model.Result;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.rts.provider.Provider;
 import com.hex.bigdata.udsp.rts.provider.impl.model.KafkaConsumerDsConfig;
@@ -35,28 +36,24 @@ public class KafkaProvider implements Provider {
 
     private static Map<String, LinkedList<ConsumerConnector>> consumerDataSourcePool;
 
-    public void initProducerDataSource(ProducerDatasource producerDsConfig) {
-        getProducerDataSource(new KafkaProducerDsConfig(producerDsConfig.getPropertyMap()));
-    }
-
-    private synchronized LinkedList<Producer<String, String>> getProducerDataSource(KafkaProducerDsConfig kakfaProducerDsConfig) {
-        String dsId = kakfaProducerDsConfig.getId();
-        if (producerDataSourcePool == null) {
-            producerDataSourcePool = new HashMap<String, LinkedList<Producer<String, String>>>();
-        }
-        LinkedList<Producer<String, String>> dataSource = producerDataSourcePool.get(dsId);
-        if (dataSource == null || dataSource.size() == 0) {
-            ProducerConfig config = getProducerConfig(kakfaProducerDsConfig);
-            dataSource = new LinkedList<Producer<String, String>>();
-            Producer<String, String> producer = null;
-            for (int i = 0; i < 5; i++) {
-                producer = new Producer<String, String>(config);
-                dataSource.add(producer);
-            }
-        }
-        producerDataSourcePool.put(dsId, dataSource);
-        return dataSource;
-    }
+//    private synchronized LinkedList<Producer<String, String>> getProducerDataSource(KafkaProducerDsConfig kakfaProducerDsConfig) {
+//        String dsId = kakfaProducerDsConfig.getId();
+//        if (producerDataSourcePool == null) {
+//            producerDataSourcePool = new HashMap<String, LinkedList<Producer<String, String>>>();
+//        }
+//        LinkedList<Producer<String, String>> dataSource = producerDataSourcePool.get(dsId);
+//        if (dataSource == null || dataSource.size() == 0) {
+//            ProducerConfig config = getProducerConfig(kakfaProducerDsConfig);
+//            dataSource = new LinkedList<Producer<String, String>>();
+//            Producer<String, String> producer = null;
+//            for (int i = 0; i < 5; i++) {
+//                producer = new Producer<String, String>(config);
+//                dataSource.add(producer);
+//            }
+//        }
+//        producerDataSourcePool.put(dsId, dataSource);
+//        return dataSource;
+//    }
 
     private ProducerConfig getProducerConfig(KafkaProducerDsConfig kakfaProducerDsConfig) {
         Properties props = new Properties();
@@ -71,37 +68,26 @@ public class KafkaProvider implements Provider {
         return new ProducerConfig(props);
     }
 
-    private Producer<String, String> getProducer(KafkaProducerDsConfig kakfaProducerDsConfig) {
-        LinkedList<Producer<String, String>> dataSource = getProducerDataSource(kakfaProducerDsConfig);
-        while (dataSource.size() > 10) {
-            Producer<String, String> producer = dataSource.remove();
-            if (producer != null) {
-                producer.close();
-            }
-        }
-        Producer<String, String> producer = null;
-        if (dataSource.size() > 0) {
-            producer = dataSource.remove();
-        } else {
-            producer = new Producer<String, String>(getProducerConfig(kakfaProducerDsConfig));
-        }
-        return producer;
-    }
+//    private Producer<String, String> getProducer(KafkaProducerDsConfig kakfaProducerDsConfig) {
+//        LinkedList<Producer<String, String>> dataSource = getProducerDataSource(kakfaProducerDsConfig);
+//        while (dataSource.size() > 10) {
+//            Producer<String, String> producer = dataSource.remove();
+//            if (producer != null) {
+//                producer.close();
+//            }
+//        }
+//        Producer<String, String> producer = null;
+//        if (dataSource.size() > 0) {
+//            producer = dataSource.remove();
+//        } else {
+//            producer = new Producer<String, String>(getProducerConfig(kakfaProducerDsConfig));
+//        }
+//        return producer;
+//    }
 
-    private void releaseProducer(KafkaProducerDsConfig kakfaProducerDsConfig, Producer<String, String> producer) {
-        getProducerDataSource(kakfaProducerDsConfig).add(producer);
-    }
-
-    public synchronized void closeProducerDataSource(ProducerDatasource producerDsConfig) {
-        LinkedList<Producer<String, String>> dataSource = producerDataSourcePool.remove(producerDsConfig.getId());
-        if (dataSource != null) {
-            for (Producer<String, String> producer : dataSource) {
-                if (producer != null) {
-                    producer.close();
-                }
-            }
-        }
-    }
+//    private void releaseProducer(KafkaProducerDsConfig kakfaProducerDsConfig, Producer<String, String> producer) {
+//        getProducerDataSource(kakfaProducerDsConfig).add(producer);
+//    }
 
     //-------------------------------------------ProducerApplication---------------------------------------------
     public ProducerResponse push(ProducerRequest producerRequest) {
@@ -111,8 +97,9 @@ public class KafkaProvider implements Provider {
         ProducerResponse producerResponse = new ProducerResponse();
         producerResponse.setProducerRequest(producerRequest);
 
-        KafkaProducerDsConfig kafkaRtsProducerDsConfig = new KafkaProducerDsConfig(propertyList);
-        Producer<String, String> producer = getProducer(kafkaRtsProducerDsConfig);
+        KafkaProducerDsConfig kakfaProducerDsConfig = new KafkaProducerDsConfig(propertyList);
+        //Producer<String, String> producer = getProducer(kakfaProducerDsConfig);
+        Producer<String, String> producer = new Producer<String, String>(getProducerConfig(kakfaProducerDsConfig));
         String topic = producerRequest.getProducerApplication().getMatedata().getTopic();
         List<Map<String, String>> dataMap = producerRequest.getMessageDatas();
         List<String> messageList = new ArrayList<String>();
@@ -130,7 +117,8 @@ public class KafkaProvider implements Provider {
             e.printStackTrace();
         } finally {
             if (producer != null) {
-                releaseProducer(kafkaRtsProducerDsConfig, producer);
+                //releaseProducer(kafkaRtsProducerDsConfig, producer);
+                producer.close();
             }
         }
 
@@ -256,39 +244,25 @@ public class KafkaProvider implements Provider {
     }
 
     //-------------------------------------------Consumer---------------------------------------------
-    public void initConsumerDataSource(ConsumerDatasource consumerDatasource) {
-        getConsumerDataSource(new KafkaConsumerDsConfig(consumerDatasource.getPropertyMap()));
-    }
 
-    public synchronized void closeConsumerDataSource(ConsumerDatasource consumerDsConfig) {
-        LinkedList<ConsumerConnector> dataSource = consumerDataSourcePool.remove(consumerDsConfig.getId());
-        if (dataSource != null) {
-            for (ConsumerConnector consumer : dataSource) {
-                if (consumer != null) {
-                    consumer.shutdown();
-                }
-            }
-        }
-    }
-
-    private synchronized LinkedList<ConsumerConnector> getConsumerDataSource(KafkaConsumerDsConfig kakfaConsumerDsConfig) {
-        String dsId = kakfaConsumerDsConfig.getId();
-        if (consumerDataSourcePool == null) {
-            consumerDataSourcePool = new HashMap<String, LinkedList<ConsumerConnector>>();
-        }
-        LinkedList<ConsumerConnector> dataSource = consumerDataSourcePool.get(dsId);
-        if (dataSource == null || dataSource.size() == 0) {
-            ConsumerConfig config = getCnsumerConfig(kakfaConsumerDsConfig);
-            dataSource = new LinkedList<ConsumerConnector>();
-            ConsumerConnector consumer = null;
-            for (int i = 0; i < 5; i++) {
-                consumer = Consumer.createJavaConsumerConnector(config);
-                dataSource.add(consumer);
-            }
-        }
-        consumerDataSourcePool.put(dsId, dataSource);
-        return dataSource;
-    }
+//    private synchronized LinkedList<ConsumerConnector> getConsumerDataSource(KafkaConsumerDsConfig kakfaConsumerDsConfig) {
+//        String dsId = kakfaConsumerDsConfig.getId();
+//        if (consumerDataSourcePool == null) {
+//            consumerDataSourcePool = new HashMap<String, LinkedList<ConsumerConnector>>();
+//        }
+//        LinkedList<ConsumerConnector> dataSource = consumerDataSourcePool.get(dsId);
+//        if (dataSource == null || dataSource.size() == 0) {
+//            ConsumerConfig config = getCnsumerConfig(kakfaConsumerDsConfig);
+//            dataSource = new LinkedList<ConsumerConnector>();
+//            ConsumerConnector consumer = null;
+//            for (int i = 0; i < 5; i++) {
+//                consumer = Consumer.createJavaConsumerConnector(config);
+//                dataSource.add(consumer);
+//            }
+//        }
+//        consumerDataSourcePool.put(dsId, dataSource);
+//        return dataSource;
+//    }
 
     private ConsumerConfig getCnsumerConfig(KafkaConsumerDsConfig kakfaConsumerDsConfig) {
         Properties props = new Properties();
@@ -321,9 +295,9 @@ public class KafkaProvider implements Provider {
         return new ConsumerConfig(props);
     }
 
-    private void releaseConsumer(KafkaConsumerDsConfig kakfaConsumerDsConfig, ConsumerConnector consumer) {
-        getConsumerDataSource(kakfaConsumerDsConfig).add(consumer);
-    }
+//    private void releaseConsumer(KafkaConsumerDsConfig kakfaConsumerDsConfig, ConsumerConnector consumer) {
+//        getConsumerDataSource(kakfaConsumerDsConfig).add(consumer);
+//    }
 
     public ConsumerResponse pull(ConsumerRequest consumerRequest) {
         int timeout = consumerRequest.getTimeout();
@@ -338,14 +312,17 @@ public class KafkaProvider implements Provider {
         int threadNum = kafkaRtsConsumerDsConfig.getThreadNum();
         try {
             List<KafkaStream<byte[], byte[]>> streams = receive(consumer, consumerRequest.getConsumerApplication().getMatedata().getTopic(), threadNum);
-
+            Map<String, Object> md = null;
             for (KafkaStream<byte[], byte[]> stream : streams) {
                 ConsumerIterator<byte[], byte[]> iterator = stream.iterator();
                 while (iterator.hasNext()) {
                     String message = new String(iterator.next().message());
-                    Map<String, Object> md = new HashMap<>();
                     logger.debug("kafka接收的信息为：" + message);
-                    md = JSONUtil.parseJSON2Map(message);
+                    try {
+                        md = JSONUtil.parseJSON2Map(message);
+                    } catch (Exception e) {
+                        continue;
+                    }
                     Result result = new Result();
                     result.putAll(md);
                     records.add(result);
@@ -368,8 +345,7 @@ public class KafkaProvider implements Provider {
             consumerResponse.setMessage(e.getMessage());
         } finally {
             if (consumer != null) {
-                logger.debug("生产者：" + consumer.toString());
-                releaseConsumer(kafkaRtsConsumerDsConfig, consumer);
+                //releaseConsumer(kafkaRtsConsumerDsConfig, consumer);
                 consumer.shutdown();
             }
         }

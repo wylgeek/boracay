@@ -27,6 +27,8 @@ public class IqAppQueryCol implements Serializable {
 
     private String isOfferOut;
 
+    private String note;
+
     public String getPkId() {
         return pkId;
     }
@@ -121,5 +123,13 @@ public class IqAppQueryCol implements Serializable {
 
     public void setIsOfferOut(String isOfferOut) {
         this.isOfferOut = isOfferOut;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

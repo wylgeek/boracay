@@ -19,6 +19,12 @@ public class ModelMapping {
 
     private String describe;
 
+    private boolean indexed;
+
+    private boolean primary;
+
+    private boolean stored;
+
     private MetadataCol metadataCol; // 元数据字段
 
     public Short getSeq() {
@@ -81,5 +87,29 @@ public class ModelMapping {
 
     public void setDescribe(String describe) {
         this.describe = describe;
+    }
+
+    public boolean isIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+        this.indexed = indexed;
+    }
+
+    public boolean isPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
+    }
+
+    public boolean isStored() {
+        return stored;
+    }
+
+    public void setStored(boolean stored) {
+        this.stored = stored;
     }
 }

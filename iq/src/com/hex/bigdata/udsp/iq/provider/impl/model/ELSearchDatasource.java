@@ -11,8 +11,6 @@ import java.util.Map;
  * Solr的数据源配置
  */
 public class ELSearchDatasource extends Datasource {
-    private String elasticsearchServers;
-    private int maxNum = 65535;
 
     public ELSearchDatasource(List<Property> properties) {
         super(properties);
@@ -31,13 +29,9 @@ public class ELSearchDatasource extends Datasource {
 
     public int getMaxNum() {
         String value = getProperty("elasticsearch.max.data.size").getValue();
-        if (StringUtils.isNotBlank(value)) {
-            try {
-                maxNum = Integer.valueOf(value);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("elasticsearch.max.data.size为一整数");
-            }
+        if (StringUtils.isBlank(value)) {
+            value = "65536";
         }
-        return maxNum;
+        return Integer.valueOf(value);
     }
 }

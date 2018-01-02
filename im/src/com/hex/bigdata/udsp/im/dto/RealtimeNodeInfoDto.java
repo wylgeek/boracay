@@ -11,6 +11,9 @@ public class RealtimeNodeInfoDto {
     private String endTime; // 任务停止的时间
     private String updateTime; // 更新信息的时间
     private String message; // 信息
+    private long consumerNum = 0; // 消费获取条数
+    private long meetNum = 0; // 筛选后的条数
+    private long storeNum = 0; // 执行成功条数
 
     public String getId() {
         return id;
@@ -66,5 +69,29 @@ public class RealtimeNodeInfoDto {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public long getConsumerNum() {
+        return consumerNum;
+    }
+
+    public void setConsumerNum(long consumerNum) {
+        this.consumerNum = consumerNum;
+    }
+
+    public long getMeetNum() {
+        return meetNum;
+    }
+
+    public void setMeetNum(long meetNum) {
+        this.meetNum = meetNum;
+    }
+
+    public long getStoreNum() {
+        return storeNum;
+    }
+
+    public void setStoreNum(long storeNum) {
+        this.storeNum = storeNum;
     }
 }

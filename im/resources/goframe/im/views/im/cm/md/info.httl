@@ -26,6 +26,7 @@ ${extends("/goframe/function_layout.httl")}
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
+                                <div header="类型" field="type"></div>
                             </div>
                         </div>
                     </td>
@@ -103,11 +104,11 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="note" headerAlign="center" allowSort="true" width="30">备注
                             <input property="editor" class="nui-textarea" vtype="maxLength:4000"/>
                         </div>
-                        <div type="checkboxcolumn"  field="indexed" trueValue="0" falseValue="1"
-                             headerAlign="center" allowSort="true" width="8">索引
-                        </div>
                         <div type="checkboxcolumn"  field="primary" trueValue="0" falseValue="1"
                              headerAlign="center" allowSort="true" width="8">主键
+                        </div>
+                        <div type="checkboxcolumn"  field="indexed" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">索引
                         </div>
                         <div type="checkboxcolumn"  field="stored" trueValue="0" falseValue="1"
                              headerAlign="center" allowSort="true" width="8">存储

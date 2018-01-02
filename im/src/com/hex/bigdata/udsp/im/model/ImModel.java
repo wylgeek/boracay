@@ -9,9 +9,9 @@ public class ImModel implements Serializable {
 
     private String describe;
 
-    private String sDsId;
+    private String sourceDsId;
 
-    private String tMdId;
+    private String targetMdId;
 
     private String note;
 
@@ -33,7 +33,7 @@ public class ImModel implements Serializable {
 
     private String updateKey;
 
-    private String eDsId;
+    private String engineDsId;
 
     private String status;
 
@@ -59,22 +59,6 @@ public class ImModel implements Serializable {
 
     public void setDescribe(String describe) {
         this.describe = describe;
-    }
-
-    public String getsDsId() {
-        return sDsId;
-    }
-
-    public void setsDsId(String sDsId) {
-        this.sDsId = sDsId;
-    }
-
-    public String gettMdId() {
-        return tMdId;
-    }
-
-    public void settMdId(String tMdId) {
-        this.tMdId = tMdId;
     }
 
     public String getNote() {
@@ -157,19 +141,35 @@ public class ImModel implements Serializable {
         this.updateKey = updateKey;
     }
 
-    public String geteDsId() {
-        return eDsId;
-    }
-
-    public void seteDsId(String eDsId) {
-        this.eDsId = eDsId;
-    }
-
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getSourceDsId() {
+        return sourceDsId;
+    }
+
+    public void setSourceDsId(String sourceDsId) {
+        this.sourceDsId = sourceDsId;
+    }
+
+    public String getTargetMdId() {
+        return targetMdId;
+    }
+
+    public void setTargetMdId(String targetMdId) {
+        this.targetMdId = targetMdId;
+    }
+
+    public String getEngineDsId() {
+        return engineDsId;
+    }
+
+    public void setEngineDsId(String engineDsId) {
+        this.engineDsId = engineDsId;
     }
 }

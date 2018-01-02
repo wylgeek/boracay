@@ -4,14 +4,14 @@ import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Property;
 import com.hex.bigdata.udsp.im.provider.impl.model.datasource.KafkaDatasource;
 import com.hex.bigdata.udsp.im.provider.impl.model.modeling.KafkaModel;
-import kafka.consumer.Consumer;
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.KafkaStream;
+import kafka.consumer.*;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -19,19 +19,48 @@ import java.util.*;
  * Created by JunjieM on 2017-9-15.
  */
 public class KafkaUtil {
+    private static Logger logger = LogManager.getLogger(KafkaUtil.class);
 
-    public static List<KafkaStream<byte[], byte[]>> outputData(KafkaModel model) {
-        Datasource datasource = model.getSourceDatasource();
-        String consumerTimeoutMs = model.getConsumerTimeoutMs();
-        String groupId = model.getGroupId();
-        String topic = model.getTopic();
-        Map<String, Property> propertyMap = datasource.getPropertyMap();
-        propertyMap.put("consumer.timeout.ms", new Property("consumer.timeout.ms", consumerTimeoutMs));
-        propertyMap.put("group.id", new Property("group.id", groupId));
+    public static List<KafkaStream<byte[], byte[]>> buildRealtime(KafkaModel model) throws Exception {
+        Map<String, Property> propertyMap = model.getSourceDatasource().getPropertyMap();
+        propertyMap.put("consumer.timeout.ms", new Property("consumer.timeout.ms", model.getConsumerTimeoutMs()));
+        propertyMap.put("group.id", new Property("group.id", model.getGroupId()));
         KafkaDatasource kafkaDatasource = new KafkaDatasource(propertyMap);
-        ConsumerConnector consumer = getConsumerConnector(kafkaDatasource);
-        int threadNum = kafkaDatasource.getThreadNum();
-        return receive(consumer, topic, threadNum);
+        ConsumerConnector consumer = null;
+        try {
+            consumer = getConsumerConnector(kafkaDatasource);
+            int threadNum = kafkaDatasource.getThreadNum();
+            return receive(consumer, model.getTopic(), threadNum);
+        } catch (ConsumerTimeoutException e) {
+            close(consumer);
+            throw new Exception(e);
+        }
+    }
+
+    public static List<String> buildRealtime2(KafkaModel model) {
+        Map<String, Property> propertyMap = model.getSourceDatasource().getPropertyMap();
+        propertyMap.put("consumer.timeout.ms", new Property("consumer.timeout.ms", model.getConsumerTimeoutMs()));
+        propertyMap.put("group.id", new Property("group.id", model.getGroupId()));
+        KafkaDatasource kafkaDatasource = new KafkaDatasource(propertyMap);
+        ConsumerConnector consumer = null;
+        List<String> list = new ArrayList<>();
+        try {
+            consumer = getConsumerConnector(kafkaDatasource);
+            int threadNum = kafkaDatasource.getThreadNum();
+            List<KafkaStream<byte[], byte[]>> streams = receive(consumer, model.getTopic(), threadNum);
+            for (KafkaStream<byte[], byte[]> stream : streams) {
+                ConsumerIterator<byte[], byte[]> iterator = stream.iterator();
+                while (iterator.hasNext()) {
+                    String message = new String(iterator.next().message());
+                    list.add(message);
+                }
+            }
+        } catch (ConsumerTimeoutException e) {
+            logger.debug("KAFKA消费超时！");
+        } finally {
+            close(consumer);
+        }
+        return list;
     }
 
     public static ConsumerConnector getConsumerConnector(KafkaDatasource datasource) {
@@ -45,8 +74,8 @@ public class KafkaUtil {
             props.put("zookeeper.connect", datasource.getZookeeperConnect());
         if (StringUtils.isNotBlank(datasource.getMetadataBrokerList()))
             props.put("metadata.broker.list", datasource.getMetadataBrokerList());
-//        if (StringUtils.isNotBlank(datasource.getGroupId()))
-//            props.put("group.id", datasource.getGroupId());
+        if (StringUtils.isNotBlank(datasource.getGroupId()))
+            props.put("group.id", datasource.getGroupId());
         if (StringUtils.isNotBlank(datasource.getZookeeperSessionTimeoutMs()))
             props.put("zookeeper.session.timeout.ms",
                     datasource.getZookeeperSessionTimeoutMs());
@@ -57,8 +86,8 @@ public class KafkaUtil {
             props.put("zookeeper.sync.time.ms", datasource.getZookeeperSyncTimeMs());
         if (StringUtils.isNotBlank(datasource.getAutoCommitIntervalMs()))
             props.put("auto.commit.interval.ms", datasource.getAutoCommitIntervalMs());
-//        if (StringUtils.isNotBlank(datasource.getConsumerTimeoutMs()))
-//            props.put("consumer.timeout.ms", datasource.getConsumerTimeoutMs());
+        if (StringUtils.isNotBlank(datasource.getConsumerTimeoutMs()))
+            props.put("consumer.timeout.ms", datasource.getConsumerTimeoutMs());
         if (StringUtils.isNotBlank(datasource.getAutoCommitEnable()))
             props.put("auto.commit.enable", datasource.getAutoCommitEnable());
         if (StringUtils.isNotBlank(datasource.getAutoOffsetReset()))

@@ -66,4 +66,14 @@ public class ImModelMapper extends SyncMapper<ImModel> {
         paramter.put("status",status);
         return sqlSessionTemplate.update("com.hex.bigdata.udsp.im.dao.ImModelMapper.updateModelDelStatus",paramter) == 1;
     }
+
+    /**
+     * 查询模型配置信息
+     * @return
+     */
+    public List<ImModel> selectAll() {
+        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.im.dao.ImModelMapper.selectAll");
+    }
+
+
 }

@@ -11,10 +11,8 @@
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.hex.bigdata.udsp.im.model.ImModelUpdateKey" >
-    insert into IM_MODEL_UPDATE_KEY (PK_ID, COL_ID, MODEL_ID
-      )
-    values (#{pkId,jdbcType=VARCHAR}, #{colId,jdbcType=VARCHAR}, #{modelId,jdbcType=VARCHAR}
-      )
+    insert into IM_MODEL_UPDATE_KEY (PK_ID, COL_ID, MODEL_ID)
+    values (#{pkId,jdbcType=VARCHAR}, #{colId,jdbcType=VARCHAR}, #{modelId,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.im.model.ImModelUpdateKey" >
     update IM_MODEL_UPDATE_KEY
@@ -33,7 +31,7 @@
   </select>
 
   <delete id="deleteByMid" parameterType="java.lang.String">
-    DELETE  FROM IM_MODEL_UPDATE_KEY
+    DELETE FROM IM_MODEL_UPDATE_KEY
     WHERE MODEL_ID = #{mid}
   </delete>
 </mapper>

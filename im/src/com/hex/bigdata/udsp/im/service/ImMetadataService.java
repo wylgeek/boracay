@@ -6,10 +6,7 @@ import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Property;
 import com.hex.bigdata.udsp.common.service.ComDatasourceService;
 import com.hex.bigdata.udsp.common.service.ComPropertiesService;
-import com.hex.bigdata.udsp.common.util.CreateFileUtil;
-import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
-import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
-import com.hex.bigdata.udsp.common.util.PropertyUtil;
+import com.hex.bigdata.udsp.common.util.*;
 import com.hex.bigdata.udsp.im.constant.MetadataStatus;
 import com.hex.bigdata.udsp.im.constant.MetadataType;
 import com.hex.bigdata.udsp.im.dao.ImMetadataMapper;
@@ -165,7 +162,7 @@ public class ImMetadataService extends BaseService {
         return list;
     }
 
-    public boolean checkSchemaExists(String dsId, String tbName) throws Exception {
+    public boolean checkSchema(String dsId, String tbName) throws Exception {
         ComDatasource comDatasource = comDatasourceService.select(dsId);
         List<ComProperties> comProperties = comPropertiesService.selectByFkId(dsId);
         Datasource datasource = new Datasource(comDatasource, comProperties);
@@ -173,21 +170,23 @@ public class ImMetadataService extends BaseService {
         metadata.setType(MetadataType.EXTERNAL);
         metadata.setTbName(tbName);
         metadata.setDatasource(datasource);
-        return imProviderService.checkSchemaExists(metadata);
+        return imProviderService.checkSchema(metadata);
     }
 
     @Transactional
     public boolean createTable(String pkId) throws Exception {
         ImMetadata imMetadata = this.select(pkId);
         imMetadata.setStatus("2"); //状态为已建
-        return imProviderService.createSchema(getMetadata(pkId)) && imMetadataMapper.update(pkId, imMetadata);
+        imProviderService.createSchema(getMetadata(pkId));
+        return imMetadataMapper.update(pkId, imMetadata);
     }
 
     @Transactional
     public boolean dropTable(String pkId) throws Exception {
         ImMetadata imMetadata = this.select(pkId);
         imMetadata.setStatus("1"); //状态为未建
-        return imProviderService.dropSchema(getMetadata(pkId)) && imMetadataMapper.update(pkId, imMetadata);
+        imProviderService.dropSchema(getMetadata(pkId));
+        return imMetadataMapper.update(pkId, imMetadata);
     }
 
     public Metadata getMetadata(String pkId) {
@@ -399,9 +398,9 @@ public class ImMetadataService extends BaseService {
                     cell = row.createCell(1);
                     cell.setCellValue(comProperty.getName());
                     cell = row.createCell(2);
-                    cell.setCellValue(comProperty.getDescribe());
-                    cell = row.createCell(3);
                     cell.setCellValue(comProperty.getValue());
+                    cell = row.createCell(3);
+                    cell.setCellValue(comProperty.getDescribe());
                     i++;
                     k++;
                 }
@@ -420,16 +419,17 @@ public class ImMetadataService extends BaseService {
         return null;
     }
 
-    public List<ImMetadata> selectTargetMateData(String type) {
-        String tgctId;
-        if ("1".equals(type)) { // 目标批量类型
-            tgctId = "IM_DS_TARGET_BATCH_TYPE";
-        } else if ("2".equals(type)) { // 目标实时类型
-            tgctId = "IM_DS_TARGET_REALTIME_TYPE";
-        } else {
-            return null;
-        }
-        return imMetadataMapper.selectTargetMateData(tgctId);
+    public List<ImMetadataView> selectTargetMateData(String type) {
+        return imMetadataMapper.selectTargetMateData(type);
+    }
+
+    /**
+     * 根据条件查询元数据信息
+     * @param imMetadataView
+     * @return
+     */
+    public List<ImMetadataView> selectMateDataByCondition(ImMetadataView imMetadataView) {
+        return imMetadataMapper.select(imMetadataView);
     }
 }
 

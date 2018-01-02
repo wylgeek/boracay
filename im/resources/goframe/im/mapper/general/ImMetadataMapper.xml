@@ -68,6 +68,7 @@
     UPT_TIME, TB_NAME, STATUS, TYPE
     from IM_METADATA
     where DEL_FLG = '0'
+    ORDER BY CRT_TIME desc
   </select>
   <select id="select" resultMap="ImMetadataView" >
     select A.PK_ID, A.DS_ID, A.NAME, A.DESCRIBE, A.NOTE, A.DEL_FLG, A.CRT_USER, A.CRT_TIME, A.UPT_USER,
@@ -99,9 +100,9 @@
     and NAME = #{name,jdbcType=VARCHAR}
   </select>
 
-  <select id="selectTargetMateData" resultMap="BaseResultMap">
+  <select id="selectTargetMateData" resultMap="ImMetadataView" parameterType="string">
     select IM.PK_ID, IM.DS_ID, IM.NAME, IM.DESCRIBE, IM.NOTE, IM.DEL_FLG, IM.CRT_USER, IM.CRT_TIME, IM.UPT_USER,
-    IM.UPT_TIME, IM.TB_NAME, IM.STATUS, IM.TYPE
+    IM.UPT_TIME, IM.TB_NAME, IM.STATUS, IM.TYPE, CD.NAME AS DS_NAME, CD.TYPE as DS_TYPE, CD.DESCRIBE as DS_DESC
     from IM_METADATA IM
     LEFT JOIN COM_DATASOURCE CD
     ON CD.PK_ID = IM.DS_ID
@@ -109,6 +110,7 @@
     on TGD.DICT_ID = CD.TYPE
     where IM.DEL_FLG = '0'
     and IM.STATUS = '2'
-    and TGD.DICT_TYPE_ID = #{tgctId}
+    <if test="_parameter!=null and _parameter=='1'.toString()">and TGD.DICT_TYPE_ID = 'IM_DS_TARGET_BATCH_TYPE'</if>
+    <if test="_parameter!=null and _parameter=='2'.toString()">and TGD.DICT_TYPE_ID = 'IM_DS_TARGET_REALTIME_TYPE'</if>
   </select>
 </mapper>

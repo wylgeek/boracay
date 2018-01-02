@@ -6,6 +6,8 @@ import com.hex.bigdata.udsp.common.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +70,12 @@ public class LocalCache<T> implements Cache<T> {
 
     @Override
     public boolean insertCache(String key, T t) {
-        return insert(key, t);
+        return insert(key, cloneObj(t));
     }
 
     @Override
     public boolean updateCache(String key, T t) {
-        return update(key, t);
+        return update(key, cloneObj(t));
     }
 
     @Override
@@ -99,12 +101,12 @@ public class LocalCache<T> implements Cache<T> {
 
     @Override
     public boolean insertListCache(String key, List<T> list) {
-        return insert(key, list);
+        return insert(key, cloneList(list));
     }
 
     @Override
     public boolean updateListCache(String key, List<T> list) {
-        return update(key, list);
+        return update(key, cloneList(list));
     }
 
     @Override
@@ -142,7 +144,7 @@ public class LocalCache<T> implements Cache<T> {
                         .build();
                 cacheMap.put(timeout, cache);
             }
-            cache.put(key, t);
+            cache.put(key, cloneObj(t));
             return true;
         }
     }
@@ -157,8 +159,20 @@ public class LocalCache<T> implements Cache<T> {
         T t = null;
         if (obj != null) {
             try {
-                t = (T) obj.getClass().newInstance();
-                ObjectUtil.copyObject(obj, t);
+                if (obj instanceof Integer) {
+                    t = (T) new Integer((Integer) obj);
+                } else if (obj instanceof Long) {
+                    t = (T) new Long((Long) obj);
+                } else if (obj instanceof Short) {
+                    t = (T) new Short((Short) obj);
+                } else if (obj instanceof Double) {
+                    t = (T) new Double((Double) obj);
+                } else if (obj instanceof Float) {
+                    t = (T) new Float((Float) obj);
+                } else {
+                    t = (T) obj.getClass().newInstance();
+                    ObjectUtil.copyObject(obj, t);
+                }
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {

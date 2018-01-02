@@ -1,6 +1,7 @@
 package com.hex.bigdata.udsp.im.task;
 
 import com.hex.bigdata.udsp.common.constant.ServiceMode;
+import com.hex.bigdata.udsp.common.service.InitParamService;
 import com.hex.bigdata.udsp.im.service.RealtimeJobService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,14 +19,10 @@ public class RealtimeTask {
 
     @Autowired
     private RealtimeJobService realtimeService;
+    @Autowired
+    private InitParamService initParamService;
 
-    /**
-     * 服务模式（single、cluster）
-     */
-    @Value("${service.mode:single}")
-    private String serviceMode;
-
-//    @Scheduled(cron = "${check.realtime.status.cron.expression:0/2 * * * * ?}")
+    @Scheduled(cron = "${check.realtime.status.cron.expression:0/2 * * * * ?}")
     public void checkRealtimeStatus() {
         logger.debug("检查实时作业状态【开始】");
         realtimeService.checkRealtimeStatus();
@@ -34,7 +31,7 @@ public class RealtimeTask {
 
     @Scheduled(cron = "${check.realtime.live.cron.expression:0 */5 * * * ?}")
     public void checkRealtimeLive() {
-        if (ServiceMode.CLUSTER.getValue().equalsIgnoreCase(serviceMode)) {
+        if (initParamService.isClusterMode()) {
             logger.debug("检测实时作业存活【开始】");
             realtimeService.checkRealtimeLive();
             logger.debug("检测实时作业存活【结束】");

@@ -280,34 +280,7 @@ ${extends("/goframe/function_layout.httl")}
     function remove() {
         var rows = grid1.getSelecteds();
         if (rows.length > 0) {
-            //删除前检查
-            var model = "${model}";
-            var url = "";
-            var checkResult;
-            if (model == "IQ") {
-                url = "${basePath}/iq/dataResource/checkDatasourceUsed/${pkId}";
-            } else if (model == "OLQ") {
-                url = "${basePath}/rc/service/checkUsed/OLQ/${pkId}";
-            } else if (model == "RTS") {
-                url = "${basePath}/rts/dataResource/checkDatasourceUsed/${pkId}";
-            }
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: null,
-                cache: false,
-                async: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    checkResult = result;
-                }
-            });
-            if (!checkResult || checkResult.status == true) {
-                nui.alert(checkResult.message);
-                return;
-            } else {
-                grid1.removeRows(rows, true);
-            }
+            grid1.removeRows(rows, true);
         } else {
             nui.alert("请至少选中一条记录!");
         }
@@ -321,60 +294,33 @@ ${extends("/goframe/function_layout.httl")}
         if (!saveData) {
             return;
         }
-        var model = "${model}";
-        var url = "";
-        var checkResult;
-        if (model == "IQ") {
-            url = "${basePath}/iq/dataResource/checkDatasourceUsed/${pkId}";
-        } else if (model == "OLQ") {
-            url = "${basePath}/rc/service/checkUsed/OLQ/${pkId}";
-        } else if (model == "RTS") {
-            url = "${basePath}/rts/dataResource/checkDatasourceUsed/${pkId}";
-        }
+        var json = nui.encode(saveData);
+        // --发送信息--
+        form1.loading("正在保存中,请稍等...");
+        //禁用保存按钮
+        nui.get("saveButton").disable();
         $.ajax({
-            url: url,
+            url: "${basePath}/com/ds/update",
             type: 'POST',
-            data: null,
+            data: json,
             cache: false,
-            async: false,
             contentType: 'application/json',
             success: function (result) {
-                checkResult = result;
+                if (result.status == true) {
+                    nui.alert(result.message);
+                    CloseWindow("success");
+                } else {
+                    nui.alert(result.message, "系统提示", function (action) {
+                        if (action == "ok" || action == "close") {
+                            CloseWindow("failed");
+                        }
+                    });
+                }
+                form1.unmask();
+                //解除保存按钮禁用
+                nui.get("saveButton").enable();
             }
         });
-
-        if (!checkResult || checkResult.status == true) {
-            nui.alert(checkResult.message);
-            return;
-        } else {
-            var json = nui.encode(saveData);
-            // --发送信息--
-            form1.loading("正在保存中,请稍等...");
-            //禁用保存按钮
-            nui.get("saveButton").disable();
-            $.ajax({
-                url: "${basePath}/com/ds/update",
-                type: 'POST',
-                data: json,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    if (result.status == true) {
-                        nui.alert(result.message);
-                        CloseWindow("success");
-                    } else {
-                        nui.alert(result.message, "系统提示", function (action) {
-                            if (action == "ok" || action == "close") {
-                                CloseWindow("failed");
-                            }
-                        });
-                    }
-                    form1.unmask();
-                    //解除保存按钮禁用
-                    nui.get("saveButton").enable();
-                }
-            });
-        }
     }
 
     /**

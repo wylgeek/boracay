@@ -11,26 +11,20 @@ import java.util.concurrent.Callable;
 public class IqSyncServiceCallable<T> implements Callable<Response> {
 
     private IqSyncService iqSyncService;
-
     private Map<String, String> data;
-
     private String appId;
-
     private Page page;
 
-    public IqSyncServiceCallable() {
-    }
-
-    public IqSyncServiceCallable( Map<String, String> data, String appId, Page page) {
+    public IqSyncServiceCallable(Map<String, String> data, String appId, Page page) {
+        this.iqSyncService = (IqSyncService) WebApplicationContextUtil.getBean("iqSyncService");
         this.data = data;
         this.appId = appId;
         this.page = page;
-        this.iqSyncService = (IqSyncService) WebApplicationContextUtil.getBean("iqSyncService");;
     }
 
     @Override
     public Response call() throws Exception {
-        return iqSyncService.syncStart(appId,data,page);
+        return iqSyncService.syncStart(appId, data, page);
     }
 
 }

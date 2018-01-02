@@ -1,5 +1,6 @@
 package com.hex.bigdata.udsp.im.controller;
 
+import com.hex.bigdata.udsp.im.model.ImMetadataCol;
 import com.hex.bigdata.udsp.im.model.ImModelMapping;
 import com.hex.bigdata.udsp.im.service.ImModelMappingService;
 import com.hex.goframe.model.MessageResult;
@@ -29,6 +30,14 @@ public class ImModelMappingController {
         List<ImModelMapping> imModelMappings =  imModelMappingService.getImModelMappingsByMid(mid);
 
         return new PageListResult(imModelMappings);
+    }
+
+    @ResponseBody
+    @RequestMapping("getImMMappingTargetCols/{mid}")
+    public MessageResult getImMMappingTargetCols(@PathVariable String mid){
+        List<ImMetadataCol> imMetadataCols =  imModelMappingService.getImMMappingTargetCols(mid);
+
+        return new PageListResult(imMetadataCols);
     }
 
 }

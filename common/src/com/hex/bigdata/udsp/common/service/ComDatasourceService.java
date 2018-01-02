@@ -5,10 +5,7 @@ import com.hex.bigdata.udsp.common.dao.ComDatasourceMapper;
 import com.hex.bigdata.udsp.common.dto.ComDatasourcePropsView;
 import com.hex.bigdata.udsp.common.dto.ComDatasourceView;
 import com.hex.bigdata.udsp.common.model.*;
-import com.hex.bigdata.udsp.common.util.CreateFileUtil;
-import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
-import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
-import com.hex.bigdata.udsp.common.util.FTPClientConfig;
+import com.hex.bigdata.udsp.common.util.*;
 import com.hex.goframe.model.GFDict;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.service.BaseService;
@@ -293,8 +290,8 @@ public class ComDatasourceService extends BaseService {
         return comDatasourceMapper.checkSourceType(sourceId);
     }
 
-    public List<ComDatasource> selectEDs() {
-        return comDatasourceMapper.selectEDs();
+    public List<ComDatasource> selectEngineDs() {
+        return comDatasourceMapper.selectEngineDs();
     }
 }
 

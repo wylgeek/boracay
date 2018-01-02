@@ -34,23 +34,21 @@ public class MysqlProvider extends JdbcWrapper implements RealtimeTargetProvider
     private static Logger logger = LogManager.getLogger(MysqlProvider.class);
 
     @Override
-    public boolean createSchema(Metadata metadata) throws Exception {
-        Datasource datasource = metadata.getDatasource();
-        MysqlDatasource mysqlDatasource = new MysqlDatasource(datasource.getPropertyMap());
+    public void createSchema(Metadata metadata) throws Exception {
+        MysqlDatasource mysqlDatasource = new MysqlDatasource( metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String tableComment = metadata.getDescribe();
         List<TableColumn> columns = ImUtil.convertToTableColumnList(metadata.getMetadataCols());
         String sql = MysqlSqlUtil.createTable(false, fullTbName, columns, tableComment);
-        return JdbcUtil.executeUpdate(mysqlDatasource, sql);
+         JdbcUtil.executeUpdate(mysqlDatasource, sql);
     }
 
     @Override
-    public boolean dropSchema(Metadata metadata) throws Exception {
-        Datasource datasource = metadata.getDatasource();
-        MysqlDatasource mysqlDatasource = new MysqlDatasource(datasource.getPropertyMap());
+    public void dropSchema(Metadata metadata) throws Exception {
+        MysqlDatasource mysqlDatasource = new MysqlDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String sql = MysqlSqlUtil.dropTable(false, fullTbName);
-        return JdbcUtil.executeUpdate(mysqlDatasource, sql);
+         JdbcUtil.executeUpdate(mysqlDatasource, sql);
     }
 
     @Override
@@ -110,20 +108,20 @@ public class MysqlProvider extends JdbcWrapper implements RealtimeTargetProvider
 
     @Override
     protected void insertInto(Metadata metadata, List<ModelMapping> modelMappings, List<ValueColumn> valueColumns) throws Exception {
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource().getPropertyMap());
-        JdbcUtil.executeUpdate2(jdbcDatasource, MysqlSqlUtil.insert(metadata.getTbName(), valueColumns));
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
+        JdbcUtil.executeUpdate(jdbcDatasource, MysqlSqlUtil.insert(metadata.getTbName(), valueColumns));
     }
 
     @Override
     protected void updateInsert(Metadata metadata, List<ModelMapping> modelMappings, List<ValueColumn> valueColumns, List<WhereProperty> whereProperties) throws Exception {
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource().getPropertyMap());
-        if (JdbcUtil.executeUpdate2(jdbcDatasource, MysqlSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties)) == 0)
-            JdbcUtil.executeUpdate2(jdbcDatasource, MysqlSqlUtil.insert(metadata.getTbName(), valueColumns));
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
+        if (JdbcUtil.executeUpdate(jdbcDatasource, MysqlSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties)) == 0)
+            JdbcUtil.executeUpdate(jdbcDatasource, MysqlSqlUtil.insert(metadata.getTbName(), valueColumns));
     }
 
     @Override
     protected void matchingUpdate(Metadata metadata, List<ModelMapping> modelMappings, List<ValueColumn> valueColumns, List<WhereProperty> whereProperties) throws Exception {
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource().getPropertyMap());
-        JdbcUtil.executeUpdate2(jdbcDatasource, MysqlSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties));
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
+        JdbcUtil.executeUpdate(jdbcDatasource, MysqlSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties));
     }
 }

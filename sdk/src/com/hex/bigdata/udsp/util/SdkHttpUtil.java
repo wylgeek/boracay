@@ -41,14 +41,15 @@ public class SdkHttpUtil {
 
     /**
      * 调用UDSP
+     *
      * @param udspRequest
      * @param url
      * @param clazz
      * @param <T>
      * @return
      */
-    public static <T> T requestUdsp(UdspRequest udspRequest, String url,Class<T> clazz) {
-        return requestUdsp(udspRequest,url,clazz,Charset.forName("UTF-8"));
+    public static <T> T requestUdsp(UdspRequest udspRequest, String url, Class<T> clazz) {
+        return requestUdsp(udspRequest, url, clazz, Charset.forName("UTF-8"));
     }
 
     /**
@@ -57,7 +58,7 @@ public class SdkHttpUtil {
      * @param udspRequest
      * @param url
      */
-    public static <T> T requestUdsp(UdspRequest udspRequest, String url,Class<T> clazz,Charset charset) {
+    public static <T> T requestUdsp(UdspRequest udspRequest, String url, Class<T> clazz, Charset charset) {
 
         T responseObject = null;
 
@@ -71,14 +72,13 @@ public class SdkHttpUtil {
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
         try {
-            StringEntity stringEntity = new StringEntity(jsonObject.toJSONString(),charset);
+            StringEntity stringEntity = new StringEntity(jsonObject.toJSONString(), charset);
             stringEntity.setContentType(CONTEXT_TYPE_TEXT_JSON);
             stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
             httpPost.setEntity(stringEntity);
             HttpResponse response = httpClient.execute(httpPost);
             String returnString = analysisResponse(response);
-            //打印返回的json串
-            //logger.info("打印返回的字符串：" + returnString);
+            logger.debug("打印返回的字符串：" + returnString);
             responseObject = JSON.parseObject(returnString, clazz);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

@@ -1,29 +1,15 @@
 package com.hex.bigdata.udsp.im.provider.impl.model.datasource;
 
-import com.hex.bigdata.udsp.common.model.ComDatasource;
-import com.hex.bigdata.udsp.common.model.ComProperties;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
-import com.hex.bigdata.udsp.common.provider.model.Property;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by JunjieM on 2017-9-5.
  */
 public class SolrHBaseDatasource extends Datasource {
 
-    public SolrHBaseDatasource(List<Property> properties) {
-        super(properties);
-    }
-
-    public SolrHBaseDatasource(Map<String, Property> propertieMap) {
-        super(propertieMap);
-    }
-
-    public SolrHBaseDatasource(ComDatasource comDatasource, List<ComProperties> comPropertieList) {
-        super(comDatasource, comPropertieList);
+    public SolrHBaseDatasource(Datasource datasource) {
+        super(datasource);
     }
 
     public String getZkQuorum() {

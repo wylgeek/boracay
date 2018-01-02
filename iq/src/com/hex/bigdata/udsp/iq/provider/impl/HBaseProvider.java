@@ -3,13 +3,14 @@ package com.hex.bigdata.udsp.iq.provider.impl;
 import com.hex.bigdata.udsp.common.constant.*;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Page;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
+import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.iq.provider.Provider;
 import com.hex.bigdata.udsp.iq.provider.impl.factory.HBaseConnectionPoolFactory;
 import com.hex.bigdata.udsp.iq.provider.impl.model.HBaseDatasource;
 import com.hex.bigdata.udsp.iq.provider.impl.model.HBasePage;
 import com.hex.bigdata.udsp.iq.provider.model.*;
-import com.hex.bigdata.udsp.iq.util.IqCommonUtil;
 import com.hex.goframe.util.GFStringUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
@@ -61,11 +62,6 @@ public class HBaseProvider implements Provider {
     private static final String stopStr = "|";
     private static Map<String, HBaseConnectionPoolFactory> dataSourcePool;
 
-    public void init(Datasource datasource) {
-        getDataSource(new HBaseDatasource(datasource.getPropertyMap()));
-        logger.debug("init HBase Provider DataSource");
-    }
-
     public IqResponse query(IqRequest request) {
         logger.debug("request=" + JSONUtil.parseObj2JSON(request));
         long bef = System.currentTimeMillis();
@@ -104,8 +100,7 @@ public class HBaseProvider implements Provider {
         try {
             conn = getConnection(hBaseDatasource);
             hTable = conn.getTable(tbName);
-            list = scan(hTable,
-                    startRow, stopRow, colMap, maxSize, family, qualifier, fqSep, dataType);
+            list = scan(hTable, startRow, stopRow, colMap, maxSize, family, qualifier, fqSep, dataType);
             // 排序处理
             list = orderBy(list, orderColumns);
 
@@ -257,14 +252,6 @@ public class HBaseProvider implements Provider {
         return response;
     }
 
-    public synchronized void close(Datasource datasource) {
-        HBaseConnectionPoolFactory factory = dataSourcePool.remove(datasource.getId());
-        if (factory != null) {
-            factory.closePool();
-        }
-        logger.debug("close HBase Provider DataSource");
-    }
-
     //-------------------------------------------分割线---------------------------------------------
     private synchronized HBaseConnectionPoolFactory getDataSource(HBaseDatasource datasource) {
         String dsId = datasource.getId();
@@ -276,14 +263,14 @@ public class HBaseProvider implements Provider {
             GenericObjectPool.Config config = new GenericObjectPool.Config();
             config.lifo = true;
             config.minIdle = 1;
-            config.maxActive = 10;
+            config.maxIdle = 10;
             config.maxWait = 3000;
             config.maxActive = 5;
             config.timeBetweenEvictionRunsMillis = 30000;
             config.testWhileIdle = true;
             config.testOnBorrow = false;
             config.testOnReturn = false;
-            factory = new HBaseConnectionPoolFactory(config, datasource.getZkQuorum(), datasource.getZkPort());
+            factory = new HBaseConnectionPoolFactory(config, datasource);
         }
         dataSourcePool.put(dsId, factory);
         return factory;
@@ -293,7 +280,7 @@ public class HBaseProvider implements Provider {
         try {
             return getDataSource(datasource).getConnection();
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            logger.warn(ExceptionUtil.getMessage(e));
             return null;
         }
     }
@@ -488,14 +475,14 @@ public class HBaseProvider implements Provider {
         return count;
     }
 
-    private List<Map<String, String>> scan(HTableInterface table,
-                                           Scan scan, Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
+    private List<Map<String, String>> scan(HTableInterface table, Scan scan, Map<Integer, String> colMap,
+                                           byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
         ResultScanner rs = table.getScanner(scan);
         return getMaps(rs, colMap, family, qualifier, fqSep, dataType);
     }
 
-    private List<Map<String, String>> scan(HTableInterface table,
-                                           String startRow, String stopRow, Map<Integer, String> colMap, long maxSize, byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
+    private List<Map<String, String>> scan(HTableInterface table, String startRow, String stopRow, Map<Integer, String> colMap,
+                                           long maxSize, byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
         Scan scan = new Scan();
         addColumn(scan, family, qualifier);
         setRowScan(scan, startRow, stopRow);
@@ -550,8 +537,8 @@ public class HBaseProvider implements Provider {
         scan.setFilter(pageFilter);
     }
 
-    private List<Map<String, String>> getMaps(ResultScanner rs,
-                                              Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep, String dataType) {
+    private List<Map<String, String>> getMaps(ResultScanner rs, Map<Integer, String> colMap,
+                                              byte[] family, byte[] qualifier, String fqSep, String dataType) {
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         for (Result r : rs) {
             list.add(getMap(r, colMap, family, qualifier, fqSep, dataType));
@@ -577,11 +564,12 @@ public class HBaseProvider implements Provider {
         return list;
     }
 
-    private Map<String, String> getMap(Result r, Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep, String dataType) {
+    private Map<String, String> getMap(Result r, Map<Integer, String> colMap,
+                                       byte[] family, byte[] qualifier, String fqSep, String dataType) {
         Map<String, String> map = new HashMap<String, String>();
         String fqVal = Bytes.toString(r.getValue(family, qualifier));
         if (fqVal == null) fqVal = "";
-        if (dataType.equalsIgnoreCase("dsv")) {
+        if (dataType.equalsIgnoreCase("dsv")) { // 分隔符格式数据
             String[] fqVals = fqVal.split(fqSep, -1);
             // 注：如果上线后又修改需求，需要添加字段，则该检查需要注释掉
 //        if (colMap.size() != fqVals.length) {
@@ -590,11 +578,10 @@ public class HBaseProvider implements Provider {
             for (int i = 0; i < fqVals.length; i++) {
                 String colName = colMap.get(i + 1);
                 if (colName != null) {
-                    String colVal = fqVals[i];
-                    map.put(colName, colVal);
+                    map.put(colName, JSONUtil.encode(fqVals[i]));
                 }
             }
-        } else if (dataType.equalsIgnoreCase("json")) {
+        } else if (dataType.equalsIgnoreCase("json")) { // JSON MAP格式数据
             Map<String, Object> result = JSONUtil.parseJSON2Map(fqVal);
             Set<Integer> keys = colMap.keySet();
             for (Integer key : keys) {
@@ -692,5 +679,10 @@ public class HBaseProvider implements Provider {
             }
         }
         return canConnection;
+    }
+
+    @Override
+    public List<MetadataCol> columnInfo(Datasource datasource, String schemaName) {
+        return null;
     }
 }

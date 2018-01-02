@@ -147,8 +147,8 @@ ${extends("/goframe/function_layout.httl")}
             <div field="describe" headerAlign="center" allowSort="true">说明</div>
             <div field="tbName" headerAlign="center" allowSort="true">表名</div>
             <div field="dsName" headerAlign="center" allowSort="true" renderer="dsRenderer">数据源</div>
-            <div field="type" headerAlign="center" allowSort="true" renderer="renderMdType">表类型</div>
-            <div field="status" headerAlign="center" allowSort="true" renderer="renderMdStatus">表状态</div>
+            <div field="type" headerAlign="center" allowSort="true" renderer="renderMdType">类型</div>
+            <div field="status" headerAlign="center" allowSort="true" renderer="renderMdStatus">状态</div>
             <div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat">创建时间</div>
             <div field="uptTime" headerAlign="center" allowSort="true" renderer="timeFormat">更新时间</div>
             <div field="note" headerAlign="center" allowSort="true">备注</div>

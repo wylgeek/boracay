@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class RealtimeTotalInfo implements Serializable {
     private String id; //
-    private String startHost; // 发起启动命令的节点
+    private String startHost; // 发起启动命令的节点,同时也是该实时任务的管理节点
     private String stopHost; // 发起停止命令的节点
     private RealtimeStatus status; // 准备启动、开始启动、正在运行、启动失败、准备停止、开始停止、停止成功、停止失败、运行失败
     private Date startTime; // 准备启动的时间
@@ -19,13 +19,10 @@ public class RealtimeTotalInfo implements Serializable {
     private Date stopTime; // 准备停止的时间
     private Date endTime; // 任务停止的时间
     private Date updateTime; // 更新信息的时间
-    private String startUser;
-    private String stopUser;
-    private String serviceName;
-    private String requestType;
-    private String appName;
-    private String appId;
     private MqModel model; // MQ模型
+    private long consumerNum = 0; // 消费获取条数
+    private long meetNum = 0; // 筛选后的条数
+    private long storeNum = 0; // 执行成功条数
 
     public String getId() {
         return id;
@@ -33,54 +30,6 @@ public class RealtimeTotalInfo implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getStartUser() {
-        return startUser;
-    }
-
-    public void setStartUser(String startUser) {
-        this.startUser = startUser;
-    }
-
-    public String getStopUser() {
-        return stopUser;
-    }
-
-    public void setStopUser(String stopUser) {
-        this.stopUser = stopUser;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public String getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
-    }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
     }
 
     public String getStartHost() {
@@ -153,5 +102,29 @@ public class RealtimeTotalInfo implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public long getConsumerNum() {
+        return consumerNum;
+    }
+
+    public void setConsumerNum(long consumerNum) {
+        this.consumerNum = consumerNum;
+    }
+
+    public long getMeetNum() {
+        return meetNum;
+    }
+
+    public void setMeetNum(long meetNum) {
+        this.meetNum = meetNum;
+    }
+
+    public long getStoreNum() {
+        return storeNum;
+    }
+
+    public void setStoreNum(long storeNum) {
+        this.storeNum = storeNum;
     }
 }

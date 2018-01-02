@@ -21,7 +21,11 @@ ${extends("/goframe/function_layout.httl")}
                     <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
                 </td>
                 <td style="text-align: right;">
-
+                    自动刷新：
+                    <input class="nui-dictcombobox" valueField="dictId" onvaluechanged="autoRefresh"
+                           textField="dictName"
+                           dictTypeId="AUTO_REFRESH_TIME" name="time" showNullItem="true" nullItemText="不刷新"
+                           emptyText="不刷新"/>
                 </td>
             </tr>
         </table>
@@ -36,67 +40,74 @@ ${extends("/goframe/function_layout.httl")}
                         <td class="roleText" style="width: 25%">
                             <input name="modelName" class="nui-textbox" style="width:98%;"/>
                         </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">准备启动的时间：</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="startTimeStart" class="nui-textbox" style="width:50%;"/>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">准备启动时间：</td>
+                        <td style="width: 25%">
+                            <input name="startTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
+                            -
+                            <input name="startTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
                         </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">～</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="startTimeEnd" class="nui-textbox" style="width:50%;"/>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">开始运行时间：</td>
+                        <td style="width: 25%">
+                            <input name="runTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
+                            -
+                            <input name="runTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
                         </td>
                     </tr>
                     <tr>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">模型状态：</td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">运行状态：</td>
                         <td class="roleText" style="width: 25%">
                             <input name="status" class="nui-dictcombobox" valueField="dictId" textField="dictName"
-                                   emptyText="全部" dictTypeId="UDSP_SERVICE_TYPE" showNullItem="true" nullItemText="全部"
+                                   emptyText="全部" dictTypeId="IM_REALTIME_JOB_STATUS" showNullItem="true"
+                                   nullItemText="全部"
                                    style="width:98%;"/>
                         </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">开始运行的时间：</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="runTimeStart" class="nui-textbox" style="width:98%;"/>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">准备停止时间：</td>
+                        <td style="width: 25%">
+                            <input name="stopTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
+                            -
+                            <input name="stopTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
                         </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">～</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="runTimeEnd" class="nui-textbox" style="width:98%;"/>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">任务停止时间：</td>
+                        <td style="width: 25%">
+                            <input name="endTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
+                            -
+                            <input name="endTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
                         </td>
                     </tr>
                     <tr>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">发起启动命令的节点：</td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">发起启动节点：</td>
                         <td class="roleText" style="width: 25%">
                             <input name="startHost" class="nui-textbox" style="width:98%;"/>
                         </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">准备停止的时间：</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="stopTimeStart" class="nui-textbox" style="width:98%;"/>
-                        </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">～</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="stopTimeEnd" class="nui-textbox" style="width:98%;"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">发起停止命令的节点：</td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">发起停止节点：</td>
                         <td class="roleText" style="width: 25%">
                             <input name="stopHost" class="nui-textbox" style="width:98%;"/>
                         </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">任务停止的时间：</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="endTimeStart" class="nui-textbox" style="width:98%;"/>
-                        </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">～</td>
-                        <td class="endTimeEnd" style="width: 25%">
-                            <input name="runTimeEnd" class="nui-textbox" style="width:98%;"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">更新信息的时间：</td>
-                        <td class="roleText" style="width: 25%">
-                            <input name="updateTimeStart" class="nui-textbox" style="width:98%;"/>
-                        </td>
-                        <td class="tit roleLabel" style="width: 100px;text-align: right">～</td>
-                        <td class="endTimeEnd" style="width: 25%">
-                            <input name="updateTimeEnd" class="nui-textbox" style="width:98%;"/>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">更新信息时间：</td>
+                        <td style="width: 25%">
+                            <input name="updateTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
+                            -
+                            <input name="updateTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss"
+                                   style="width: 46%"/>
                         </td>
                     </tr>
                     <tr>
@@ -120,29 +131,44 @@ ${extends("/goframe/function_layout.httl")}
          allowCellSelect="false" onrowdblclick="info" onshowrowdetail="onShowRowDetail">
         <div property="columns">
             <div type="expandcolumn" width="20">#</div>
-            <div field="modelName" headerAlign="center" allowSort="true">模型名称</div>
-            <div field="status" headerAlign="center" allowSort="true">模型状态</div>
-            <div field="runTime" headerAlign="center" allowSort="true">开始运行时间</div>
+            <div field="id" headerAlign="center" allowSort="true">作业ID</div>
+            <div field="modelName" headerAlign="center" allowSort="true" renderer="showModelName">模型名称</div>
+            <div field="status" headerAlign="center" allowSort="true" renderer="onRealTimeRenderer">运行状态</div>
+            <div field="startHost" headerAlign="center" allowSort="true">发起启动节点</div>
+            <!--
             <div field="startTime" headerAlign="center" allowSort="true">准备启动时间</div>
-            <div field="startHost" headerAlign="center" allowSort="true">发起启动命令节点</div>
-            <div field="stopHost" headerAlign="center" allowSort="true">发起停止命令节点</div>
+            -->
+            <div field="runTime" headerAlign="center" allowSort="true">开始运行时间</div>
             <div field="updateTime" headerAlign="center" allowSort="true">更新信息时间</div>
+            <div headerAlign="center" allowSort="true" align="center" renderer="renderInterval">运行时间</div>
+            <div field="consumerNum" headerAlign="center" allowSort="true" align="center" renderer="renderCount">消费获取条数</div>
+            <div field="meetNum" headerAlign="center" allowSort="true" align="center" renderer="renderCount">筛选后的条数</div>
+            <div field="storeNum" headerAlign="center" allowSort="true" align="center" renderer="renderCount">执行成功条数</div>
+
+            <div field="requestContent" headerAlign="center" allowSort="true">请求内容</div>
+            <div field="stopHost" headerAlign="center" allowSort="true">发起停止节点</div>
+            <!--
             <div field="stopTime" headerAlign="center" allowSort="true">准备停止时间</div>
+            -->
             <div field="endTime" headerAlign="center" allowSort="true">任务停止时间</div>
+
+            <div headerAlign="center" allowSort="true" renderer="operateType">操作</div>
         </div>
     </div>
 
-    <div id="detailGrid_Form" style="display:none;">
+    <div id="detailGrid_Form" style="width:100%;height:100%;">
         <div id="employee_grid" class="mini-datagrid" style="width:100%;height:150px;"
-             url="" onrowdblclick="info">
+             url="" onrowdblclick="info" showPager="false">
             <div property="columns">
-                <div type="expandcolumn" width="20">#</div>
                 <div field="host" headerAlign="center" allowSort="true">主机名称</div>
-                <div field="status" headerAlign="center" allowSort="true">运行状态</div>
+                <div field="status" headerAlign="center" allowSort="true" renderer="onRealTimeRenderer">运行状态</div>
                 <div field="runTime" headerAlign="center" allowSort="true">开始运行时间</div>
-                <div field="endTime" headerAlign="center" allowSort="true" renderer="renderRequestType">任务停止时间</div>
-                <div field="updateTime" headerAlign="center" allowSort="true">更新信息时间</div>
                 <div field="message" headerAlign="center" allowSort="true">信息</div>
+                <div field="consumerNum" headerAlign="center" allowSort="true" align="center" renderer="renderCount">消费获取条数</div>
+                <div field="meetNum" headerAlign="center" allowSort="true" align="center" renderer="renderCount">筛选后的条数</div>
+                <div field="storeNum" headerAlign="center" allowSort="true" align="center" renderer="renderCount">执行成功条数</div>
+                <div field="updateTime" headerAlign="center" allowSort="true">更新信息时间</div>
+                <div field="endTime" headerAlign="center" allowSort="true">任务停止时间</div>
             </div>
         </div>
     </div>
@@ -175,7 +201,7 @@ ${extends("/goframe/function_layout.httl")}
         var td = sender.getRowDetailCellEl(record);
         td.appendChild(detailGrid_Form);
         detailGrid_Form.style.display = "block";
-        var url = "${basePath}/im/job/realtime/select/nodes/"+record.id;
+        var url = "${basePath}/im/job/realtime/select/nodes/" + record.id;
         grid2.setUrl(url)
         grid2.load();
     }
@@ -209,10 +235,35 @@ ${extends("/goframe/function_layout.httl")}
             return;
         }
         nui.open({
-            url: "${basePath}/goframe/p/mc.current.info/?pkId=" + row.pkId,
-            title: "并发信息详情",
+            url: "${basePath}/goframe/p/mc.job.realtime.info/?pkId=" + row.id,
+            title: "实时作业详情",
             width: 800,
             height: 400,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+            }
+        });
+    }
+
+    /**
+     * 展现模型名称
+     * @param e
+     */
+    function showModelName(e) {
+        return "<a href='#' class='underline' onclick='showModelInfo(\"" + e.row.modelId + "\")'>" + e.row.modelName + "</a>";
+    }
+
+    /**
+     * 显示模型详细信息
+     * @param modelId
+     */
+    function showModelInfo(modelId) {
+        nui.open({
+            url: "${basePath}/goframe/p/im.cm.model.info?pkId=" + modelId,
+            title: "模型内容详情",
+            width: 800,
+            height: 600,
             onload: function () {
             },
             ondestroy: function (action) {
@@ -232,32 +283,124 @@ ${extends("/goframe/function_layout.httl")}
     }
 
     /**
-     * 转换应用类型
+     * 转换运行状态
      * @param e
      * @returns {*}
      */
-    function renderAppType(e) {
-        return nui.getDictText("UDSP_SERVICE_TYPE", e.row.appType);
-    }
-
-    /**
-     * 转换请求类型
-     * @param e
-     * @returns {*}
-     */
-    function renderRequestType(e) {
-        return nui.getDictText("UDSP_REQUEST_TYPE", e.row.requestType);
-    }
-
-    /**
-     * 转换同步/异步
-     * @returns {*}
-     */
-    function renderSyncType(e) {
-        if (e.row.syncType == "" || e.row.syncType == null) {
-            return "-";
+    function onRealTimeRenderer(e) {
+        var name = nui.getDictText("IM_REALTIME_JOB_STATUS", e.row.status);
+        if (e.row.status == "READY_START") { //准备启动
+            return '<div style="width:100%;background:#d7d326">' + name + '</div>';
+        } else if (e.row.status == "STARTING" || e.row.status == "RUNNING") { //开始启动\正在运行
+            return '<div style="width:100%;background:#1d953f">' + name + '</div>';
+        } else if (e.row.status == "READY_STOP" || e.row.status == "STOPING" || e.row.status == "STOP_SUCCESS") { //准备停止\开始停止\停止成功
+            return '<div style="width:100%;background:#e14edb">' + name + '</div>';
+        } else { //启动失败\停止失败\运行失败
+            return '<div style="width:100%;background:#bb080b">' + name + '</div>';
         }
-        return nui.getDictText("UDSP_SYNC_TYPE", e.row.syncType);
+        return name;
+    }
+
+    /**
+     * 模型构建耗时情况
+     * @param e
+     */
+    function renderInterval(e) {
+        var startTime = new Date(e.row.startTime);
+        var updateTime = new Date(e.row.updateTime);
+        var interval = "0秒钟";
+        var time = Math.ceil((updateTime.getTime() - startTime.getTime()) / 1000);
+        if (time < 60) {
+            interval = time + "秒钟";
+        } else if (time < 3600) {
+            interval = (time / 60).toFixed(2) + "分钟";
+        } else if (time < 86400) {
+            interval = (time / 3600).toFixed(2) + "小时";
+        } else {
+            interval = (time / 86400).toFixed(2) + "天";
+        }
+        return interval;
+    }
+
+    /**
+     * 转换数值
+     */
+    function renderCount(e) {
+        if (e.value != undefined) {
+            var value = e.value;
+//            var count = "0条";
+//            if (value < 10000) {
+//                count = value + "条";
+//            } else if (value < 100000000) {
+//                count = (value / 10000).toFixed(4) + "万条";
+//            } else if (value < 1000000000000) {
+//                count = (time / 100000000).toFixed(4) + "亿条";
+//            } else {
+//                count = (time / 1000000000000).toFixed(4) + "万亿条";
+//            }
+//            return count;
+            return toThousands(value);
+        }
+    }
+
+    function toThousands(num) {
+        var result = "", counter = 0;
+        num = (num || 0).toString();
+        for (var i = num.length - 1; i >= 0; i--) {
+            counter++;
+            result = num.charAt(i) + result;
+            if (!(counter % 3) && i != 0) {
+                result = "," + result;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 操作类型
+     * @param e
+     */
+    function operateType(e) {
+        if (e.row.status == "RUNNING") {
+            return "<a href='#' class='underline' onclick='operateToStop(\"" + e.row.id + "\")'>停止</a>";
+        } else {
+            return '<div style="width:100%;color:#8c9398">停止</div>';
+        }
+    }
+
+    /**
+     * 停止操作
+     */
+    function operateToStop(id) {
+        nui.confirm("确定停止该作业？", "系统提示", function (action) {
+            if (action == "ok") {
+                grid1.loading("正在停止中,请稍等...");
+                $.ajax({
+                    url: "${basePath}/im/job/realtime/stop/" + id,
+                    type: 'POST',
+                    data: null,
+                    cache: false,
+                    contentType: 'application/json',
+                    success: function (result) {
+                        nui.alert(result.message);
+                        search();
+                    }
+                });
+            }
+        });
+    }
+
+    var interval;
+    /**
+     * 自动刷新
+     * @param e
+     */
+    function autoRefresh(e) {
+        window.clearInterval(interval);
+        var time = e.value;
+        if (time != "") {
+            interval = window.setInterval(search, time);
+        }
     }
 </script>
 <!--#end-->

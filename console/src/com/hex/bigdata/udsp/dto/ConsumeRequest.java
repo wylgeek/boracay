@@ -1,8 +1,8 @@
 package com.hex.bigdata.udsp.dto;
 
 import com.hex.bigdata.udsp.common.constant.ErrorCode;
-import com.hex.bigdata.udsp.mc.model.McCurrent;
-import com.hex.bigdata.udsp.mc.service.McWaitQueueService;
+import com.hex.bigdata.udsp.mc.model.Current;
+import com.hex.bigdata.udsp.mc.service.WaitQueueService;
 import com.hex.bigdata.udsp.model.Request;
 import com.hex.bigdata.udsp.rc.model.RcService;
 import com.hex.bigdata.udsp.rc.model.RcUserService;
@@ -11,7 +11,7 @@ public class ConsumeRequest {
 
     private Request request;
 
-    private McCurrent mcCurrent;
+    private Current mcCurrent;
 
     private ErrorCode error;
 
@@ -21,7 +21,7 @@ public class ConsumeRequest {
 
     private WaitNumResult waitNumResult;
 
-    private McWaitQueueService mcWaitQueueService;
+    //private WaitQueueService mcWaitQueueService;
 
     public Request getRequest() {
         return request;
@@ -31,11 +31,11 @@ public class ConsumeRequest {
         this.request = request;
     }
 
-    public McCurrent getMcCurrent() {
+    public Current getMcCurrent() {
         return mcCurrent;
     }
 
-    public void setMcCurrent(McCurrent mcCurrent) {
+    public void setMcCurrent(Current mcCurrent) {
         this.mcCurrent = mcCurrent;
     }
 
@@ -47,13 +47,13 @@ public class ConsumeRequest {
         this.error = error;
     }
 
-    public RcService getRcService() {
-        return rcService;
-    }
-
-    public void setRcService(RcService rcService) {
-        this.rcService = rcService;
-    }
+//    public RcService getRcService() {
+//        return rcService;
+//    }
+//
+//    public void setRcService(RcService rcService) {
+//        this.rcService = rcService;
+//    }
 
     public RcUserService getRcUserService() {
         return rcUserService;
@@ -71,11 +71,11 @@ public class ConsumeRequest {
         this.waitNumResult = waitNumResult;
     }
 
-    public McWaitQueueService getMcWaitQueueService() {
-        return mcWaitQueueService;
-    }
-
-    public void setMcWaitQueueService(McWaitQueueService mcWaitQueueService) {
-        this.mcWaitQueueService = mcWaitQueueService;
-    }
+//    public WaitQueueService getMcWaitQueueService() {
+//        return mcWaitQueueService;
+//    }
+//
+//    public void setMcWaitQueueService(WaitQueueService mcWaitQueueService) {
+//        this.mcWaitQueueService = mcWaitQueueService;
+//    }
 }

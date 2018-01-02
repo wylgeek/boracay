@@ -1,0 +1,183 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding: 5px 5px 0px 5px;">
+    <div id="form1" method="post">
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">基础栏</span></legend>
+            <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
+                <tr>
+                    <th class="nui-form-label"><label for="dsId">数据源：</label></th>
+                    <td>
+                        <div id="dsId" class="nui-combobox" style="width:97%;" popupWidth="400" textField="name"
+                             valueField="pkId" onvaluechanged="dsIdChanged" allowInput="true"
+                             url="${basePath}/com/ds/select?model=IM&imDsTypeDictId=IM_DS_TARGET_TYPE&type=${dsType}"
+                             dataField="data" name="dsId" multiSelect="false">
+                            <div property="columns">
+                                <div header="名称" field="name"></div>
+                                <div header="说明" field="describe"></div>
+                                <div header="类型" field="type"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <th class="nui-form-label"><label for="dsId">元数据信息：</label></th>
+                    <td>
+                        <div id="mdId" class="nui-combobox" style="width:97%;" popupWidth="400" textField="name"
+                             valueField="pkId" allowInput="true" onvaluechanged="mdIdChanged"
+                             dataField="data" name="dsId" multiSelect="false">
+                            <div property="columns">
+                                <div header="名称" field="name"></div>
+                                <div header="说明" field="describe"></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">字段栏</span></legend>
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>字段信息</b>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:260px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid1" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellEdit="true" allowCellSelect="true" sortMode="client"
+                     showPager="false" editNextOnEnterKey="true" editNextRowCell="true">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="30">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input name="colName" property="editor" class="nui-combobox"
+                                   textField="name" valueField="name" allowInput="true" dataField="data"
+                                   onbeforeshowpopup="colNameBeforeShowPopup" vtype="maxLength:64" required="true"
+                                   onvaluechanged="colNameChanged" onvalidation="colNameValidation"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="30">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                        <div field="type" headerAlign="center" allowSort="true" width="20">类型
+                            <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   dictTypeId="IQ_MD_COL_DATA_TYPE" value="STRING" vtype="maxLength:32"/>
+                        </div>
+                        <div field="length" headerAlign="center" allowSort="true" width="15">长度
+                            <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textarea" vtype="maxLength:4000"/>
+                        </div>
+                        <div type="checkboxcolumn" field="indexed" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">索引
+                        </div>
+                        <div type="checkboxcolumn" field="primary" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">主键
+                        </div>
+                        <div type="checkboxcolumn" field="stored" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">存储
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
+            <a class="nui-button" iconCls="icon-save" onclick="save" id="saveButton" onclick="saveCols">关联</a>
+            <span style="display:inline-block;width:25px;"></span>
+            <a class="nui-button" iconCls="icon-cancel" onclick="cancel">返回</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var form1;
+    var grid1;
+    var originTbName;
+    var originName;
+    var dsIdObject;
+    var mdIdObject;
+
+    /**
+     * 按需加载资源文件
+     */
+    require(['jquery', 'nui'], function ($, nui) {
+        nui.parse();
+        form1 = new nui.Form("#form1");
+        grid1 = nui.get("datagrid1");
+        dsIdObject = nui.get("dsId");
+        mdIdObject = nui.get("mdId");
+    });
+
+    /**
+     * 数据源改变
+     */
+    function dsIdChanged() {
+        var dsIdSelected = dsIdObject.getSelected();
+        if (!dsIdSelected || dsIdSelected == undefined) {
+            return;
+        }
+        var requestBody = {};
+        requestBody.dsId = dsIdSelected.pkId;
+        requestBody.status = "2";
+        var json = nui.encode(requestBody);
+        //debugger;
+        $.ajax({
+            url: "${basePath}/im/md/selectByCondition",
+            type: 'POST',
+            data: json,
+            cache: false,
+            contentType: 'application/json',
+            success: function (result) {
+                if (result.status == true) {
+                    mdIdObject.setData(result.data);
+                }
+            }
+        });
+    }
+
+    function mdIdChanged(){
+        var mdIdSelected = mdIdObject.getSelected();
+        //清除所有行
+        grid1.clearRows();
+        if (!mdIdSelected || mdIdSelected == undefined) {
+            return;
+        }
+        var mdId =  mdIdSelected.pkId;
+        $.ajax({
+            url: "${basePath}/im/md/col/select/"+mdId,
+            type: 'POST',
+            data: null,
+            cache: false,
+            contentType: 'application/json',
+            success: function (result) {
+                if (result.status == true) {
+                    grid1.setData(result.data);
+                }
+            }
+        });
+    }
+
+    /**
+     * 保存
+     */
+    function save(){
+        var colsSelected = grid1.getSelecteds();
+        window.Owner.setColsData(colsSelected);
+        cancel();
+    }
+
+    /**
+     * 返回
+     */
+    function cancel() {
+        CloseWindow("onCancel");
+    }
+
+</script>
+<!--#end-->

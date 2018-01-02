@@ -45,11 +45,11 @@ public class ImpalaForPgsqlJdbcSqlHelper extends BaseJdbcSqlHelper {
 
     @Override
     public String getColumnsSql(String dbName, String tbName) {
-        return "SELECT"
+        return "(SELECT"
                 + "  COL.\"COMMENT\" " + Constant.COL_COMMENT
                 + ", COL.\"TYPE_NAME\" " + Constant.COL_DATA_TYPE
                 + ", COL.\"COLUMN_NAME\" " + Constant.COL_NAME
-                + ", COL.\"INTEGER_IDX\" " + Constant.COL_SEQ
+                + ", COL.\"INTEGER_IDX\" + 1 " + Constant.COL_SEQ
                 + ", 0 " + Constant.COL_PF_SEQ
                 + " FROM \"COLUMNS_V2\" COL, \"DBS\" DB, \"TBLS\" TAB, \"SDS\" SDS"
                 + " WHERE COL.\"CD_ID\" = SDS.\"CD_ID\""
@@ -57,20 +57,20 @@ public class ImpalaForPgsqlJdbcSqlHelper extends BaseJdbcSqlHelper {
                 + "  AND TAB.\"DB_ID\" = DB.\"DB_ID\""
                 + "  AND DB.\"NAME\" = '" + dbName.toLowerCase() + "'"
                 + "  AND TAB.\"TBL_NAME\" = '" + tbName.toLowerCase() + "'"
-                + " ORDER BY COL.\"INTEGER_IDX\""
-                + " UNION ALL"
-                + " SELECT"
-                + "  PK.\"PKEY_COMMENT\" " + Constant.COL_COMMENT
-                + ", PK.\"PKEY_TYPE\" " + Constant.COL_DATA_TYPE
-                + ", PK.\"PKEY_NAME\" " + Constant.COL_NAME
+                + " ORDER BY COL.\"INTEGER_IDX\")"
+                + " UNION ALL "
+                + " (SELECT"
+                + "  PF.\"PKEY_COMMENT\" " + Constant.COL_COMMENT
+                + ", PF.\"PKEY_TYPE\" " + Constant.COL_DATA_TYPE
+                + ", PF.\"PKEY_NAME\" " + Constant.COL_NAME
                 + ", 0 " + Constant.COL_SEQ
-                + ", PK.\"INTEGER_IDX\" " + Constant.COL_PF_SEQ
-                + " FROM \"DBS\" DB, \"TBLS\" TAB, \"PARTITION_KEYS\" PK"
+                + ", PF.\"INTEGER_IDX\" + 1 " + Constant.COL_PF_SEQ
+                + " FROM \"DBS\" DB, \"TBLS\" TAB, \"PARTITION_KEYS\" PF"
                 + " WHERE TAB.\"DB_ID\" = DB.\"DB_ID\""
-                + "  AND PK.\"TBL_ID\" = TAB.\"TBL_ID\""
+                + "  AND PF.\"TBL_ID\" = TAB.\"TBL_ID\""
                 + "  AND DB.\"NAME\" = '" + dbName.toLowerCase() + "'"
                 + "  AND TAB.\"TBL_NAME\" = '" + tbName.toLowerCase() + "'"
-                + " ORDER BY PK.\"INTEGER_IDX\"";
+                + " ORDER BY PF.\"INTEGER_IDX\")";
     }
 
     @Override

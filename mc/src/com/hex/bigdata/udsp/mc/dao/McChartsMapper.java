@@ -48,6 +48,10 @@ public class McChartsMapper extends BaseMapper {
         return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.mc.dao.McChartsMapper.chart2Day", mcChartsView);
     }
 
+    public List<McChartsView> chart3(McChartsView mcChartsView) {
+        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.mc.dao.McChartsMapper.chart3", mcChartsView);
+    }
+
     public List<McChartsView> chart4(String timeStart, String timeEnd) {
         McChartsView mcChartsView = new McChartsView(timeStart, timeEnd);
         return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.mc.dao.McChartsMapper.chart4", mcChartsView);
@@ -63,12 +67,13 @@ public class McChartsMapper extends BaseMapper {
         return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.mc.dao.McChartsMapper.chart6", mcChartsView);
     }
 
-    /**
-     * 按照用户对服务调用进行统计
-     * @param mcChartsView
-     * @return
-     */
-    public List<McChartsView> statsServiceGroupByUserName(McChartsView mcChartsView) {
-        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.mc.dao.McChartsMapper.chart3", mcChartsView);
+    public List<McChartsView> chart7(String timeStart, String timeEnd) {
+        McChartsView mcChartsView = new McChartsView(timeStart, timeEnd);
+        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.mc.dao.McChartsMapper.chart7", mcChartsView);
+    }
+
+    public List<McChartsView> chart8(String timeStart, String timeEnd) {
+        McChartsView mcChartsView = new McChartsView(timeStart, timeEnd);
+        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.mc.dao.McChartsMapper.chart8", mcChartsView);
     }
 }

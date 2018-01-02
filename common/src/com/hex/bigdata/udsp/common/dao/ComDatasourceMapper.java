@@ -80,7 +80,7 @@ public class ComDatasourceMapper extends SyncMapper<ComDatasource> {
                 "com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.checkSourceType",sourceId).size() > 0;
     }
 
-    public List<ComDatasource> selectEDs() {
-        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.selectEDs");
+    public List<ComDatasource> selectEngineDs() {
+        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.common.dao.ComDatasourceMapper.selectEngineDs");
     }
 }

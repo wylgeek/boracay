@@ -35,6 +35,7 @@ ${extends("/goframe/function_layout.httl")}
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
+                                <div header="类型" field="type"></div>
                             </div>
                         </div>
                     </td>
@@ -116,11 +117,11 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="note" headerAlign="center" allowSort="true" width="30">备注
                             <input property="editor" class="nui-textarea" vtype="maxLength:4000"/>
                         </div>
-                        <div type="checkboxcolumn" field="indexed" trueValue="0" falseValue="1"
-                             headerAlign="center" allowSort="true" width="8">索引
-                        </div>
                         <div type="checkboxcolumn" field="primary" trueValue="0" falseValue="1"
                              headerAlign="center" allowSort="true" width="8">主键
+                        </div>
+                        <div type="checkboxcolumn" field="indexed" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">索引
                         </div>
                         <div type="checkboxcolumn" field="stored" trueValue="0" falseValue="1"
                              headerAlign="center" allowSort="true" width="8">存储
@@ -624,8 +625,10 @@ ${extends("/goframe/function_layout.httl")}
     var count1 = 0;
     function colNameBeforeShowPopup(e) {
         // --下拉选项变化--
+        var dsId = nui.get("dsId").getValue();
+        var tbName = nui.get("tbName").getValue();
         if (count1 == 0) {
-            e.source.load("${basePath}/im/md/getCloumnInfo/" + nui.get("dsId").getValue() + "/" + nui.get("tbName").getValue());
+            e.source.load("${basePath}/im/md/getCloumnInfo2?dsId=" + dsId + "&tbName=" + tbName);
             count1++;
         }
     }
@@ -762,6 +765,7 @@ ${extends("/goframe/function_layout.httl")}
      * 设置外表字段信息
      */
     function setCols() {
+        count1 = 0;
         var type = nui.get("type").getValue();
         var dsId = nui.get("dsId").getValue();
         if (!dsId) {
@@ -775,7 +779,7 @@ ${extends("/goframe/function_layout.httl")}
         var json = nui.encode({"dsId": dsId, "tbName": tbName});
         if (type == 0) { // 内表
             form1.loading("正在检查表中,请稍等...");
-            $.post("${basePath}/im/md/checkSchemaExists/"+dsId+"/"+tbName, {}, function (result) {
+            $.post("${basePath}/im/md/checkSchema/"+dsId,{"tbName":tbName}, function (result) {
                 if (!result.status) {
                     nui.alert(result.message);
                 }
@@ -784,8 +788,8 @@ ${extends("/goframe/function_layout.httl")}
         } else { // 外表
             form1.loading("正在获取字段中,请稍等...");
             grid1.clearRows();
-            $.post("${basePath}/im/md/getCloumnInfo/"+dsId+"/"+tbName, {}, function (result) {
-                if (result.status) {
+            $.post("${basePath}/im/md/getCloumnInfo/"+dsId,{"tbName":tbName}, function (result) {
+                if (result.status && result.data && result.data.length > 0) {
                     grid1.addRows(dealCols(result.data));
                 }
                 nui.alert(result.message);

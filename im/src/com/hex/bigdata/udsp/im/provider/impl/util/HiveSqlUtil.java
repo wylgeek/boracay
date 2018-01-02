@@ -35,6 +35,16 @@ public class HiveSqlUtil {
     }
 
     /**
+     * 清空表数据
+     *
+     * @param tableName
+     * @return
+     */
+    public static String truncateTable(String tableName) {
+        return "TRUNCATE TABLE " + tableName;
+    }
+
+    /**
      * 删除表
      *
      * @param ifExists
@@ -73,24 +83,36 @@ public class HiveSqlUtil {
     }
 
     /**
+     * 查询表
+     *
+     * @param selectColumns
+     * @param selectTableName
+     * @param whereProperties
+     * @return
+     */
+    public static String select(List<String> selectColumns,
+                                String selectTableName, List<WhereProperty> whereProperties) {
+        return "SELECT " + getSelectColumns(selectColumns) + "\n FROM "
+                + selectTableName + getWhere(whereProperties);
+    }
+
+    /**
      * 查询表并插入表
      *
      * @param isOverwrite
      * @param insertTableName
-     * @param insertColumns
      * @param partitionColumns
      * @param selectColumns
      * @param selectTableName
      * @param whereProperties
      * @return
      */
-    public static String insert(boolean isOverwrite, String insertTableName, List<String> insertColumns,
+    public static String insert(boolean isOverwrite, String insertTableName,
                                 List<String> partitionColumns, List<String> selectColumns,
                                 String selectTableName, List<WhereProperty> whereProperties) {
         return "INSERT" + getOverwrite(isOverwrite) + " TABLE "
-                + insertTableName + getInsertColumns(insertColumns)
-                + getPartitionKey(partitionColumns)
-                + "\n SELECT " + getSelectColumns(selectColumns) + " FROM "
+                + insertTableName + getPartitionKey(partitionColumns)
+                + "\n SELECT " + getSelectColumns(selectColumns) + "\n FROM "
                 + selectTableName + getWhere(whereProperties);
     }
 
@@ -99,21 +121,19 @@ public class HiveSqlUtil {
      *
      * @param isOverwrite
      * @param insertTableName
-     * @param insertColumns
      * @param partitionColumns
      * @param selectColumns
      * @param selectSql
      * @param whereProperties
      * @return
      */
-    public static String insert2(boolean isOverwrite, String insertTableName, List<String> insertColumns,
+    public static String insert2(boolean isOverwrite, String insertTableName,
                                  List<String> partitionColumns, List<String> selectColumns,
                                  String selectSql, List<WhereProperty> whereProperties) {
         return "INSERT" + getOverwrite(isOverwrite) + " TABLE "
-                + insertTableName + getInsertColumns(insertColumns)
-                + getPartitionKey(partitionColumns)
-                + "\n SELECT " + getSelectColumns2(selectColumns) + " FROM ("
-                + selectSql + ") UDSP_VIEW " + getWhere2(whereProperties);
+                + insertTableName + getPartitionKey(partitionColumns)
+                + "\n SELECT " + getSelectColumns2(selectColumns) + "\n FROM (\n"
+                + selectSql + "\n) UDSP_VIEW " + getWhere2(whereProperties);
     }
 
     public static String createDatabase(boolean ifNotExists, String databaseName) {
@@ -142,7 +162,6 @@ public class HiveSqlUtil {
         Operator operator = null;
         int count = 0;
         if (whereProperties != null && whereProperties.size() != 0) {
-            sql = "\n WHERE ";
             for (WhereProperty whereProperty : whereProperties) {
                 name = whereProperty.getName();
                 value = whereProperty.getValue();
@@ -151,7 +170,7 @@ public class HiveSqlUtil {
                 if (StringUtils.isBlank(name) || StringUtils.isBlank(value) || operator == null) {
                     continue;
                 }
-                sql += (count == 0 ? "" : " AND ");
+                sql += (count == 0 ? "\n WHERE " : " AND ");
                 sql += name + SqlUtil.getCondition(value, type, operator);
                 count++;
             }
@@ -167,7 +186,6 @@ public class HiveSqlUtil {
         Operator operator = null;
         int count = 0;
         if (whereProperties != null && whereProperties.size() != 0) {
-            sql = "\n WHERE ";
             for (WhereProperty whereProperty : whereProperties) {
                 name = whereProperty.getName();
                 value = whereProperty.getValue();
@@ -175,7 +193,7 @@ public class HiveSqlUtil {
                 operator = whereProperty.getOperator();
                 if (StringUtils.isBlank(name) || StringUtils.isBlank(value) || operator == null)
                     continue;
-                sql += (count == 0 ? "" : " AND ");
+                sql += (count == 0 ? "\n WHERE " : " AND ");
                 sql += "UDSP_VIEW." + name + SqlUtil.getCondition(value, type, operator);
                 count++;
             }
@@ -183,35 +201,30 @@ public class HiveSqlUtil {
         return sql;
     }
 
-    private static String getInsertColumns(List<String> columns) {
-        String sql = " ";
-        if (columns != null && columns.size() != 0) {
-            sql = " (";
-            for (int i = 0; i < columns.size(); i++) {
-                sql += (i == 0 ? "" : ",");
-                sql += columns.get(i);
-            }
-            sql += ")";
-        }
-        return sql;
-    }
-
     private static String getSelectColumns(List<String> columns) {
-        return getColumns(columns, " * ");
-    }
-
-    private static String getColumns(List<String> columns, String sql) {
+        String sql = " * ";
         if (columns != null && columns.size() != 0) {
+            sql = "";
             for (int i = 0; i < columns.size(); i++) {
+                String name = columns.get(i);
                 sql += (i == 0 ? "" : ",");
-                sql += columns.get(i);
+                sql += StringUtils.isBlank(name) ? "NULL" : name;
             }
         }
         return sql;
     }
 
     private static String getSelectColumns2(List<String> columns) {
-        return getColumns(columns, " UDSP_VIEW.* ");
+        String sql = " UDSP_VIEW.* ";
+        if (columns != null && columns.size() != 0) {
+            sql = "";
+            for (int i = 0; i < columns.size(); i++) {
+                String name = columns.get(i);
+                sql += (i == 0 ? "" : ",");
+                sql += (StringUtils.isBlank(name) || "NULL".equalsIgnoreCase(name)) ? "NULL" : "UDSP_VIEW." + name;
+            }
+        }
+        return sql;
     }
 
     private static String getOverwrite(boolean isOverwrite) {

@@ -11,18 +11,6 @@ import java.util.Map;
  * Created by junjiem on 2017-2-20.
  */
 public class KafkaConsumerDsConfig extends ConsumerDatasource {
-    private int threadNum;
-    private String zookeeperConnect;
-    private String metadataBrokerList;
-    private String zookeeperSessionTimeoutMs;
-    private String zookeeperConnectionTimeoutMs;
-    private String zookeeperSyncTimeMs;
-    private String consumerTimeoutMs;
-    private String autoCommitEnable;
-    private String autoCommitIntervalMs;
-    private String autoOffsetReset;
-    private String rebalanceMaxRetries;
-    private String rebalanceBackoffMs;
 
     public KafkaConsumerDsConfig(List<Property> propertyList) {
         super(propertyList);

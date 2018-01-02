@@ -1,52 +1,53 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.hex.bigdata.udsp.im.dao.ImModelMapper" >
-  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.im.model.ImModel" >
-    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
-    <result column="NAME" property="name" jdbcType="VARCHAR" />
-    <result column="DESCRIBE" property="describe" jdbcType="VARCHAR" />
-    <result column="S_DS_ID" property="sDsId" jdbcType="VARCHAR" />
-    <result column="T_MD_ID" property="tMdId" jdbcType="VARCHAR" />
-    <result column="NOTE" property="note" jdbcType="VARCHAR" />
-    <result column="DEL_FLG" property="delFlg" jdbcType="CHAR" />
-    <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR" />
-    <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR" />
-    <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR" />
-    <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR" />
-    <result column="TYPE" property="type" jdbcType="CHAR" />
-    <result column="BUILD_MODE" property="buildMode" jdbcType="CHAR" />
-    <result column="UPDATE_MODE" property="updateMode" jdbcType="CHAR" />
-    <result column="E_DS_ID" property="eDsId" jdbcType="VARCHAR"/>
-    <result column="STATUS" property="status" jdbcType="CHAR" />
-  </resultMap>
+<mapper namespace="com.hex.bigdata.udsp.im.dao.ImModelMapper">
+    <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.im.model.ImModel">
+        <id column="PK_ID" property="pkId" jdbcType="VARCHAR"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="DESCRIBE" property="describe" jdbcType="VARCHAR"/>
+        <result column="S_DS_ID" property="sourceDsId" jdbcType="VARCHAR"/>
+        <result column="T_MD_ID" property="targetMdId" jdbcType="VARCHAR"/>
+        <result column="NOTE" property="note" jdbcType="VARCHAR"/>
+        <result column="DEL_FLG" property="delFlg" jdbcType="CHAR"/>
+        <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR"/>
+        <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR"/>
+        <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR"/>
+        <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR"/>
+        <result column="TYPE" property="type" jdbcType="CHAR"/>
+        <result column="BUILD_MODE" property="buildMode" jdbcType="CHAR"/>
+        <result column="UPDATE_MODE" property="updateMode" jdbcType="CHAR"/>
+        <result column="E_DS_ID" property="engineDsId" jdbcType="VARCHAR"/>
+        <result column="STATUS" property="status" jdbcType="CHAR"/>
+    </resultMap>
 
-  <resultMap id="ImModelView" type="com.hex.bigdata.udsp.im.dto.ImModelView" extends="BaseResultMap">
-    <result column="T_MD_NAME" property="tMdName" jdbcType="VARCHAR" />
-    <result column="S_DS_NAME" property="sDsName" jdbcType="VARCHAR" />
-  </resultMap>
+    <resultMap id="ImModelView" type="com.hex.bigdata.udsp.im.dto.ImModelView" extends="BaseResultMap">
+        <result column="T_MD_NAME" property="targetMdName" jdbcType="VARCHAR"/>
+        <result column="S_DS_NAME" property="sourceDsName" jdbcType="VARCHAR"/>
+    </resultMap>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from IM_MODEL
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.hex.bigdata.udsp.im.model.ImModel" >
+    <insert id="insert" parameterType="com.hex.bigdata.udsp.im.model.ImModel">
     insert into IM_MODEL (PK_ID, NAME, DESCRIBE, 
       S_DS_ID, T_MD_ID,
       NOTE, DEL_FLG, CRT_USER, 
       CRT_TIME, UPT_USER, UPT_TIME, 
       TYPE, BUILD_MODE, UPDATE_MODE,E_DS_ID,STATUS)
     values (#{pkId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{describe,jdbcType=VARCHAR}, 
-      #{sDsId,jdbcType=VARCHAR},#{tMdId,jdbcType=VARCHAR},
-      #{note,jdbcType=VARCHAR}, #{delFlg,jdbcType=CHAR}, #{crtUser,jdbcType=VARCHAR}, 
+      #{sourceDsId,jdbcType=VARCHAR}, #{targetMdId,jdbcType=VARCHAR},
+      #{note,jdbcType=VARCHAR}, '0', #{crtUser,jdbcType=VARCHAR},
       #{crtTime,jdbcType=VARCHAR}, #{uptUser,jdbcType=VARCHAR}, #{uptTime,jdbcType=VARCHAR}, 
-      #{type,jdbcType=CHAR}, #{buildMode,jdbcType=CHAR}, #{updateMode,jdbcType=CHAR},#{eDsId,jdbcType=VARCHAR},#{status,jdbcType=CHAR})
+      #{type,jdbcType=CHAR}, #{buildMode,jdbcType=CHAR}, #{updateMode,jdbcType=CHAR},
+      #{engineDsId,jdbcType=VARCHAR}, #{status,jdbcType=CHAR})
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.im.model.ImModel" >
+    <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.im.model.ImModel">
     update IM_MODEL
     set NAME = #{name,jdbcType=VARCHAR},
       DESCRIBE = #{describe,jdbcType=VARCHAR},
-      S_DS_ID = #{sDsId,jdbcType=VARCHAR},
-      T_MD_ID = #{tMdId,jdbcType=VARCHAR},
+      S_DS_ID = #{sourceDsId,jdbcType=VARCHAR},
+      T_MD_ID = #{targetMdId,jdbcType=VARCHAR},
       NOTE = #{note,jdbcType=VARCHAR},
       DEL_FLG = #{delFlg,jdbcType=CHAR},
       UPT_USER = #{uptUser,jdbcType=VARCHAR},
@@ -54,90 +55,79 @@
       TYPE = #{type,jdbcType=CHAR},
       BUILD_MODE = #{buildMode,jdbcType=CHAR},
       UPDATE_MODE = #{updateMode,jdbcType=CHAR},
-      E_DS_ID = #{eDsId,jdbcType=VARCHAR},
+      E_DS_ID = #{engineDsId,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=CHAR}
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </update>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
     select PK_ID, NAME, DESCRIBE, S_DS_ID, T_MD_ID, NOTE, DEL_FLG, CRT_USER,
     CRT_TIME, UPT_USER, UPT_TIME, TYPE, BUILD_MODE, UPDATE_MODE,E_DS_ID,STATUS
     from IM_MODEL
     where PK_ID = #{pkId,jdbcType=VARCHAR}
     and DEL_FLG = '0'
   </select>
-  <select id="selectAll" resultMap="BaseResultMap" >
+    <select id="selectAll" resultMap="BaseResultMap">
     select PK_ID, NAME, DESCRIBE, S_DS_ID, T_MD_ID, NOTE, DEL_FLG, CRT_USER,
     CRT_TIME, UPT_USER, UPT_TIME, TYPE, BUILD_MODE, UPDATE_MODE,E_DS_ID,STATUS
     from IM_MODEL
+    where DEL_FLG = '0'
+    ORDER BY CRT_TIME desc
   </select>
 
-  <select id="selectPage" resultMap="ImModelView" parameterType="com.hex.bigdata.udsp.im.dto.ImModelView">
-    select IM.PK_ID, IM.NAME, IM.DESCRIBE, IM.S_DS_ID, IM.T_MD_ID, IM.NOTE, IM.DEL_FLG, IM.CRT_USER,
-    IM.CRT_TIME, IM.UPT_USER, IM.UPT_TIME, IM.TYPE, IM.BUILD_MODE, IM.UPDATE_MODE,IM.E_DS_ID,IM.STATUS,CD.NAME S_DS_NAME,IMM.NAME  T_MD_NAME
-    from IM_MODEL IM
-    left join COM_DATASOURCE CD
-    on CD.PK_ID = IM.S_DS_ID
-    and CD.DEL_FLG = '0'
-    LEFT JOIN IM_METADATA IMM
-    on IMM.PK_ID = IM.T_MD_ID
-    and IMM.DEL_FLG = '0'
-    where IM.DEL_FLG = '0'
-    <!--<trim prefix="WHERE" prefixOverrides="AND |OR ">-->
-        <if test="name != null and name != ''">and IM.NAME = #{name} </if>
-        <if test="describe != null and describe != ''">and IM.DESCRIBE = #{describe} </if>
-        <if test="tMdId != null and tMdId != ''">and IM.T_MD_ID = #{tMdId} </if>
-        <if test="type != null and type != ''">and IM.TYPE = #{type} </if>
-        <if test="sDsId != null and sDsId != ''">and IM.S_DS_ID = #{sDsId} </if>
-        <if test="crtTimeStart != null and crtTimeStart != ''">and IM.CRT_TIME >= #{crtTimeStart} </if>
-        <if test="crtTimeEnd != null and crtTimeEnd != ''">and #{crtTimeEnd} >= IM.CRT_TIME </if>
-        <if test="uptTimeStart != null and uptTimeStart != ''">and IM.UPT_TIME >= #{uptTimeStart} </if>
-        <if test="uptTimeEnd != null and uptTimeEnd != ''">and #{uptTimeEnd} >= IM.UPT_TIME </if>
-        <choose>
-          <!-- 未建模-->
-          <when test="isBuilded != null and isBuilded == '1'.toString()">
-            and IM.STATUS = '2' and IM.TYPE = '1'
-          </when>
-          <!-- 已建模-->
-          <when test="isBuilded != null and isBuilded == '2'.toString()">
-            and IM.STATUS = '1' and IM.TYPE = '1'
-          </when>
-          <!-- 实时 -->
-          <when test="isBuilded != null and isBuilded == '3'.toString()">
-            and IM.TYPE = '2'
-          </when>
-        </choose>
-   <!-- </trim>-->
-  </select>
+    <select id="selectPage" resultMap="ImModelView" parameterType="com.hex.bigdata.udsp.im.dto.ImModelView">
+        select IM.PK_ID, IM.NAME, IM.DESCRIBE, IM.S_DS_ID, IM.T_MD_ID, IM.NOTE, IM.DEL_FLG, IM.CRT_USER,
+        IM.CRT_TIME, IM.UPT_USER, IM.UPT_TIME, IM.TYPE, IM.BUILD_MODE, IM.UPDATE_MODE,IM.E_DS_ID,IM.STATUS,CD.NAME
+        S_DS_NAME,IMM.NAME T_MD_NAME
+        from IM_MODEL IM
+        left join COM_DATASOURCE CD
+        on CD.PK_ID = IM.S_DS_ID
+        and CD.DEL_FLG = '0'
+        LEFT JOIN IM_METADATA IMM
+        on IMM.PK_ID = IM.T_MD_ID
+        and IMM.DEL_FLG = '0'
+        where IM.DEL_FLG = '0'
+        <if test="name != null and name != ''">and IM.NAME like '%' || #{name} || '%'</if>
+        <if test="describe != null and describe != ''">and IM.DESCRIBE like '%' || #{describe} || '%'</if>
+        <if test="targetMdId != null and targetMdId != ''">and IM.T_MD_ID = #{targetMdId}</if>
+        <if test="type != null and type != ''">and IM.TYPE = #{type}</if>
+        <if test="sourceDsId != null and sourceDsId != ''">and IM.S_DS_ID = #{sourceDsId}</if>
+        <if test="crtTimeStart != null and crtTimeStart != ''">and IM.CRT_TIME >= #{crtTimeStart}</if>
+        <if test="crtTimeEnd != null and crtTimeEnd != ''">and #{crtTimeEnd} >= IM.CRT_TIME</if>
+        <if test="uptTimeStart != null and uptTimeStart != ''">and IM.UPT_TIME >= #{uptTimeStart}</if>
+        <if test="uptTimeEnd != null and uptTimeEnd != ''">and #{uptTimeEnd} >= IM.UPT_TIME</if>
+        <if test="status != null and status != ''">and IM.STATUS = #{status}</if>
+        ORDER BY CRT_TIME desc
+    </select>
 
-  <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
-      select PK_ID, NAME, DESCRIBE, S_DS_ID, T_MD_ID, NOTE, DEL_FLG, CRT_USER,
+    <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select PK_ID, NAME, DESCRIBE, S_DS_ID, T_MD_ID, NOTE, DEL_FLG, CRT_USER,
     CRT_TIME, UPT_USER, UPT_TIME, TYPE, BUILD_MODE, UPDATE_MODE,E_DS_ID,STATUS
     from IM_MODEL
     where NAME = #{modelName,jdbcType=VARCHAR}
     and DEL_FLG = '0' 
   </select>
 
-  <select id="getModelUpdateModeByName" resultType="java.lang.String" >
+    <select id="getModelUpdateModeByName" resultType="java.lang.String">
     select DICT_ID
     from t_gf_dict
     where DICT_TYPE_ID = 'IM_MODEL_UPDATE_TYPE'
     and DICT_NAME = #{updateMode}
   </select>
 
-  <select id="getModelBuildModeByName" resultType="java.lang.String" >
+    <select id="getModelBuildModeByName" resultType="java.lang.String">
     select DICT_ID
     from t_gf_dict
     where DICT_TYPE_ID = 'IM_MODEL_BUILD_TYPE'
     and DICT_NAME = #{updateMode}
   </select>
 
-  <update id="updateToDeleted">
+    <update id="updateToDeleted">
     UPDATE IM_MODEL
     SET DEL_FLG = '1'
     where PK_ID = #{id}
   </update>
 
-  <update id="updateModelDelStatus">
+    <update id="updateModelDelStatus">
     UPDATE IM_MODEL
     SET DEL_FLG = #{status}
     where PK_ID = #{pkId}

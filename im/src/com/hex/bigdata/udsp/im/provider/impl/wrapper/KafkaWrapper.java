@@ -4,10 +4,12 @@ import com.hex.bigdata.udsp.im.provider.RealtimeSourceProvider;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.ValueColumn;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.WhereProperty;
 import com.hex.bigdata.udsp.im.provider.model.Metadata;
+import com.hex.bigdata.udsp.im.provider.model.Model;
 import com.hex.bigdata.udsp.im.provider.model.ModelMapping;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -54,12 +56,11 @@ public abstract class KafkaWrapper extends Wrapper implements RealtimeSourceProv
     }
 
     @Override
-    protected List<String> getInsertColumns(List<ModelMapping> modelMappings, Metadata metadata) {
+    protected void emptyDatas(Metadata metadata) throws IOException, Exception {
         try {
             throw new Exception("不支持该方法");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
 }

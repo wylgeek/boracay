@@ -70,6 +70,20 @@ public class RealtimeTotalService {
         }
     }
 
+    public void running(String id, long consumerNum, long meetNum, long storeNum) {
+        try {
+            RealtimeTotalInfo realtimeInfo = select(id);
+            realtimeInfo.setStatus(RealtimeStatus.RUNNING);
+            realtimeInfo.setUpdateTime(new Date());
+            realtimeInfo.setConsumerNum(consumerNum);
+            realtimeInfo.setMeetNum(meetNum);
+            realtimeInfo.setStoreNum(storeNum);
+            update(id, realtimeInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startFail(String id) {
         logger.debug("更新实时作业的集群信息【启动失败】");
         try {

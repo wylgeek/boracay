@@ -5,22 +5,16 @@ import com.hex.bigdata.udsp.im.provider.BatchTargetProvider;
 import com.hex.bigdata.udsp.im.provider.RealtimeTargetProvider;
 import com.hex.bigdata.udsp.im.provider.impl.factory.SolrConnectionPoolFactory;
 import com.hex.bigdata.udsp.im.provider.impl.model.datasource.SolrDatasource;
-import com.hex.bigdata.udsp.im.provider.impl.model.datasource.SolrHBaseDatasource;
 import com.hex.bigdata.udsp.im.provider.impl.util.SolrUtil;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.TableColumn;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.TblProperty;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.ValueColumn;
-import com.hex.bigdata.udsp.im.provider.model.Metadata;
 import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.im.provider.model.ModelMapping;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +29,7 @@ public abstract class SolrWrapper extends Wrapper implements BatchSourceProvider
 
     protected String getSourcePrimaryKey(List<ModelMapping> modelMappings) {
         for (ModelMapping mapping : modelMappings) {
-            MetadataCol metadataCol = mapping.getMetadataCol();
-            if (metadataCol.isPrimary()) {
+            if (mapping.isPrimary()) {
                 return mapping.getName();
             }
         }
@@ -53,14 +46,52 @@ public abstract class SolrWrapper extends Wrapper implements BatchSourceProvider
         return null;
     }
 
-    protected List<TblProperty> getTblProperties(SolrDatasource datasource, String pkName, String collectionName) {
+    protected List<TblProperty> getSourceTblProperties(SolrDatasource datasource, String pkName, String collectionName,
+                                                       List<ModelMapping> modelMappings, String solrQuery) {
+        List<TblProperty> tblProperties = new ArrayList<>();
+        tblProperties.add(new TblProperty("solr.url", datasource.getSolrUrl())); // zookeeper地址、端口和目录
+        if (StringUtils.isBlank(solrQuery)) solrQuery = "*:*";
+        tblProperties.add(new TblProperty("solr.query", solrQuery)); // Solr查询语句
+        tblProperties.add(new TblProperty("solr.cursor.batch.size", "1000")); // 批量大小
+        if (StringUtils.isBlank(pkName)) {
+            throw new IllegalArgumentException("主键字段不能为空");
+        }
+        tblProperties.add(new TblProperty("solr.primary.key", pkName)); // Solr Collection 主键字段名
+        tblProperties.add(new TblProperty("is.solrcloud", "1")); // 0：单机模式，1：集群模式，Default：0
+        tblProperties.add(new TblProperty("collection.name", collectionName)); // Solr Collection Name
+        // Hive字段和Solr字段对应
+        if (modelMappings == null || modelMappings.size() == 0) {
+            throw new IllegalArgumentException("映射字段不能为空");
+        }
+        List<String> list = new ArrayList<>();
+        for (ModelMapping modelMapping : modelMappings) {
+            list.add(modelMapping.getName());
+        }
+        tblProperties.add(new TblProperty("columns", StringUtils.join(list, ",")));
+        return tblProperties;
+    }
+
+    protected List<TblProperty> getTargetTblProperties(SolrDatasource datasource, String pkName, String collectionName,
+                                                       List<ModelMapping> modelMappings) {
         List<TblProperty> tblProperties = new ArrayList<>();
         tblProperties.add(new TblProperty("solr.url", datasource.getSolrUrl())); // zookeeper地址、端口和目录
         tblProperties.add(new TblProperty("solr.query", "*:*")); // Solr查询语句
         tblProperties.add(new TblProperty("solr.cursor.batch.size", "1000")); // 批量大小
+        if (StringUtils.isBlank(pkName)) {
+            throw new IllegalArgumentException("主键字段不能为空");
+        }
         tblProperties.add(new TblProperty("solr.primary.key", pkName)); // Solr Collection 主键字段名
         tblProperties.add(new TblProperty("is.solrcloud", "1")); // 0：单机模式，1：集群模式，Default：0
         tblProperties.add(new TblProperty("collection.name", collectionName)); // Solr Collection Name
+        // Hive字段和Solr字段对应
+        if (modelMappings == null || modelMappings.size() == 0) {
+            throw new IllegalArgumentException("映射字段不能为空");
+        }
+        List<String> list = new ArrayList<>();
+        for (ModelMapping modelMapping : modelMappings) {
+            list.add(modelMapping.getMetadataCol().getName());
+        }
+        tblProperties.add(new TblProperty("columns", StringUtils.join(list, ",")));
         return tblProperties;
     }
 

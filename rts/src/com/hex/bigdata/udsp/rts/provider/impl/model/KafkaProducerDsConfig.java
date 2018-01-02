@@ -10,10 +10,6 @@ import java.util.Map;
  * Created by junjiem on 2017-2-20.
  */
 public class KafkaProducerDsConfig extends ProducerDatasource {
-    private String metadataBrokerList;
-    private String serializerClass;
-    private String keySerializerClass;
-    private String requestRequiredAcks;
 
     public KafkaProducerDsConfig(List<Property> propertyList) {
         super(propertyList);

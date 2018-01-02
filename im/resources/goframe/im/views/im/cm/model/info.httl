@@ -18,23 +18,26 @@ ${extends("/goframe/function_layout.httl")}
                     </td>
                 </tr>
                 <tr>
-                    <th class="nui-form-label"><label for="sDsId">源数据源：</label></th>
+                    <th class="nui-form-label"><label for="sourceDsId">源数据源：</label></th>
                     <td>
-                        <div  class="nui-combobox" style="width:97%;" id="sDsId"  popupWidth="400" textField="name" valueField="pkId" type="type" readonly="true"
-                              url="${basePath}/com/ds/selectImSourceDs" dataField="data" name="sDsId" multiSelect="false"   onvaluechanged="srcSourceChange">
+                        <div  class="nui-combobox" style="width:100%;" id="sourceDsId"  popupWidth="400" textField="name" valueField="pkId" type="type" readonly="true"
+                              url="${basePath}/com/ds/selectImSourceDs" dataField="data" name="sourceDsId" multiSelect="false"   onvaluechanged="srcSourceChange">
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
+                                <div header="类型" field="type"></div>
                             </div>
                         </div>
                     </td>
-                    <th class="nui-form-label"><label for="tMdId">目标元数据：</label></th>
+                    <th class="nui-form-label"><label for="targetMdId">目标元数据：</label></th>
                     <td >
-                        <div id="tMdId" class="nui-combobox" style="width:70%;"  popupWidth="400" textField="name" valueField="pkId"
-                             url="${basePath}/im/md/selectAll" dataField="data" name="tMdId" multiSelect="false"   readonly="true" onvaluechanged="targetSourceChange">
+                        <div id="targetMdId" class="nui-combobox" style="width:75%;"  popupWidth="400" textField="name" valueField="pkId"
+                             url="${basePath}/im/md/selectAll" dataField="data" name="targetMdId" multiSelect="false"   readonly="true" onvaluechanged="targetSourceChange">
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
+                                <div header="数据源" field="dsName"></div>
+                                <!--<div header="类型" field="dsType"></div>-->
                             </div>
                         </div>
                         <a class="nui-button" style="margin-left: 5px;" iconCls="icon-add" onclick="addTarget">添加</a>
@@ -46,8 +49,8 @@ ${extends("/goframe/function_layout.httl")}
                         <input style="width:100%;" id="updateMode" name="updateMode" class="nui-dictcombobox" textField="dictName" valueField="dictId"
                                dictTypeId="IM_MODEL_UPDATE_TYPE" multiSelect="false"   readonly="true"/>
                     </td>
-                    <th class="nui-form-label"><label for="updateKey">更新主键：</label></th>
-                    <td>
+                    <th id="updateKey1" class="nui-form-label"><label for="updateKey">更新主键：</label></th>
+                    <td id="updateKey2">
                         <input style="width:100%;" id="updateKey" name="updateKey" class="nui-buttonedit" onbuttonclick="showTargetCols"  readonly="true"/>
                     </td>
                 </tr>
@@ -59,8 +62,8 @@ ${extends("/goframe/function_layout.httl")}
                     </td>
                     <th class="nui-form-label"><label for="buildMode">引擎数据源：</label></th>
                     <td >
-                        <div id="eDsId" class="nui-combobox" style="width:100%;"  popupWidth="400" textField="name" valueField="pkId"
-                             url="${basePath}/com/ds/selectEDs" dataField="data" name="eDsId" multiSelect="true"   readonly="true">
+                        <div id="engineDsId" class="nui-combobox" style="width:100%;"  popupWidth="400" textField="name" valueField="pkId"
+                             url="${basePath}/com/ds/selectEngineDs" dataField="data" name="engineDsId" multiSelect="true"   readonly="true">
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
@@ -139,33 +142,76 @@ ${extends("/goframe/function_layout.httl")}
                 </div>
             </div>
 
-            <div class="nui-fit" style="height:150px;padding: 0px 5px 0px 5px;">
-                <div id="datagrid2" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
-                     idField="pkId" multiSelect="true" allowCellSelect="true" sortMode="client" showPager="false"
-                      url="${basePath}/im/imMMapping/getImMMappingByMid/${pkId}">
+            <div class="nui-fit" id="mappingDiv" style="height:300px;padding: 0px 5px 0px 5px;overflow-y: auto">
+                <div id="datagrid2" class="nui-datagrid" style="width:70%;float:left" dataField="data"
+                     idField="pkId" multiSelect="true"  allowCellSelect="true" sortMode="client"
+                     showPager="false" url="${basePath}/im/imMMapping/getImMMappingByMid/${pkId}" virtualScroll="false">
                     <div property="columns">
-                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="checkcolumn" headerAlign="center" width="8"></div>
                         <div type="indexcolumn" headerAlign="center" width="8">位置</div>
-                        <div field="name" headerAlign="center" allowSort="true" width="28">【源】名称<font color="#FF0000">（必填）</font>
-                            <input property="editor" class="nui-textbox" vtype="maxLength:256" readonly="true"/>
+                        <div field="name" headerAlign="center" allowSort="true" width="30">源名称<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-combobox"
+                                   textField="name" valueField="name" allowInput="true" dataField="data"
+                                   onbeforeshowpopup="targetFilterColumn" vtype="maxLength:64" required="true"
+                                   onvaluechanged="mappingColChange"/>
                         </div>
-                        <div field="type" headerAlign="center" allowSort="true" width="15">【源】类型</font>
+                        <div field="type" headerAlign="center" allowSort="true" width="25">类型</font>
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
-                                   dictTypeId="IQ_MD_COL_DATA_TYPE" value="STRING" vtype="maxLength:32" readonly="true"/>
+                                   dictTypeId="IQ_MD_COL_DATA_TYPE" value="STRING" vtype="maxLength:32"/>
                         </div>
-                        <div field="length" headerAlign="center" allowSort="true" width="15">【源】长度
-                            <input property="editor" class="nui-textbox" vtype="maxLength:4000" readonly="true"/>
+                        <div field="length" headerAlign="center" allowSort="true" width="20">长度
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
                         </div>
-                        <div field="describe" headerAlign="center" allowSort="true" width="30">【源】描述<font color="#FF0000">（必填）</font>
-                            <input property="editor" class="nui-textbox" vtype="maxLength:4000" readonly="true"/>
+                        <div field="describe" headerAlign="center" allowSort="true" width="25">描述<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
                         </div>
-                        <div field="colId" headerAlign="center" allowSort="true" width="28">【目标】名称<font color="#FF0000">（必填）</font>
-                            <input name="colName" property="editor" class="nui-combobox"
-                                   textField="name" valueField="pkId" allowInput="true" dataField="data"
-                                   onbeforeshowpopup="targetMateColumn" vtype="maxLength:64"  readonly="true"/>
+                        <div type="checkboxcolumn" field="primary" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">主键
                         </div>
-                        <div field="note" headerAlign="center" allowSort="true" width="20">备注
-                            <input property="editor" class="nui-textbox" vtype="maxLength:4000" readonly="true"/>
+                        <div type="checkboxcolumn" field="indexed" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">索引
+                        </div>
+                        <div type="checkboxcolumn" field="stored" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">存储
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="15">备注
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                        </div>
+                    </div>
+                </div>
+                <div  id="targetColDiv" style="width:30%;overflow-x: scroll;overflow-y:hidden;float: right;min-height: 280px">
+                    <div id="datagrid3" class="nui-datagrid" style="width:500px;" dataField="data"
+                         idField="pkId" multiSelect="true" allowCellSelect="true" sortMode="client"
+                         showPager="false" url="${basePath}/im/imMMapping/getImMMappingTargetCols/${pkId}" virtualScroll="false">
+                        <div property="columns">
+                            <div field="name" headerAlign="center" allowSort="true" width="30">目标名称<font color="#FF0000">（必填）</font>
+                                <input property="editor" class="nui-combobox"
+                                       textField="name" valueField="name" allowInput="true" dataField="data"
+                                       onbeforeshowpopup="targetMateColumn" vtype="maxLength:64" required="true"
+                                       onvaluechanged="mappingTargetColChange"/>
+                            </div>
+                            <div field="type" headerAlign="center" allowSort="true" width="25">类型</font>
+                                <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                       dictTypeId="IQ_MD_COL_DATA_TYPE" value="STRING" vtype="maxLength:32"/>
+                            </div>
+                            <div field="length" headerAlign="center" allowSort="true" width="20">长度
+                                <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                            </div>
+                            <div field="describe" headerAlign="center" allowSort="true" width="25">描述<font color="#FF0000">（必填）</font>
+                                <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                            </div>
+                            <div type="checkboxcolumn" field="primary" trueValue="0" falseValue="1"
+                                 headerAlign="center" allowSort="true" width="8">主键
+                            </div>
+                            <div type="checkboxcolumn" field="indexed" trueValue="0" falseValue="1"
+                                 headerAlign="center" allowSort="true" width="8">索引
+                            </div>
+                            <div type="checkboxcolumn" field="stored" trueValue="0" falseValue="1"
+                                 headerAlign="center" allowSort="true" width="8">存储
+                            </div>
+                            <div field="note" headerAlign="center" allowSort="true" width="15">备注
+                                <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -192,9 +238,9 @@ ${extends("/goframe/function_layout.httl")}
                      idField="pkId" multiSelect="true" allowCellSelect="true" sortMode="client" showPager="false"
                         url="${basePath}/im/imMFilter/getImMFilterByMid/${pkId}">
                     <div property="columns">
-                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="checkcolumn" headerAlign="center" width="8"></div>
                         <div type="indexcolumn" headerAlign="center" width="8">位置</div>
-                        <div field="name" headerAlign="center" allowSort="true" width="30">字段名称<font
+                        <div field="name" headerAlign="center" allowSort="true" width="30">名称<font
                                 color="#FF0000">（必填）</font>
                             <!--<input property="editor" class="nui-textbox" vtype="maxLength:256"/>-->
                             <input name="colName" property="editor" class="nui-combobox"
@@ -222,7 +268,7 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="defaultVal" headerAlign="center" allowSort="true" width="15">默认值
                             <input property="editor" class="nui-textbox" vtype="maxLength:32" readonly="true"/>
                         </div>
-                        <div field="label" headerAlign="center" allowSort="true" width="30">别名
+                        <div field="label" headerAlign="center" allowSort="true" width="25">别名
                             <input property="editor" class="nui-textbox" vtype="maxLength:4000" readonly="true"/>
                         </div>
                     </div>
@@ -241,6 +287,7 @@ ${extends("/goframe/function_layout.httl")}
     var form1;
     var grid1;
     var grid2;
+    var grid3;
     var grid4;
     var srcDsModel;
     var targetDsModel;
@@ -260,12 +307,18 @@ ${extends("/goframe/function_layout.httl")}
         form1 = new nui.Form("#form1");
         grid1 = nui.get("datagrid1");
         grid2 = nui.get("datagrid2");
+        grid3 = nui.get("datagrid3");
         grid4 = nui.get("datagrid4");
-        srcDsModel = nui.get("sDsId");
-        targetDsModel = nui.get("tMdId");
+        srcDsModel = nui.get("sourceDsId");
+        targetDsModel = nui.get("targetMdId");
         updateModeObject = nui.get("updateMode");
         updateKeyObject = nui.get("updateKey");
         buildModeObject = nui.get("buildMode");
+
+        $("#mappingDiv").scroll(function(){
+            var height = $("#mappingDiv").scrollTop();
+            $("#targetColDiv").css("height",(height + 300) + "px");
+        });
 
         //加载数据
         loadData();
@@ -279,22 +332,28 @@ ${extends("/goframe/function_layout.httl")}
             form1.setChanged(false);
             //初始化模型名称
             modelName = data.name;
-            targetSourceId = data.tMdId;
+            targetSourceId = data.targetMdId;
             //判断是否实时
             if(data.type == "2"){
-                $("#updateType").css("display","table-row");
-                $("#buildType").css("display","none");
-                $("#eDsModel").css("display","none");
+                $("#updateType").show();
+                $("#buildType").hide();
                 srcSourceType = "2";
+                if(data.updateMode == "3"){
+                    $("#updateKey1").hide();
+                    $("#updateKey2").hide();
+                } else {
+                    $("#updateKey1").show();
+                    $("#updateKey2").show();
+                }
             }else{
-                $("#updateType").css("display","none");
-                $("#buildType").css("display","table-row");
-                $("#eDsModel").css("display","table-row");
+                $("#updateType").hide();
+                $("#buildType").show();
                 srcSourceType = "1";
             }
         });
         grid1.load();
         grid2.load();
+        grid3.load();
         grid4.load();
 
         //加载更新主键
@@ -308,6 +367,9 @@ ${extends("/goframe/function_layout.httl")}
             updateKeyObject.setValue(key.join(","));
             updateKeyObject.setText(value.join(","));
         });
+
+        //检查滚动条位置，设置目标字段div高度
+        $("#targetColDiv").css("height","300px");
     }
 
 

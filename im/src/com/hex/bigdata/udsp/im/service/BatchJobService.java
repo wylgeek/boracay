@@ -1,27 +1,29 @@
 package com.hex.bigdata.udsp.im.service;
 
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
+import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.common.util.UdspCommonUtil;
 import com.hex.bigdata.udsp.im.constant.BatchStatus;
+import com.hex.bigdata.udsp.im.constant.DatasourceType;
 import com.hex.bigdata.udsp.im.dao.BatchMapper;
 import com.hex.bigdata.udsp.im.dto.BatchInfoDto;
 import com.hex.bigdata.udsp.im.dto.BatchInfoView;
 import com.hex.bigdata.udsp.im.model.BatchInfo;
 import com.hex.bigdata.udsp.im.provider.impl.util.HiveJdbcUtil;
 import com.hex.bigdata.udsp.im.provider.model.Model;
+import com.hex.bigdata.udsp.im.provider.model.ModelFilterCol;
+import com.hex.bigdata.udsp.im.provider.model.ModelMapping;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.model.PageListResult;
 import httl.util.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.hive.jdbc.HiveStatement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
 
 /**
  * Created by JunjieM on 2017-9-21.
@@ -44,13 +46,30 @@ public class BatchJobService {
      */
     public void start(Model model) throws Exception {
         String id = UdspCommonUtil.getConsumeId(model.getId());
-        readyBuild(id, model);
-        try {
-            imProviderService.buildBatch(id, model);
-            buildSuccess(id);
-        } catch (Exception e) {
-            buildFail(id, e.getMessage());
-            throw new Exception(e);
+        String tDsType = model.getTargetMetadata().getDatasource().getType();
+        if (DatasourceType.SOLR_HBASE.getValue().equals(tDsType)) {
+            String hbaseId = "HBASE_" + id;
+            String solrId = "SOLR_" + id;
+            readyBuild(hbaseId, model);
+            readyBuild(solrId, model);
+            try {
+                imProviderService.buildBatch(id, model);
+                buildSuccess(hbaseId);
+                buildSuccess(solrId);
+            } catch (Exception e) {
+                buildFail(hbaseId, e.getMessage());
+                buildFail(solrId, e.getMessage());
+                throw new Exception(e);
+            }
+        } else {
+            readyBuild(id, model);
+            try {
+                imProviderService.buildBatch(id, model);
+                buildSuccess(id);
+            } catch (Exception e) {
+                buildFail(id, e.getMessage());
+                throw new Exception(e);
+            }
         }
     }
 
@@ -61,11 +80,24 @@ public class BatchJobService {
      * @throws Exception
      */
     public void stop(String id) throws Exception {
-        Statement stmt = HiveJdbcUtil.getStatement(id);
+        BatchInfo batchInfo = select(id);
+        if (!HOST_KEY.equals(batchInfo.getHost())) {
+            throw new Exception("请在运行作业的主机上停止该批量作业");
+        }
+        HiveStatement stmt = getHiveStatement(id);
         if (stmt == null || stmt.isClosed()) {
             throw new Exception("作业不存在或已经完成");
         }
-        stmt.close();
+        try {
+            stmt.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("停止作业失败");
+        }
+    }
+
+    public HiveStatement getHiveStatement(String id) {
+        return HiveJdbcUtil.getHiveStatement(id);
     }
 
     /**
@@ -79,6 +111,8 @@ public class BatchJobService {
             batchInfo.setStatus(BatchStatus.READY_BUILD);
             batchInfo.setHost(HOST_KEY);
             Date nowDate = new Date();
+            List<ModelFilterCol> modelFilterCols = model.getModelFilterCols();
+            if (modelFilterCols != null) batchInfo.setRequestContent(JSONUtil.parseList2JSON(modelFilterCols));
             batchInfo.setStartTime(nowDate);
             batchInfo.setUpdateTime(nowDate);
             batchInfo.setModelId(model.getId());
@@ -90,10 +124,10 @@ public class BatchJobService {
     }
 
     /**
-     * 开始构建
+     * 正在构建
      */
     public void building(String id, int percent) {
-        logger.debug("更新批量作业的信息【开始构建】");
+        logger.debug("更新批量作业的信息【正在构建】");
         try {
             BatchInfo batchInfo = select(id);
             batchInfo.setStatus(BatchStatus.BUILDING);
@@ -221,50 +255,67 @@ public class BatchJobService {
             list.add(infoToDto(info));
         }
 
-        // 过滤
+        // 判断查询条件，过滤数据
+        List<BatchInfoDto> batchInfoList = new ArrayList<>();
         for (BatchInfoDto dto : list) {
             if (StringUtils.isNotBlank(modelName) && !dto.getModelName().contains(modelName)) {
-                list.remove(dto);
+                continue;
+            }
+            // 查询时，将原数据为空的先去除，以下字段也类似
+            if (StringUtils.isNotBlank(message) && StringUtils.isBlank(dto.getMessage())) {
                 continue;
             }
             if (StringUtils.isNotBlank(message) && !dto.getMessage().contains(message)) {
-                list.remove(dto);
                 continue;
             }
             if (StringUtils.isNotBlank(status) && !dto.getStatus().equals(status)) {
-                list.remove(dto);
                 continue;
             }
             if (StringUtils.isNotBlank(host) && !dto.getHost().equals(host)) {
-                list.remove(dto);
                 continue;
             }
             if (StringUtils.isNotBlank(startTimeStart) && dto.getStartTime().compareTo(startTimeStart) < 0) {
-                list.remove(dto);
                 continue;
             }
             if (StringUtils.isNotBlank(startTimeEnd) && dto.getStartTime().compareTo(startTimeEnd) > 0) {
-                list.remove(dto);
+                continue;
+            }
+            if (StringUtils.isNotBlank(endTimeStart) && StringUtils.isBlank(dto.getEndTime())) {
                 continue;
             }
             if (StringUtils.isNotBlank(endTimeStart) && dto.getEndTime().compareTo(endTimeStart) < 0) {
-                list.remove(dto);
+                continue;
+            }
+            if (StringUtils.isNotBlank(endTimeEnd) && StringUtils.isBlank(dto.getEndTime())) {
                 continue;
             }
             if (StringUtils.isNotBlank(endTimeEnd) && dto.getEndTime().compareTo(endTimeEnd) > 0) {
-                list.remove(dto);
+                continue;
+            }
+            if (StringUtils.isNotBlank(updateTimeStart) && StringUtils.isBlank(dto.getUpdateTime())) {
                 continue;
             }
             if (StringUtils.isNotBlank(updateTimeStart) && dto.getUpdateTime().compareTo(updateTimeStart) < 0) {
-                list.remove(dto);
+                continue;
+            }
+            if (StringUtils.isNotBlank(updateTimeEnd) && StringUtils.isBlank(dto.getUpdateTime())) {
                 continue;
             }
             if (StringUtils.isNotBlank(updateTimeEnd) && dto.getUpdateTime().compareTo(updateTimeEnd) > 0) {
-                list.remove(dto);
                 continue;
             }
+            batchInfoList.add(dto);
         }
-        return list;
+
+        // 按照开始的时间倒序
+        Collections.sort(batchInfoList, new Comparator<BatchInfoDto>() {
+            @Override
+            public int compare(BatchInfoDto o1, BatchInfoDto o2) {
+                return o2.getStartTime().compareTo(o1.getStartTime());
+            }
+        });
+
+        return batchInfoList;
     }
 
     /**
@@ -286,9 +337,13 @@ public class BatchJobService {
         dto.setPercent(info.getPercent());
         dto.setModelName(info.getModelName());
         dto.setModelId(info.getModelId());
-        dto.setStartTime(format.format(info.getStartTime()));
-        dto.setEndTime(format.format(info.getEndTime()));
-        dto.setUpdateTime(format.format(info.getUpdateTime()));
+        Date startTime = info.getStartTime();
+        dto.setRequestContent(info.getRequestContent());
+        if (startTime != null) dto.setStartTime(format.format(startTime));
+        Date endTime = info.getEndTime();
+        if (endTime != null) dto.setEndTime(format.format(endTime));
+        Date updateTime = info.getUpdateTime();
+        if (updateTime != null) dto.setUpdateTime(format.format(updateTime));
         return dto;
     }
 

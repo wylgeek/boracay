@@ -8,6 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="elasticsearch" level="project" />
     <orderEntry type="library" name="goframe" level="project" />
     <orderEntry type="library" name="common" level="project" />
     <orderEntry type="library" name="mybatis" level="project" />
@@ -20,5 +21,6 @@
     <orderEntry type="library" name="solr" level="project" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="rc" />
+    <orderEntry type="module" module-name="im" />
   </component>
 </module>

@@ -31,6 +31,15 @@ public class Datasource extends Base {
         super(propertieMap);
     }
 
+    public Datasource(Datasource datasource) {
+        super(datasource.getPropertyMap());
+        this.type = datasource.getType();
+        this.name = datasource.getName();
+        this.describe = datasource.getDescribe();
+        this.note = datasource.getNote();
+        this.implClass = datasource.getImplClass();
+    }
+
     public Datasource(ComDatasource comDatasource, List<ComProperties> comPropertieList) {
         name = comDatasource.getName();
         type = comDatasource.getType();
@@ -54,6 +63,8 @@ public class Datasource extends Base {
     }
 
     public String getName() {
+        if (StringUtils.isBlank(name))
+            throw new IllegalArgumentException("name不能为空");
         return name;
     }
 
@@ -62,6 +73,8 @@ public class Datasource extends Base {
     }
 
     public String getDescribe() {
+        if (StringUtils.isBlank(describe))
+            throw new IllegalArgumentException("describe不能为空");
         return describe;
     }
 

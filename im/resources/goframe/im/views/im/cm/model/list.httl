@@ -54,8 +54,7 @@ ${extends("/goframe/function_layout.httl")}
                         </td>
                         <td class="tit roleLabel" style="width: 100px;text-align: right">目标元数据：</td>
                         <td class="roleText" style="width: 25%">
-                            <!--<input name="tMdId" class="nui-textbox" style="width:98%;"/>-->
-                            <input id="tMdId" name="tMdId" class="nui-combobox" valueField="pkId" textField="name"
+                            <input id="targetMdId" name="targetMdId" class="nui-combobox" valueField="pkId" textField="name"
                                    dataField="data" url="${basePath}/im/md/selectAll" allowInput="true" sortMode="client"
                                    showNullItem="true" emptyText="全部" nullItemText="全部" style="width:98%;"/>
                         </td>
@@ -71,7 +70,7 @@ ${extends("/goframe/function_layout.httl")}
                         </td>
                         <td style="width: 100px;text-align: right">源数据源：</td>
                         <td style="width: 25%">
-                            <input id="sDsId" name="sDsId" class="nui-combobox" valueField="pkId" textField="name"
+                            <input id="sourceDsId" name="sourceDsId" class="nui-combobox" valueField="pkId" textField="name"
                                    dataField="data" url="${basePath}/com/ds/selectImSourceDs" allowInput="true"
                                    sortMode="client"
                                    showNullItem="true" emptyText="全部" nullItemText="全部" style="width:98%;"/>
@@ -85,7 +84,7 @@ ${extends("/goframe/function_layout.httl")}
                     <tr>
                         <td class="tit roleLabel" style="width: 100px;text-align: right">状态：</td>
                         <td class="roleText" style="width: 25%">
-                            <input name="isBuilded" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                            <input name="status" class="nui-dictcombobox" valueField="dictId" textField="dictName"
                                    style="width:98%;"
                                    dictTypeId="IM_MODEL_STATUS" value="" vtype="maxLength:32" emptyText="全部"
                                    nullItemText="全部" showNullItem="true"/>
@@ -157,8 +156,8 @@ ${extends("/goframe/function_layout.httl")}
             <div type="checkcolumn" width="20"></div>
             <div field="name" headerAlign="center" allowSort="true" >名称</div>
             <div field="describe" headerAlign="center" allowSort="true" >说明</div>
-            <div field="sDsName" headerAlign="center" allowSort="true" renderer="dsRenderer">源数据源</div>
-            <div field="tMdName" headerAlign="center" allowSort="true" renderer="mdRenderer">目标元数据</div>
+            <div field="sourceDsName" headerAlign="center" allowSort="true" renderer="dsRenderer">源数据源</div>
+            <div field="targetMdName" headerAlign="center" allowSort="true" renderer="mdRenderer">目标元数据</div>
             <div field="type" headerAlign="center" allowSort="true" renderer="typeRenderer" >类型</div>
             <div field="buildStatus" headerAlign="center" allowSort="true" renderer="statusRenderer" >状态</div>
             <div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat" >创建时间</div>
@@ -226,6 +225,9 @@ ${extends("/goframe/function_layout.httl")}
             }else if(rows[0].type == 2) { // 实时
                 nui.get("edit").enable();
                 nui.get("remove").enable();
+            } else {
+                nui.get("edit").disable();
+                nui.get("remove").disable();
             }
         } else if (rows.length == 0) {
             nui.get("edit").disable();
@@ -241,6 +243,24 @@ ${extends("/goframe/function_layout.httl")}
                 }
             });
             if (canRemove) nui.get("remove").enable();
+        }
+        if(rows.length != 0){
+            var json = nui.encode(getRows(rows));
+            $.ajax({
+                url: "${basePath}/rc/service/checkAppUsed/IM",
+                type: 'POST',
+                data: json,
+                async:false,
+                cache: false,
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.status == true) {
+                        //nui.alert(result.message, "提示");
+                        nui.get("edit").disable();
+                        nui.get("remove").disable();
+                    }
+                }
+            });
         }
     }
 
@@ -497,17 +517,17 @@ ${extends("/goframe/function_layout.httl")}
     function operatorRenderer(e) {
         var operatorS = "<div style='text-align: center'>";
         //先判断是否实时
-        if(e.row.type == '1'){
+        if(e.row.type == '1'){ // 批量
             //判断是否构建
-            if(e.row.status == '1'){
+            if(e.row.status == '1'){ // 未建
                 operatorS = operatorS.concat("<a href='#' style='padding-left: 6px' onclick='createModel(\""+e.row.pkId+"\",this)'>建模</a>");
-            } else {
+            } else { // 已建
                 operatorS = operatorS.concat("<a href='#' style='padding-left: 6px' onclick='dropModel(\""+e.row.pkId+"\",this)'>删模</a>");
                 operatorS = operatorS.concat("<a href='#' style='padding-left: 6px' onclick='buildBatch(\""+e.row.pkId+"\",this)'>构建</a>");
             }
-        }else{
+        } else { // 实时
             //实时的未删除的应该也可以运行
-            operatorS = operatorS.concat("<a href='#' style='padding-left: 6px'class='runBuild' onclick='buildRealtime(\""+e.row.pkId+"\",this)'>运行</a>");
+            operatorS = operatorS.concat("<a href='#' style='padding-left: 6px' onclick='buildRealtime(\""+e.row.pkId+"\",this)'>运行</a>");
         }
         operatorS = operatorS.concat("</div>");
         return operatorS;
@@ -560,7 +580,7 @@ ${extends("/goframe/function_layout.httl")}
      * 建模
      */
     function createModel(pkId,e){
-        grid1.loading("正在建模中,请稍等...");
+        grid1.loading("正在创建模型中,请稍等...");
         //先将按钮灰度并修改点击事件，防止重复操作
         $(e).attr("onclick","javascript:return false;");
         $(e).attr("style","padding-left: 6px;opacity: 0.2");
@@ -571,7 +591,7 @@ ${extends("/goframe/function_layout.httl")}
             contentType : 'application/json',
             success : function(data) {
                 if(data.status == true){
-                    nui.alert("建模成功", "系统提示");
+                    nui.alert("创建模型成功", "系统提示");
                     grid1.unmask();
                     grid1.reload();
                 }else{
@@ -579,7 +599,7 @@ ${extends("/goframe/function_layout.httl")}
                     $(e).attr("onclick","createModel('"+pkId+"',this)");
                     $(e).attr("style","padding-left: 6px");
                     grid1.unmask();
-                    showMessage("建模失败，信息：" + data.message);
+                    showMessage("创建模型失败，信息：" + data.message);
                 }
             }
         });
@@ -589,7 +609,7 @@ ${extends("/goframe/function_layout.httl")}
      * 删模
      */
     function dropModel(pkId,e){
-        grid1.loading("正在取消建模中,请稍等...");
+        grid1.loading("正在删除模型中,请稍等...");
         //先将按钮灰度并修改点击事件，防止重复操作
         $(e).attr("onclick","javascript:return false;");
         $(e).attr("style","padding-left: 6px;opacity: 0.2");
@@ -600,7 +620,7 @@ ${extends("/goframe/function_layout.httl")}
             contentType : 'application/json',
             success : function(data) {
                 if(data.status == true){
-                    nui.alert("取消建模成功", "系统提示");
+                    nui.alert("删除模型成功", "系统提示");
                     grid1.unmask();
                     grid1.reload();
                 }else{
@@ -608,7 +628,7 @@ ${extends("/goframe/function_layout.httl")}
                     $(e).attr("onclick","dropModel('"+pkId+"',this)");
                     $(e).attr("style","padding-left: 6px");
                     grid1.unmask();
-                    showMessage("取消建模失败，信息：" + data.message);
+                    showMessage("删除模型失败，信息：" + data.message);
                 }
             }
         });
@@ -618,9 +638,6 @@ ${extends("/goframe/function_layout.httl")}
      * 批量构建
      */
     function buildBatch(pkId,e){
-        //先将按钮灰度并修改点击事件，防止重复操作
-        $(e).attr("onclick","javascript:return false;");
-        $(e).attr("style","padding-left: 6px;opacity: 0.2");
         //如果是批量则先弹出窗口让输入过滤字段值
         var modelFilterCols;
         $.ajax({
@@ -639,7 +656,7 @@ ${extends("/goframe/function_layout.httl")}
         });
         if(modelFilterCols) {
             //根据数据条数设置弹窗高度
-            var height = 70 + ( modelFilterCols.length / 4 + 1) * 18
+            var height = 100 + (( modelFilterCols.length / 3 + 1) * 27);
             nui.open({
                 url: "${basePath}/goframe/p/im.cm.model.input_filterValue",
                 title: "参数",
@@ -649,27 +666,43 @@ ${extends("/goframe/function_layout.httl")}
                     var iframe = this.getIFrameEl();
                     iframe.contentWindow.setModelFilterCols(modelFilterCols);
                 },
-                ondestroy: function (data) {
+                ondestroy: function (filteValues) {
                     $(e).attr("onclick", "buildBatch('" + pkId + "',this)");
-                    if (data.status && data.status == true ) {
-                        grid1.loading("正在构建中,请稍等...");
+                    if (filteValues.status && filteValues.status == true ) {
+//                        $.ajax({
+//                            url: "${basePath}/im/job/batch/start/" + pkId,
+//                            type: 'POST',
+//                            cache: false,
+//                            data: nui.encode(filteValues.data),
+//                            contentType: 'application/json',
+//                            success: function (result) {
+//                            }
+//                        });
+                        // 使用公共的消费接口
+                        var data = {};
+                        $.each(filteValues.data, function (_index, record) {
+                            data[record.label] = record.value;
+                        });
+                        var json = nui.encode({
+                            "appType": "IM",
+                            "appId": pkId,
+                            "type": "sync",
+                            "entity": "start",
+                            "data": data
+                        });
                         $.ajax({
-                            url: "${basePath}/im/job/batch/start/" + pkId,
+                            url: "${basePath}/http/inner/consume",
                             type: 'POST',
                             cache: false,
-                            data: nui.encode(data.data),
-                            async: false,
+                            data: json,
                             contentType: 'application/json',
-                            success: function (data) {
-                                if (data.status == true) {
-                                    nui.alert("已构建，可到监控中心查看状态！", "系统提示");
-                                } else {
-                                    showMessage(data.message);
-                                }
+                            success: function (response) {
+//                                if(response.status != "SUCCESS"){
+//                                    showMessage("启动失败，信息：" + response.message);
+//                                }
                             }
                         });
-                    } else {
-                        showMessage(data.message);
+                        nui.alert("开始构建...，详细监控信息，<br/>可到【监控中心】>【作业监控】>【批量作业】查看！");
                     }
                 }
             });
@@ -680,33 +713,6 @@ ${extends("/goframe/function_layout.httl")}
      * 实时构建
      */
     function buildRealtime(pkId,e){
-        //实时的是否也需要输入过滤字段的值
-        //先将按钮灰度并修改点击事件，防止重复操作
-        $(e).attr("onclick","javascript:return false;");
-        //添加取消按钮
-       // $(e).parent().append("<a href='#' style='padding-left: 6px' class='stopBuild' onclick='stopBuild(\""+pkId+"\",this)'>取消构建</a>");
-        $.ajax({
-            url:"${basePath}/im/job/realtime/start/"+pkId,
-            type : 'POST',
-            cache : false,
-            contentType : 'application/json',
-            success : function(data) {
-                if(data.status == true){
-                    $(e).html("正在运行");
-                }else{
-                    $(e).attr("onclick","buildRealtime('"+pkId+"',this)");
-                    showMessage("运行失败，信息：" + data.message);
-                    //删除取消按钮
-                    //$(e).next().remove();
-                }
-            }
-        });
-    }
-
-
-    function runBuild1(pkId,e){
-        //先将按钮灰度并修改点击事件，防止重复操作
-        $(e).attr("onclick","javascript:return false;");
         //如果是批量则先弹出窗口让输入过滤字段值
         var modelFilterCols;
         $.ajax({
@@ -725,7 +731,7 @@ ${extends("/goframe/function_layout.httl")}
         });
         if(modelFilterCols) {
             //根据数据条数设置弹窗高度
-            var height = 70 + ( modelFilterCols.length / 4 + 1) * 18
+            var height = 100 + (( modelFilterCols.length / 3 + 1) * 27);
             nui.open({
                 url: "${basePath}/goframe/p/im.cm.model.input_filterValue",
                 title: "参数",
@@ -735,54 +741,47 @@ ${extends("/goframe/function_layout.httl")}
                     var iframe = this.getIFrameEl();
                     iframe.contentWindow.setModelFilterCols(modelFilterCols);
                 },
-                ondestroy: function (data) {
-                    $(e).attr("onclick", "buildModel('" + pkId + "',this)");
-                    if (data.status && data.status == true ) {
+                ondestroy: function (filteValues) {
+                    $(e).attr("onclick", "buildRealtime('" + pkId + "',this)");
+                    if (filteValues.status && filteValues.status == true ) {
+//                        $.ajax({
+//                            url: "${basePath}/im/job/realtime/start/"+pkId,
+//                            type: 'POST',
+//                            cache: false,
+//                            data: nui.encode(filteValues.data),
+//                            contentType: 'application/json',
+//                            success: function (result) {
+//                            }
+//                        });
+                        // 使用公共的消费接口
+                        var data = {};
+                        $.each(filteValues.data, function (_index, record) {
+                            data[record.label] = record.value;
+                        });
+                        var json = nui.encode({
+                            "appType": "IM",
+                            "appId": pkId,
+                            "type": "sync",
+                            "entity": "start",
+                            "data": data
+                        });
                         $.ajax({
-                            url: "${basePath}/im/job/realtime/start/" + pkId,
+                            url: "${basePath}/http/inner/consume",
                             type: 'POST',
                             cache: false,
-                            data: nui.encode(data.data),
-                            async: false,
+                            data: json,
                             contentType: 'application/json',
-                            success: function (data) {
-                                if(data.status == true){
-                                    $(e).html("正在运行");
-                                }else{
-                                    $(e).attr("onclick","runBuild('"+pkId+"',this)");
-                                    showMessage("运行失败，信息：" + data.message);
-                                    //删除取消按钮
-                                    //$(e).next().remove();
-                                }
+                            success: function (response) {
+//                                if(response.status != "SUCCESS"){
+//                                    showMessage("启动失败，信息：" + response.message);
+//                                }
                             }
                         });
-                    } else {
-                        showMessage(data.message);
+                        nui.alert("开始运行...，详细监控信息，<br/>可到【监控中心】>【作业监控】>【实时作业】查看！");
                     }
                 }
             });
         }
-    }
-
-    function stopBuild(pkId,e){
-        $(e).attr("onclick","javascript:return false;");
-        $(e).attr("style","padding-left: 6px;opacity: 0.2");
-        $.ajax({
-            url:"${basePath}/im/job/realtime/stop/"+pkId,
-            type : 'POST',
-            cache : false,
-            contentType : 'application/json',
-            success : function(data) {
-                if(data.status == true){
-                    $(e).prev().html("运行");
-                    $(e).prev().attr("onclick","runBuild('"+pkId+"',this,2)");
-                    nui.alert("停止成功", "系统提示");
-                    $(e).remove();
-                }else{
-
-                }
-            }
-        });
     }
 
     /**
@@ -791,7 +790,7 @@ ${extends("/goframe/function_layout.httl")}
      * @returns {string}
      */
     function dsRenderer(e) {
-        return "<a href='#' class='underline' onclick='showDatabaseInfo(\"" + e.row.sDsId + "\",\"" + e.row.sDsName + "\")'>" + e.row.sDsName + "</a>";
+        return "<a href='#' class='underline' onclick='showDatabaseInfo(\"" + e.row.sourceDsId + "\",\"" + e.row.sourceDsName + "\")'>" + e.row.sourceDsName + "</a>";
     }
 
     /**
@@ -800,7 +799,7 @@ ${extends("/goframe/function_layout.httl")}
      * @returns {string}
      */
     function mdRenderer(e) {
-        return "<a href='#' class='underline' onclick='showMetadataInfo(\"" + e.row.tMdId + "\",\"" + e.row.tMdName + "\")'>" + e.row.tMdName + "</a>";
+        return "<a href='#' class='underline' onclick='showMetadataInfo(\"" + e.row.targetMdId + "\",\"" + e.row.targetMdName + "\")'>" + e.row.targetMdName + "</a>";
     }
 
     /**

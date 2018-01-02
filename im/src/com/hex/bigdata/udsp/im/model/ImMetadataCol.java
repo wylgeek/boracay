@@ -1,6 +1,8 @@
 package com.hex.bigdata.udsp.im.model;
 
-public class ImMetadataCol {
+import java.io.Serializable;
+
+public class ImMetadataCol  implements Serializable {
     private String pkId;
 
     private String mdId;

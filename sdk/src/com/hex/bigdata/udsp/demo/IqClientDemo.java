@@ -17,10 +17,7 @@ import java.util.Map;
 
 /**
  * 交互查询调用示例
- * Created with IntelliJ IDEA
- * Author: tomnic.wang
- * DATE:2017/5/17
- * TIME:19:52
+ *
  */
 @Deprecated
 public class IqClientDemo {
@@ -29,124 +26,125 @@ public class IqClientDemo {
      */
     private static Logger logger = LogManager.getLogger(IqClientDemo.class);
 
-    public static void main(String[] args) {
-        IqClientDemo iqClientDemo = new IqClientDemo();
-        iqClientDemo.asyncStatusTest();
-        //iqClientDemo.syncStartTest();
-        //iqClientDemo.asyncStartTest();
+    /**
+     * 交互查询-同步start接口示例
+     */
+    public void syncStart() {
+        //创建自定义客户端
+//        String url = "http://127.0.0.1:8088/udsp/http/consume";
+//        IqClient client = ConsumerClientFactory.createCustomClient(IqClient.class, url);
+        //创建默认客户端,根据udsp.config.properties配置文件获取地址
+        IqClient client = ConsumerClientFactory.createCustomClient(IqClient.class);
+
+        //创建请求实体
+        IqRequest request = new IqRequest();
+        //基础参数设置-设置调用服务的名称
+        request.setServiceName("soa_jyls_app1");
+        //基础参数设置-上层应用系统使用者工号
+        request.setAppUser("10940");
+        //基础参数设置-设置调用start接口
+        request.setEntity(SdkConstant.CONSUMER_ENTITY_START);
+        //基础参数设置-设置同步调用，同步调用为sync，异步调用为async
+        request.setType(SdkConstant.CONSUMER_TYPE_SYNC);
+        //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
+        request.setUdspUser("CRM");
+        request.setToken("000000");
+
+        //设置业务参数-查询参数设置
+        Map<String, String> data = new HashMap<>();
+        data.put("acct_no", "130000365600030");
+        data.put("start_time", "2016-12-31");
+        data.put("end_time", "2017-12-31");
+        request.setData(data);
+
+        //设置业务参数-分页参数设置
+        Page page = new Page();
+        page.setPageIndex(1);
+        page.setPageSize(20);
+        request.setPage(page);
+
+        //发起动用
+        SyncPackResponse response = client.syncStart(request);
     }
 
     /**
      * 交互查询-异步start接口示例
      */
-    public void asyncStartTest() {
-        //udsp请求连接
-        String url = "http://127.0.0.1:8088/udsp/http/consume";
-        IqClient iqClient = ConsumerClientFactory.createCustomClient(IqClient.class, url);
-        //创建默认客户端,根据sdk.config.properties配置文件获取地址
-        //IqClient iqClient=ConsumerClientFactory.createDefaultClient(IqClient.class);
+    public void asyncStart() {
+        //创建自定义客户端
+//        String url = "http://127.0.0.1:8088/udsp/http/consume";
+//        IqClient client = ConsumerClientFactory.createCustomClient(IqClient.class, url);
+        //创建默认客户端,根据udsp.config.properties配置文件获取地址
+        IqClient client = ConsumerClientFactory.createCustomClient(IqClient.class);
+
         //创建请求实体
-        IqRequest iqRequest = new IqRequest();
+        IqRequest request = new IqRequest();
         //基础参数设置-设置调用服务的名称
-        iqRequest.setServiceName("soa_jyls_app");
+        request.setServiceName("soa_jyls_app");
         //基础参数设置-上层应用系统使用者工号
-        iqRequest.setAppUser("10940");
+        request.setAppUser("10940");
         //基础参数设置-设置调用start接口
-        iqRequest.setEntity(SdkConstant.CONSUMER_ENTITY_START);
+        request.setEntity(SdkConstant.CONSUMER_ENTITY_START);
         //基础参数设置-设置异步调用，同步调用为sync，异步调用为async
-        iqRequest.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
+        request.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
         //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
-        iqRequest.setUdspUser("CRM");
-        iqRequest.setToken("000000");
+        request.setUdspUser("CRM");
+        request.setToken("000000");
 
         //设置业务参数-查询参数设置
         Map<String, String> data = new HashMap<>();
         data.put("acct_no", "130000365600030");
         data.put("start_time", "2016-12-31");
         data.put("end_time", "2017-12-31");
-        iqRequest.setData(data);
+        request.setData(data);
 
         //设置业务参数-分页参数设置
         Page page = new Page();
         page.setPageIndex(1);
         page.setPageSize(20);
-        iqRequest.setPage(page);
+        request.setPage(page);
 
         //发起调用
-        AsyncPackResponse asyncPackResponse = iqClient.asyncStart(iqRequest);
+        AsyncPackResponse response = client.asyncStart(request);
     }
 
     /**
      * 交互查询-异步status接口示例
      */
-    public void asyncStatusTest() {
+    public void asyncStatus() {
         //udsp请求连接
-        String url = "http://127.0.0.1:8088/udsp/http/consume";
+
         //创建自定义客户端
-        IqClient iqClient = ConsumerClientFactory.createCustomClient(IqClient.class,url);
-        //创建默认客户端,根据sdk.config.properties配置文件获取地址
-        //IqClient iqClient=ConsumerClientFactory.createDefaultClient(IqClient.class);
+//        String url = "http://127.0.0.1:8088/udsp/http/consume";
+//        IqClient client = ConsumerClientFactory.createCustomClient(IqClient.class, url);
+        //创建默认客户端,根据udsp.config.properties配置文件获取地址
+        IqClient client = ConsumerClientFactory.createCustomClient(IqClient.class);
+
         //创建请求实体
-        StatusRequest statusRequest = new StatusRequest();
+        StatusRequest request = new StatusRequest();
         //基础参数设置-设置调用服务的名称
-        statusRequest.setServiceName("soa_jyls_app");
+        request.setServiceName("soa_jyls_app");
         //基础参数设置-上层应用系统使用者工号
-        statusRequest.setAppUser("10940");
+        request.setAppUser("10940");
         //基础参数设置-设置调用status接口，查看任务状态
-        statusRequest.setEntity(SdkConstant.CONSUMER_ENTITY_STATUS);
+        request.setEntity(SdkConstant.CONSUMER_ENTITY_STATUS);
         //基础参数设置-设置异步调用，同步调用为sync，异步调用为async
-        statusRequest.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
+        request.setType(SdkConstant.CONSUMER_TYPE_ASYNC);
         //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
-        statusRequest.setUdspUser("CRM");
-        statusRequest.setToken("000000");
+        request.setUdspUser("CRM");
+        request.setToken("000000");
 
         //业务参数
-        statusRequest.setConsumeId("955a0c14a55ebe727ff45f20939dfc97");
+        request.setConsumeId("955a0c14a55ebe727ff45f20939dfc97");
+
         //发起调用
-        StatusPackResponse statusResponse = iqClient.asyncStatus(statusRequest);
+        StatusPackResponse response = client.asyncStatus(request);
     }
 
-    /**
-     * 交互查询-同步start接口示例
-     */
-    public void syncStartTest() {
-        //udsp请求连接
-        String url = "http://127.0.0.1:8088/udsp/http/consume";
-        //创建自定义客户端
-        IqClient iqClient = ConsumerClientFactory.createCustomClient(IqClient.class, url);
-        //创建默认客户端,根据sdk.config.properties配置文件获取地址
-        //IqClient iqClient=ConsumerClientFactory.createDefaultClient(IqClient.class);
-
-        //创建请求实体
-        IqRequest iqRequest = new IqRequest();
-        //基础参数设置-设置调用服务的名称
-        iqRequest.setServiceName("soa_jyls_app1");
-        //基础参数设置-上层应用系统使用者工号
-        iqRequest.setAppUser("10940");
-        //基础参数设置-设置调用start接口
-        iqRequest.setEntity(SdkConstant.CONSUMER_ENTITY_START);
-        //基础参数设置-设置同步调用，同步调用为sync，异步调用为async
-        iqRequest.setType(SdkConstant.CONSUMER_TYPE_SYNC);
-        //基础参数设置-设置UDSP校验用户信息，用户名及token，用户校验信息需UDSP下发
-        iqRequest.setUdspUser("CRM");
-        iqRequest.setToken("000000");
-
-        //设置业务参数-查询参数设置
-        Map<String, String> data = new HashMap<>();
-        data.put("acct_no", "130000365600030");
-        data.put("start_time", "2016-12-31");
-        data.put("end_time", "2017-12-31");
-        iqRequest.setData(data);
-
-        //设置业务参数-分页参数设置
-        Page page = new Page();
-        page.setPageIndex(1);
-        page.setPageSize(20);
-        iqRequest.setPage(page);
-
-        //发起动用
-        SyncPackResponse syncPackResponse = iqClient.syncStart(iqRequest);
+    public static void main(String[] args) {
+        IqClientDemo demo = new IqClientDemo();
+        demo.syncStart();
+        demo.asyncStatus();
+        demo.asyncStart();
     }
-
-
 }

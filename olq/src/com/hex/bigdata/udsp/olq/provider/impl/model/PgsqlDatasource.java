@@ -13,23 +13,6 @@ import java.util.Map;
  * Created by PC on 2017/3/10.
  */
 public class PgsqlDatasource extends Datasource {
-    private String driverClass;
-    private String jdbcUrl;
-    private String username;
-    private String password;
-    private String initialSize;
-    private String minIdle;
-    private String maxIdle;
-    private String maxWait;
-    private String maxActive;
-    private String validationQueryTimeout;
-    private String timeBetweenEvictionRunsMillis;
-    private String minEvictableIdleTimeMillis;
-    private String validationQuery;
-    private String testWhileIdle;
-    private String testOnBorrow;
-    private String testOnReturn;
-    private int maxNum = 65535;
 
     public String getDriverClass() {
         String value = getProperty("driver.class").getValue();
@@ -115,13 +98,9 @@ public class PgsqlDatasource extends Datasource {
 
     public int getMaxNum() {
         String value = getProperty("max.data.size").getValue();
-        if (StringUtils.isNotBlank(value)) {
-            try {
-                maxNum = Integer.valueOf(value);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("max.data.size为一整数");
-            }
+        if (StringUtils.isBlank(value)) {
+            value = "65535";
         }
-        return maxNum;
+        return Integer.valueOf(value);
     }
 }

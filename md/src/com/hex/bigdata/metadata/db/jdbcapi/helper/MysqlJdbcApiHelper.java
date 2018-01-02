@@ -24,17 +24,21 @@ public class MysqlJdbcApiHelper extends BaseJdbcApiHelper {
 
     @Override
     public ResultSet getTablesResultSet(DatabaseMetaData dbmd, String dbName) throws SQLException {
+        checkDatabaseName(dbName);
         return dbmd.getTables(dbName, null, null, new String[]{"TABLE", "VIEW"});
-
     }
 
     @Override
     public ResultSet getColumnsResultSet(DatabaseMetaData dbmd, String dbName, String tbName) throws SQLException {
+        checkDatabaseName(dbName);
+        checkTableName(tbName);
         return dbmd.getColumns(dbName, null, tbName, null);
     }
 
     @Override
     public ResultSet getPrimaryKeysResultSet(DatabaseMetaData dbmd, String dbName, String tbName) throws SQLException {
+        checkDatabaseName(dbName);
+        checkTableName(tbName);
         return dbmd.getPrimaryKeys(dbName, null, tbName);
     }
 

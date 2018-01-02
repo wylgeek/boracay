@@ -53,6 +53,32 @@ public class RealtimeNodeService {
         }
     }
 
+    public void running(String id, String message) {
+        try {
+            RealtimeNodeInfo realtimeInfo = select(id);
+            realtimeInfo.setStatus(RealtimeStatus.RUNNING);
+            realtimeInfo.setUpdateTime(new Date());
+            realtimeInfo.setMessage(message);
+            update(id, realtimeInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void running(String id, long consumerNum, long meetNum, long storeNum) {
+        try {
+            RealtimeNodeInfo realtimeInfo = select(id);
+            realtimeInfo.setStatus(RealtimeStatus.RUNNING);
+            realtimeInfo.setUpdateTime(new Date());
+            realtimeInfo.setConsumerNum(consumerNum);
+            realtimeInfo.setMeetNum(meetNum);
+            realtimeInfo.setStoreNum(storeNum);
+            update(id, realtimeInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startFail(String id, String message) {
         logger.debug("更新实时作业的节点信息【启动失败】");
         try {
@@ -118,16 +144,36 @@ public class RealtimeNodeService {
         }
     }
 
+    public void runFail(String id, String host, String message) {
+        try {
+            RealtimeNodeInfo realtimeInfo = select(id, host);
+            realtimeInfo.setStatus(RealtimeStatus.RUN_FAIL);
+            realtimeInfo.setUpdateTime(new Date());
+            realtimeInfo.setMessage(message);
+            update(id, host, realtimeInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void insert(String id, RealtimeNodeInfo realtimeInfo) {
         realtimeNodeMapper.insert(REALTIME_NODE_INFO_KEY + KEY_DELIMITER + id + KEY_DELIMITER + HOST_KEY, realtimeInfo);
     }
 
     public RealtimeNodeInfo select(String id) {
-        return realtimeNodeMapper.select(REALTIME_NODE_INFO_KEY + KEY_DELIMITER + id + KEY_DELIMITER + HOST_KEY);
+        return select(id, HOST_KEY);
+    }
+
+    public RealtimeNodeInfo select(String id, String host) {
+        return realtimeNodeMapper.select(REALTIME_NODE_INFO_KEY + KEY_DELIMITER + id + KEY_DELIMITER + host);
     }
 
     public void update(String id, RealtimeNodeInfo realtimeInfo) {
-        realtimeNodeMapper.update(REALTIME_NODE_INFO_KEY + KEY_DELIMITER + id + KEY_DELIMITER + HOST_KEY, realtimeInfo);
+        update(id, HOST_KEY, realtimeInfo);
+    }
+
+    public void update(String id, String host, RealtimeNodeInfo realtimeInfo) {
+        realtimeNodeMapper.update(REALTIME_NODE_INFO_KEY + KEY_DELIMITER + id + KEY_DELIMITER + host, realtimeInfo);
     }
 
     public List<RealtimeNodeInfo> selectList(String id) {
@@ -136,12 +182,12 @@ public class RealtimeNodeService {
 
     public void deleteList(String id) {
         for (RealtimeNodeInfo nodeInfo : selectList(id)) {
-            realtimeNodeMapper.delete(REALTIME_NODE_INFO_KEY + KEY_DELIMITER + id + KEY_DELIMITER + nodeInfo.getHost());
+            delete(id, nodeInfo.getHost());
         }
     }
 
     public void delete(String id) {
-        realtimeNodeMapper.delete(REALTIME_NODE_INFO_KEY + KEY_DELIMITER + id + KEY_DELIMITER + HOST_KEY);
+        delete(id, HOST_KEY);
     }
 
     public void delete(String id, String host) {

@@ -298,4 +298,16 @@ public abstract class BaseJdbcApiHelper extends BaseHelper implements JdbcApiHel
 
         return columnList;
     }
+
+    protected void checkDatabaseName(String dbName) {
+        if (StringUtils.isBlank(dbName)) {
+            throw new IllegalArgumentException("dbName不能为空");
+        }
+    }
+
+    protected void checkTableName(String tbName) {
+        if (StringUtils.isBlank(tbName)) {
+            throw new IllegalArgumentException("tbName不能为空");
+        }
+    }
 }

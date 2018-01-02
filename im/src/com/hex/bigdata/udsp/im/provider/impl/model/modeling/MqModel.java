@@ -5,22 +5,15 @@ import com.hex.bigdata.udsp.common.provider.model.Property;
 import com.hex.bigdata.udsp.im.provider.model.Model;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by JunjieM on 2017-9-15.
  */
-public class MqModel extends Model {
+public class MqModel extends Model implements Serializable {
     public MqModel() {
-    }
-
-    public MqModel(List<Property> properties) {
-        super(properties);
-    }
-
-    public MqModel(Map<String, Property> propertyMap) {
-        super(propertyMap);
     }
 
     public MqModel(Model model) {
@@ -34,8 +27,8 @@ public class MqModel extends Model {
         return value;
     }
 
-    public MqModel(List<Property> properties, Datasource srcDatasource){
-        super(properties,srcDatasource);
+    public MqModel(List<Property> properties, Datasource srcDatasource) {
+        super(properties, srcDatasource);
     }
 
     public String getConsumerTimeoutMs() {

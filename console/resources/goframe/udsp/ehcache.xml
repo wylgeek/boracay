@@ -16,19 +16,22 @@
         memoryStoreEvictionPolicy="LFU" 内存存储与释放策略.当达到maxElementsInMemory时
                共有三种策略,分别为LRU(最近最少使用)、LFU(最常用的)、FIFO(先进先出)默认使用"最近使用"策略
     -->
+    <!-- 注：用到范围搜索时，必须要有<searchable keys="true"></searchable>且overflowToDisk="false" -->
 
     <diskStore path="java.io.tmpdir"/>
 
     <!--
-        <cache name="udspCache"
-               maxElementsOnDisk="30000"
-               maxElementsInMemory="1000000"
-               timeToIdleSeconds="0"
-               timeToLiveSeconds="0"
-               overflowToDisk="true"
-               diskPersistent="false"
-               diskExpiryThreadIntervalSeconds="120"
-               memoryStoreEvictionPolicy="LFU"/>
+    <cache name="udspCache"
+           maxElementsOnDisk="30000"
+           maxElementsInMemory="1000000"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           diskPersistent="false"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LFU">
+        <searchable keys="true"></searchable>
+    </cache>
     -->
 
     <!-- RMI手工配置方式，需要配置其他几个的IP地址 -->
@@ -71,7 +74,6 @@
                 replicateRemovals=true"
         />
         <searchable keys="true"></searchable>
-        <!--<terracotta clustered="true" consistency="strong"/>-->
     </cache>
 
 </ehcache>

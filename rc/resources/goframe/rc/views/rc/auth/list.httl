@@ -57,10 +57,16 @@ ${extends("/goframe/function_layout.httl")}
                         </td>
                         <td class="tit roleLabel" style="width: 100px;text-align: right">用户名：</td>
                         <td class="roleText" style="width: 25%">
-                            <input name="userName" class="nui-textbox" style="width:98%;"/>
+                            <input name="userId" class="nui-textbox" style="width:98%;"/>
                         </td>
                     </tr>
                     <tr>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">告警方式：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="alarmType" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   emptyText="全部" showNullItem="true" nullItemText="全部" dictTypeId="RC_ALARM_TYPE"
+                                   style="width:98%;"/>
+                        </td>
                         <td style="width: 100px;text-align: right">创建时间：</td>
                         <td style="width: 25%">
                             <input name="crtTimeStart" class="nui-datepicker" allowInput="true"
@@ -85,6 +91,8 @@ ${extends("/goframe/function_layout.httl")}
                             <input class="nui-button" iconCls="icon-reset" text="重置" onclick="onFormReset('form1')"/>
                             <span style="display:inline-block;width:25px;"></span>
                             <input class="nui-button" iconCls="icon-download" text="下载" onclick="downLoad()"/>
+                            <span style="display:inline-block;width:25px;"></span>
+                            <input class="nui-button" iconCls="icon-download" text="下游信息导出" onclick="downStreamDownLoad()"/>
                         </td>
                     </tr>
                 </table>
@@ -128,12 +136,15 @@ ${extends("/goframe/function_layout.httl")}
             <div type="checkcolumn" width="20"></div>
             <div field="serviceName" headerAlign="center" allowSort="true">服务名称</div>
             <div field="serviceType" headerAlign="center" allowSort="true" renderer="renderServiceType">应用类型</div>
-            <div field="userName" headerAlign="center" allowSort="true">用户名</div>
+            <div field="userId" headerAlign="center" allowSort="true">用户名</div>
             <div field="ipSection" headerAlign="center" allowSort="true">IP段</div>
-            <div field="maxSyncNum" headerAlign="center" allowSort="true">最大同步并发数</div>
-            <div field="maxAsyncNum" headerAlign="center" allowSort="true">最大异步并发数</div>
-            <div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat">创建时间</div>
-            <div field="crtUser" headerAlign="center" allowSort="true">创建者</div>
+            <div field="maxSyncNum" headerAlign="center" allowSort="true">运行队列大小（同步）</div>
+            <div field="maxAsyncNum" headerAlign="center" allowSort="true">运行队列大小（异步）</div>
+            <div field="maxSyncWaitNum" headerAlign="center" allowSort="true">等待队列大小（同步）</div>
+            <div field="maxAsyncWaitNum" headerAlign="center" allowSort="true">等待队列大小（异步）</div>
+            <div field="alarmType" headerAlign="center" allowSort="true" renderer="renderAlarmType">告警方式</div>
+            <!--<div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat">创建时间</div>-->
+            <!--<div field="crtUser" headerAlign="center" allowSort="true">创建者</div>-->
             <!--<div name="operation" headerAlign="center" align="center" allowSort="true" renderer="operation">操作</div>-->
         </div>
     </div>
@@ -380,6 +391,14 @@ ${extends("/goframe/function_layout.httl")}
         return nui.getDictText("UDSP_SERVICE_TYPE", e.row.serviceType);
     }
 
+    /**
+     * 转换告警方式
+     * @param e
+     * @returns {*}
+     */
+    function renderAlarmType(e) {
+        return nui.getDictText("RC_ALARM_TYPE", e.row.alarmType);
+    }
 
     // 开始上传文件
     function startUpload() {
@@ -468,6 +487,34 @@ ${extends("/goframe/function_layout.httl")}
             }
         });
     }
+
+    function downStreamDownLoad(){
+        var rows = grid1.getSelecteds();
+        if (!rows || rows.length == 0) {
+            nui.alert("请至少选择一条记录!");
+            return;
+        }
+        var json = nui.encode(getRows(rows));
+        grid1.loading("正在导出中,请稍等...");
+        $.ajax({
+            url:"${basePath}/rc/userService/downStreamInfoDownload",
+            type : 'POST',
+            data : json,
+            cache : false,
+            contentType : 'application/json',
+            success : function(text) {
+                if (text != null && text.trim() != "") {
+                    $("#filePath").val(text);
+                    $("#downForm").submit();
+                    nui.alert("导出Excel成功", "系统提示");
+                } else {
+                    nui.alert("导出Excel失败", "系统提示");
+                }
+                grid1.unmask();
+            }
+        });
+    }
+
 </script>
 
 <!--#end-->

@@ -1,7 +1,5 @@
 package com.hex.bigdata.udsp.im.provider.impl.util;
 
-import com.hex.bigdata.udsp.common.constant.DataType;
-import com.hex.bigdata.udsp.common.constant.Operator;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.TableColumn;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.ValueColumn;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.WhereProperty;
@@ -42,6 +40,26 @@ public class OracleSqlUtil {
             }
         }
         return commentSqls;
+    }
+
+    /**
+     * 清空表数据
+     *
+     * @param tableName
+     * @return
+     */
+    public static String truncateTable(String tableName) {
+        return "TRUNCATE TABLE " + tableName;
+    }
+
+    /**
+     * 删除所有数据
+     *
+     * @param tableName
+     * @return
+     */
+    public static String deleteAll(String tableName) {
+        return "DELETE FROM " + tableName;
     }
 
     /**
@@ -135,6 +153,8 @@ public class OracleSqlUtil {
             dataType = "CHAR(" + length + ")";
         } else if ("DECIMAL".equals(dataType)) {
             dataType = "NUMBER(" + length + ")";
+        } else if ("STRING".equals(dataType)) {
+            dataType = "VARCHAR2(4000)";
         }
         return dataType;
     }

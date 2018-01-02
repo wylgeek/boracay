@@ -10,7 +10,7 @@ ${extends("/goframe/function_layout.httl")}
                     <h4 style="margin:0;line-height:22px;font-size:12px;">字段列表：</h4>
                     <div id="serachGrid" class="nui-datagrid" style="width:250px;height:280px;"
                          pageStyle="padding:2px;" multiSelect="true" idField="pkId" showPager="false"
-                         url="${basePath}/im/md/col/select/${tMdId}">
+                         url="${basePath}/im/md/col/select/${targetMdId}">
                         <div property="columns">
                             <div type="checkcolumn"></div>
                             <!--
@@ -98,7 +98,7 @@ ${extends("/goframe/function_layout.httl")}
                 var values = data.split(",");
                 //console.warn(values);
                 // 查询字段集合
-                $.post("${basePath}/im/md/col/select/${tMdId}",{
+                $.post("${basePath}/im/md/col/select/${targetMdId}",{
                 },function(data){
                     // 去重并判断字段是否存在
                     var maps = {};

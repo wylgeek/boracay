@@ -5,6 +5,7 @@ import com.hex.bigdata.udsp.im.dto.RealtimeNodeInfoDto;
 import com.hex.bigdata.udsp.im.dto.RealtimeTotalInfoDto;
 import com.hex.bigdata.udsp.im.dto.RealtimeTotalInfoView;
 import com.hex.bigdata.udsp.im.provider.model.Model;
+import com.hex.bigdata.udsp.im.provider.model.ModelFilterCol;
 import com.hex.bigdata.udsp.im.service.ImModelService;
 import com.hex.bigdata.udsp.im.service.RealtimeJobService;
 import com.hex.goframe.model.MessageResult;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -40,13 +42,14 @@ public class RealtimeJobController {
      * @param pkId 模型的主键
      * @return
      */
+    @Deprecated
     @RequestMapping(value = "start/{pkId}")
     @ResponseBody
-    public MessageResult start(@PathVariable("pkId") String pkId) {
+    public MessageResult start(@PathVariable("pkId") String pkId, @RequestBody ModelFilterCol[] modelFilterCols) {
         boolean status = true;
         String message = "实时作业启动成功！";
         try {
-            Model model = imModelService.getModel(pkId,null);
+            Model model = imModelService.getModel(pkId, modelFilterCols);
             realtimeJobService.start(model);
         } catch (Exception e) {
             e.printStackTrace();

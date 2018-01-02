@@ -17,6 +17,7 @@ public class QuartzManager {
     @Autowired
     @Qualifier("scheduler")
     private Scheduler scheduler;
+
     /**
      * 添加一个定时任务
      *
@@ -31,6 +32,9 @@ public class QuartzManager {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void addJob(String jobName, String jobGroupName,
                        String triggerName, String triggerGroupName, Class jobClass, String cron) {
+        logger.debug("添加一个定时任务：jobName=>" + jobName + ", jobGroupName=>" + jobGroupName
+                + ",triggerName=>" + triggerName + ",triggerGroupName=>" + triggerGroupName
+                + ",jobClass=>" + jobClass + ",cron=>" + cron);
         try {
             // 任务名，任务组，任务执行类
             JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).build();
@@ -65,6 +69,7 @@ public class QuartzManager {
      * @return
      */
     public boolean checkTriggerExists(String triggerName, String triggerGroupName) {
+        logger.debug("检查一个触发器：triggerName=>" + triggerName + ",triggerGroupName=>" + triggerGroupName);
         try {
             return scheduler.checkExists(TriggerKey.triggerKey(triggerName, triggerGroupName));
         } catch (Exception e) {
@@ -81,6 +86,7 @@ public class QuartzManager {
      * @return
      */
     public boolean checkJobExists(String jobName, String jobGroupName) {
+        logger.debug("检查一个任务：jobName=>" + jobName + ",jobGroupName=>" + jobGroupName);
         try {
             return scheduler.checkExists(JobKey.jobKey(jobName, jobGroupName));
         } catch (Exception e) {
@@ -102,6 +108,9 @@ public class QuartzManager {
      */
     public void modifyJobTime(String jobName,
                               String jobGroupName, String triggerName, String triggerGroupName, String cron) {
+        logger.debug("修改一个任务的触发时间：jobName=>" + jobName + ", jobGroupName=>" + jobGroupName
+                + ",triggerName=>" + triggerName + ",triggerGroupName=>" + triggerGroupName
+                + ",cron=>" + cron);
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
             CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
@@ -147,6 +156,8 @@ public class QuartzManager {
      */
     public void removeJob(String jobName, String jobGroupName,
                           String triggerName, String triggerGroupName) {
+        logger.debug("移除一个任务：jobName=>" + jobName + ", jobGroupName=>" + jobGroupName
+                + ",triggerName=>" + triggerName + ",triggerGroupName=>" + triggerGroupName);
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
 
@@ -164,6 +175,7 @@ public class QuartzManager {
      * @Description:启动所有定时任务
      */
     public void startJobs() {
+        logger.debug("启动所有定时任务");
         try {
             scheduler.start();
         } catch (Exception e) {
@@ -177,6 +189,7 @@ public class QuartzManager {
      * @Description:关闭所有定时任务
      */
     public void shutdownJobs() {
+        logger.debug("关闭所有定时任务");
         try {
             if (!scheduler.isShutdown()) {
                 scheduler.shutdown();

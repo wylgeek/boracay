@@ -33,24 +33,22 @@ public class HiveProvider extends JdbcWrapper {
     private static Logger logger = LogManager.getLogger(HiveProvider.class);
 
     @Override
-    public boolean createSchema(Metadata metadata) throws Exception {
-        Datasource datasource = metadata.getDatasource();
-        HiveDatasource hiveDatasource = new HiveDatasource(datasource.getPropertyMap());
+    public void createSchema(Metadata metadata) throws Exception {
+        HiveDatasource hiveDatasource = new HiveDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String tableComment = metadata.getDescribe();
         List<TableColumn> columns = ImUtil.convertToTableColumnList(metadata.getMetadataCols());
         String sql = HiveSqlUtil.createTable(false, false, fullTbName,
                 columns, tableComment, null, null, FileFormat.HIVE_FILE_FORMAT_PARQUET);
-        return JdbcUtil.executeUpdate(hiveDatasource, sql);
+        JdbcUtil.executeUpdate(hiveDatasource, sql);
     }
 
     @Override
-    public boolean dropSchema(Metadata metadata) throws Exception {
-        Datasource datasource = metadata.getDatasource();
-        HiveDatasource hiveDatasource = new HiveDatasource(datasource.getPropertyMap());
+    public void dropSchema(Metadata metadata) throws Exception {
+        HiveDatasource hiveDatasource = new HiveDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String sql = HiveSqlUtil.dropTable(false, fullTbName);
-        return JdbcUtil.executeUpdate(hiveDatasource, sql);
+        JdbcUtil.executeUpdate(hiveDatasource, sql);
     }
 
     @Override

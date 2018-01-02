@@ -19,7 +19,7 @@ public class ModelFilterCol {
 
     private String length;
 
-    private boolean isNeed;
+    private boolean isNeed = false;
 
     private String defaultVal;
 
@@ -112,6 +112,8 @@ public class ModelFilterCol {
     }
 
     public String getValue() {
+        if (isNeed && StringUtils.isBlank(value))
+            throw new IllegalArgumentException("必输字段值不能为空");
         return value;
     }
 

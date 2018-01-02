@@ -54,7 +54,12 @@ public class ImMetadataMapper extends SyncMapper<ImMetadata> {
         return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.im.dao.ImMetadataMapper.selectAll");
     }
 
-    public List<ImMetadata> selectTargetMateData(String tgctId) {
-        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.im.dao.ImMetadataMapper.selectTargetMateData",tgctId);
+    public List<ImMetadataView> selectTargetMateData(String type) {
+        return sqlSessionTemplate.selectList("com.hex.bigdata.udsp.im.dao.ImMetadataMapper.selectTargetMateData", type);
+    }
+
+    public List<ImMetadataView> select(ImMetadataView imMetadataView) {
+        return sqlSessionTemplate.selectList(
+                "com.hex.bigdata.udsp.im.dao.ImMetadataMapper.select", imMetadataView);
     }
 }

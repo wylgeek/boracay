@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.hex.bigdata.udsp.iq.dao.IqAppReturnColMapper" >
-  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.iq.model.IqAppReturnCol" >
-    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
-    <result column="APP_ID" property="appId" jdbcType="VARCHAR" />
-    <result column="NAME" property="name" jdbcType="VARCHAR" />
-    <result column="DESCRIBE" property="describe" jdbcType="VARCHAR" />
-    <result column="TYPE" property="type" jdbcType="VARCHAR" />
-    <result column="STATS" property="stats" jdbcType="VARCHAR" />
-    <result column="LABEL" property="label" jdbcType="VARCHAR" />
-    <result column="SEQ" property="seq" jdbcType="DECIMAL" />
-    <result column="LENGTH" property="length" jdbcType="VARCHAR" />
-  </resultMap>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+<mapper namespace="com.hex.bigdata.udsp.iq.dao.IqAppReturnColMapper">
+    <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.iq.model.IqAppReturnCol">
+        <id column="PK_ID" property="pkId" jdbcType="VARCHAR"/>
+        <result column="APP_ID" property="appId" jdbcType="VARCHAR"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="DESCRIBE" property="describe" jdbcType="VARCHAR"/>
+        <result column="TYPE" property="type" jdbcType="VARCHAR"/>
+        <result column="STATS" property="stats" jdbcType="VARCHAR"/>
+        <result column="LABEL" property="label" jdbcType="VARCHAR"/>
+        <result column="SEQ" property="seq" jdbcType="DECIMAL"/>
+        <result column="LENGTH" property="length" jdbcType="VARCHAR"/>
+        <result column="NOTE" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from IQ_APPLICATION_RETURN_COLUMN
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.hex.bigdata.udsp.iq.model.IqAppReturnCol" >
+    <insert id="insert" parameterType="com.hex.bigdata.udsp.iq.model.IqAppReturnCol">
     insert into IQ_APPLICATION_RETURN_COLUMN (PK_ID, APP_ID, NAME, 
       DESCRIBE, TYPE, STATS, 
-      LABEL, SEQ, LENGTH)
+      LABEL, SEQ, LENGTH,NOTE)
     values (#{pkId,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
       #{describe,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{stats,jdbcType=VARCHAR}, 
-      #{label,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, #{length,jdbcType=VARCHAR})
+      #{label,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, #{length,jdbcType=VARCHAR},
+       #{note,jdbcType=VARCHAR})
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.iq.model.IqAppReturnCol" >
+    <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.iq.model.IqAppReturnCol">
     update IQ_APPLICATION_RETURN_COLUMN
     set APP_ID = #{appId,jdbcType=VARCHAR},
       NAME = #{name,jdbcType=VARCHAR},
@@ -33,34 +35,35 @@
       STATS = #{stats,jdbcType=VARCHAR},
       LABEL = #{label,jdbcType=VARCHAR},
       SEQ = #{seq,jdbcType=VARCHAR},
-      LENGTH = #{length,jdbcType=VARCHAR}
+      LENGTH = #{length,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR}
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </update>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select PK_ID, APP_ID, NAME, DESCRIBE, TYPE, STATS, LABEL, SEQ, LENGTH
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select PK_ID, APP_ID, NAME, DESCRIBE, TYPE, STATS, LABEL, SEQ, LENGTH,NOTE
     from IQ_APPLICATION_RETURN_COLUMN
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </select>
-  <select id="selectAll" resultMap="BaseResultMap" >
-    select PK_ID, APP_ID, NAME, DESCRIBE, TYPE, STATS, LABEL, SEQ, LENGTH
+    <select id="selectAll" resultMap="BaseResultMap">
+    select PK_ID, APP_ID, NAME, DESCRIBE, TYPE, STATS, LABEL, SEQ, LENGTH,NOTE
     from IQ_APPLICATION_RETURN_COLUMN
   </select>
-  <select id="select" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.iq.model.IqAppQueryCol">
-    select PK_ID, APP_ID, NAME, DESCRIBE, TYPE, STATS, LABEL, SEQ, LENGTH
-    from IQ_APPLICATION_RETURN_COLUMN
-    <trim prefix="WHERE" prefixOverrides="AND |OR ">
-      <if test="pkId!='' and pkId!=null ">and PK_ID = #{pkId}</if>
-      <if test="appId!='' and appId!=null ">and APP_ID = #{appId}</if>
-      <if test="seq!='' and seq!=null ">and SEQ = #{seq}</if>
-      <if test="name!='' and name!=null ">and NAME like '%'||#{name}||'%'</if>
-      <if test="describe!='' and describe!=null ">and DESCRIBE like '%'||#{describe}||'%'</if>
-      <if test="type!='' and type!=null ">and TYPE = #{type}</if>
-      <if test="stats!='' and stats!=null ">and STATS = #{stats}</if>
-      <if test="length!='' and length!=null ">and LENGTH = #{length}</if>
-    </trim>
-    order by SEQ asc
-  </select>
-  <delete id="deleteByAppId" parameterType="java.lang.String">
+    <select id="select" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.iq.model.IqAppQueryCol">
+        select PK_ID, APP_ID, NAME, DESCRIBE, TYPE, STATS, LABEL, SEQ, LENGTH,NOTE
+        from IQ_APPLICATION_RETURN_COLUMN
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="pkId!='' and pkId!=null ">and PK_ID = #{pkId}</if>
+            <if test="appId!='' and appId!=null ">and APP_ID = #{appId}</if>
+            <if test="seq!='' and seq!=null ">and SEQ = #{seq}</if>
+            <if test="name!='' and name!=null ">and NAME like '%'||#{name}||'%'</if>
+            <if test="describe!='' and describe!=null ">and DESCRIBE like '%'||#{describe}||'%'</if>
+            <if test="type!='' and type!=null ">and TYPE = #{type}</if>
+            <if test="stats!='' and stats!=null ">and STATS = #{stats}</if>
+            <if test="length!='' and length!=null ">and LENGTH = #{length}</if>
+        </trim>
+        order by SEQ asc
+    </select>
+    <delete id="deleteByAppId" parameterType="java.lang.String">
     delete from IQ_APPLICATION_RETURN_COLUMN
     where APP_ID = #{appId,jdbcType=VARCHAR}
   </delete>

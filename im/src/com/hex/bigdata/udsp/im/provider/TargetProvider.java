@@ -25,7 +25,7 @@ public interface TargetProvider extends Provider {
      * @return
      * @throws Exception
      */
-    boolean createSchema(Metadata metadata) throws Exception;
+    void createSchema(Metadata metadata) throws Exception;
 
     /**
      * 删除Schema
@@ -34,14 +34,14 @@ public interface TargetProvider extends Provider {
      * @return
      * @throws Exception
      */
-    boolean dropSchema(Metadata metadata) throws Exception;
+    void dropSchema(Metadata metadata) throws Exception;
 
     /**
-     * 检查Schema是否存在
+     * 检查Schema
      *
      * @param metadata
      * @return
      * @throws Exception
      */
-    boolean checkSchemaExists(Metadata metadata) throws Exception;
+    boolean checkSchema(Metadata metadata) throws Exception;
 }

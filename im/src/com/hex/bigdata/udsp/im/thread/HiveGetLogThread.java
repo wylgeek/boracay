@@ -1,6 +1,8 @@
 package com.hex.bigdata.udsp.im.thread;
 
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.im.service.BatchJobService;
+import com.hex.goframe.util.WebApplicationContextUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hive.jdbc.HiveStatement;
 import org.apache.logging.log4j.LogManager;
@@ -14,16 +16,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by JunjieM on 2017-9-21.
+ * Hive Jdbc 获取执行日志的线程类
  */
 public class HiveGetLogThread extends Thread {
     private static Logger logger = LogManager.getLogger(HiveGetLogThread.class);
 
+    private BatchJobService batchService = (BatchJobService) WebApplicationContextUtil.getBean("batchJobService");
+
     private long queryLogIntervalMs = 500L;
     private int fetchSize = 100;
-    private Statement statement = null;
     private String id;
-    private BatchJobService batchService;
 
     private int jobCount = 0;
     private int mapCount = 0;
@@ -31,67 +33,38 @@ public class HiveGetLogThread extends Thread {
     private int percent = 0;
     private int oldPercent = -1;
 
-    public HiveGetLogThread(BatchJobService batchService, String id, Statement statement) {
-        this.batchService = batchService;
+    public HiveGetLogThread(String id) {
         this.id = id;
-        this.statement = statement;
     }
 
-    public HiveGetLogThread(BatchJobService batchService, String id, Statement statement, long queryLogIntervalMs) {
-        this.batchService = batchService;
+    public HiveGetLogThread(String id, long queryLogIntervalMs) {
         this.id = id;
-        this.statement = statement;
         this.queryLogIntervalMs = queryLogIntervalMs;
     }
 
-    public HiveGetLogThread(BatchJobService batchService, String id, Statement statement, long queryLogIntervalMs, int fetchSize) {
-        this.batchService = batchService;
+    public HiveGetLogThread(String id, long queryLogIntervalMs, int fetchSize) {
         this.id = id;
-        this.statement = statement;
         this.queryLogIntervalMs = queryLogIntervalMs;
         this.fetchSize = fetchSize;
-    }
-
-    public HiveGetLogThread(Statement statement) {
-        this.statement = statement;
-    }
-
-    public HiveGetLogThread(Statement statement, long queryLogIntervalMs) {
-        this.statement = statement;
-        this.queryLogIntervalMs = queryLogIntervalMs;
-    }
-
-    public HiveGetLogThread(Statement statement, long queryLogIntervalMs, int fetchSize) {
-        this.statement = statement;
-        this.queryLogIntervalMs = queryLogIntervalMs;
-        this.fetchSize = fetchSize;
-    }
-
-    public Statement getStatement() {
-        return statement;
-    }
-
-    public void setStatement(Statement statement) {
-        this.statement = statement;
     }
 
     public void run() {
-        if (statement == null) {
+        HiveStatement hiveStatement = batchService.getHiveStatement(id);
+        if (hiveStatement == null) {
             return;
         }
-        HiveStatement hiveStatement = (HiveStatement) statement;
         try {
-            while (!hiveStatement.isClosed() && ((HiveStatement) statement).hasMoreLogs()) {
+            while (!hiveStatement.isClosed() && hiveStatement.hasMoreLogs()) {
                 try {
-                    for (String log : ((HiveStatement) statement).getQueryLog(true, fetchSize)) {
+                    for (String log : hiveStatement.getQueryLog(true, fetchSize)) {
                         parseLog(log);
                     }
                     Thread.currentThread().sleep(queryLogIntervalMs);
                 } catch (SQLException e) { // 防止while里面报错，导致一直退不出循环
-                    e.printStackTrace();
+                    logger.warn(ExceptionUtil.getMessage(e));
                     return;
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.warn(ExceptionUtil.getMessage(e));
                     return;
                 }
             }
@@ -106,7 +79,7 @@ public class HiveGetLogThread extends Thread {
      * @param log
      */
     private void parseLog(String log) {
-        logger.debug(log);
+        logger.warn(log);
         String reg0 = "Total jobs = (\\d+)";
         List<String> list0 = regxString(log, reg0);
         if (list0 != null && list0.size() == 1) {

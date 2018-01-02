@@ -29,7 +29,8 @@ ${extends("/goframe/function_layout.httl")}
                     </td>
                     <td style="text-align: right;width: 60px;">数据源：</td>
                     <td style="text-align: right;">
-                        <div id="dsId" class="nui-combobox" style="width:98%;"  popupWidth="400" textField="name" valueField="pkId"
+                        <div id="dsId" class="nui-combobox" style="width:98%;" popupWidth="400" textField="name"
+                             valueField="pkId"
                              url="${basePath}/com/ds/select?model=OLQ" dataField="data" name="dsId" multiSelect="false"
                              emptyText="请选择数据源" required="true" onvaluechanged="dsIdChanged">
                             <div property="columns">
@@ -85,7 +86,7 @@ ${extends("/goframe/function_layout.httl")}
 </div>
 
 <form id="downForm" action="${basePath}/http/inner/download" method="get">
-    <input id="filePath" name="filePath" type="hidden" />
+    <input id="filePath" name="filePath" type="hidden"/>
 </form>
 
 <script type="text/javascript">
@@ -187,37 +188,12 @@ ${extends("/goframe/function_layout.httl")}
         var data = form1.getData(true, true);
         //console.warn(data);
         data.dsId = dsIdObj.value;
-        data.sql = getSql(sql, data.defaultNum);
+        data.sql = sql;
+        var page = {};
+        page.pageIndex = 0;
+        page.pageSize = data.defaultNum;
+        data.page = page;
         refreshGrid(data);
-    }
-
-    function getSql(sql, defaultNum) {
-        var sqlUpper = sql.trim().toUpperCase();
-        if (sqlUpper.indexOf("SELECT ") == 0 && sqlUpper.indexOf("LIMIT") == -1 && dsData.type != "ORACLE" && dsData.type != "DB2") {
-            sql = sql.trim();
-            if (sql.indexOf(";") == sql.length - 1 ) {
-                sql = sql.substring(0, sql.length - 1) + " limit " + defaultNum + ";";
-            } else {
-                sql = sql + " limit " + defaultNum;
-            }
-        }
-        if (sqlUpper.indexOf("SELECT ") == 0 && sqlUpper.indexOf("ROWNUM") == -1 && dsData.type == "ORACLE") {
-            sql = sql.trim();
-            if (sql.indexOf(";") == sql.length - 1 ) {
-                if(sqlUpper.indexOf("WHERE ") > -1){
-                    sql = sql.substring(0, sql.length - 1) + " AND  ROWNUM  < " + defaultNum + ";";
-                }else{
-                    sql = sql.substring(0, sql.length - 1) + " WHERE  ROWNUM  < " + defaultNum + ";";
-                }
-            } else {
-                if(sqlUpper.indexOf("WHERE ") > -1){
-                    sql = sql + " AND  ROWNUM  <  " + defaultNum;
-                }else{
-                    sql = sql + " WHERE  ROWNUM  <  " + defaultNum;
-                }
-            }
-        }
-        return sql;
     }
 
     /**
@@ -231,7 +207,8 @@ ${extends("/goframe/function_layout.httl")}
             "appId": data.dsId,
             "type": "sync",
             "entity": "start",
-            "sql": data.sql
+            "sql": data.sql,
+            "page":data.page
         });
         $.ajax({
             url: "${basePath}/http/inner/consume",
@@ -271,6 +248,7 @@ ${extends("/goframe/function_layout.httl")}
                 intGridColumns(columns);
                 grid1.setData(records);
                 grid1.unmask();
+                nui.alert("加载成功!");
             }
         });
     }
@@ -280,7 +258,7 @@ ${extends("/goframe/function_layout.httl")}
      */
     function intGridColumns(colsData) {
         var baseHtml = "<div id='datagrid1' class='nui-datagrid' style='width:100%;height:100%;'" +
-            "allowResize='false' showPager='false' multiSelect='true' allowCellSelect='false' sortMode='client' >";
+                "allowResize='false' showPager='false' multiSelect='true' allowCellSelect='false' sortMode='client' >";
         baseHtml += "<div property='columns'>";
         $.each(colsData, function (_index, record) {
             if ("indexColumn" == record.type && "序号" == record.header) {

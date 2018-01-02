@@ -1,5 +1,7 @@
 package com.hex.bigdata.udsp.iq.provider.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.hex.bigdata.udsp.common.constant.Operator;
 import com.hex.bigdata.udsp.common.constant.Order;
 import com.hex.bigdata.udsp.common.constant.Status;
@@ -7,6 +9,8 @@ import com.hex.bigdata.udsp.common.constant.StatusCode;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Page;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
+import com.hex.bigdata.udsp.im.provider.impl.util.SolrUtil;
+import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.iq.provider.Provider;
 import com.hex.bigdata.udsp.iq.provider.impl.factory.SolrConnectionPoolFactory;
 import com.hex.bigdata.udsp.iq.provider.impl.model.SolrDatasource;
@@ -34,10 +38,6 @@ import java.util.*;
 public class SolrProvider implements Provider {
     private static Logger logger = LogManager.getLogger(SolrProvider.class);
     private static Map<String, SolrConnectionPoolFactory> dataSourcePool;
-
-    public void init(Datasource datasource) {
-        //
-    }
 
     public IqResponse query(IqRequest request) {
         logger.debug("request=" + JSONUtil.parseObj2JSON(request));
@@ -171,11 +171,7 @@ public class SolrProvider implements Provider {
         logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
         return response;
     }
-
-    public synchronized void close(Datasource datasource) {
-        //
-    }
-
+    
     //-------------------------------------------分割线---------------------------------------------
 
     private synchronized SolrConnectionPoolFactory getDataSource(String collectionName, SolrDatasource datasource) {
@@ -188,7 +184,7 @@ public class SolrProvider implements Provider {
             GenericObjectPool.Config config = new GenericObjectPool.Config();
             config.lifo = true;
             config.minIdle = 1;
-            config.maxActive = 10;
+            config.maxIdle = 10;
             config.maxWait = 3000;
             config.maxActive = 5;
             config.timeBetweenEvictionRunsMillis = 30000;
@@ -397,5 +393,45 @@ public class SolrProvider implements Provider {
             }
         }
         return canConnection;
+    }
+
+    @Override
+    public List<MetadataCol> columnInfo(Datasource datasource, String schemaName) {
+        SolrDatasource solrDatasource = new SolrDatasource(datasource.getPropertyMap());
+        String solrServers = solrDatasource.getSolrServers();
+        return getColumns(schemaName, solrServers);
+    }
+
+    public List<MetadataCol> getColumns(String collectionName, String solrServers) {
+        if (StringUtils.isEmpty(collectionName) || StringUtils.isEmpty(solrServers)) {
+            return null;
+        }
+        String response = "";
+        String[] addresses = solrServers.split(",");
+        for (String solrServer : addresses) {
+            String url = "http://" + solrServer + "/solr/" + collectionName + "/schema/fields";
+            response = SolrUtil.sendGet(url, "");
+            if (StringUtils.isEmpty(response)) {
+                continue;
+            } else {
+                break;
+            }
+        }
+        JSONObject rs = JSONObject.parseObject(response);
+        JSONArray fields = (JSONArray) rs.get("fields");
+        List<MetadataCol> metadataCols = new ArrayList<>();
+        MetadataCol mdCol = null;
+        for (int i = 0; i < fields.size(); i++) {
+            mdCol = new MetadataCol();
+            mdCol.setSeq((short) i);
+            mdCol.setName((String) fields.getJSONObject(i).get("name"));
+            mdCol.setDescribe((String) fields.getJSONObject(i).get("name"));
+            mdCol.setType(SolrUtil.getColType((String) fields.getJSONObject(i).get("type")));
+            mdCol.setIndexed((boolean) fields.getJSONObject(i).get("indexed"));
+            mdCol.setStored((boolean) fields.getJSONObject(i).get("stored"));
+            mdCol.setPrimary(fields.getJSONObject(i).get("uniqueKey") == null ? false : true);
+            metadataCols.add(mdCol);
+        }
+        return metadataCols;
     }
 }

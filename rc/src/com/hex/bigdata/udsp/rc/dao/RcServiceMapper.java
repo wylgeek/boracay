@@ -95,7 +95,7 @@ public class RcServiceMapper extends SyncMapper<RcService> {
      * @param appId
      * @return
      */
-    public RcService selectRcServiceByAppIdAndType(String type, String appId) {
+    public RcService selectByAppTypeAndAppId(String type, String appId) {
         RcService rcService = new RcService();
         rcService.setType(type);
         rcService.setAppId(appId);
@@ -103,7 +103,22 @@ public class RcServiceMapper extends SyncMapper<RcService> {
     }
 
     /**
+     * 根据应用名称和应用类型查找对应的启用的服务注册信息
+     *
+     * @param type
+     * @param appId
+     * @return
+     */
+    public RcService selectStartByAppTypeAndAppId(String type, String appId) {
+        RcService rcService = new RcService();
+        rcService.setType(type);
+        rcService.setAppId(appId);
+        return this.sqlSessionTemplate.selectOne("com.hex.bigdata.udsp.rc.dao.RcServiceMapper.selectStartByAppTypeAndAppId", rcService);
+    }
+
+    /**
      * 修改服务状态
+     *
      * @param item
      * @return
      */

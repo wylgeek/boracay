@@ -1,8 +1,8 @@
 package com.hex.bigdata.udsp.thread;
 
-import com.hex.bigdata.udsp.mc.model.McCurrent;
-import com.hex.bigdata.udsp.mc.service.McCurrentCountService;
-import com.hex.bigdata.udsp.mc.service.McWaitQueueService;
+import com.hex.bigdata.udsp.mc.model.Current;
+import com.hex.bigdata.udsp.mc.service.RunQueueService;
+import com.hex.bigdata.udsp.mc.service.WaitQueueService;
 import com.hex.goframe.util.WebApplicationContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,46 +11,49 @@ import java.util.concurrent.Callable;
 
 public class WaitQueueCallable<T> implements Callable<Boolean> {
 
-    private static Logger logger = LoggerFactory.getLogger(McWaitQueueService.class);
+    private static Logger logger = LoggerFactory.getLogger(WaitQueueService.class);
 
-    private McCurrent mcCurrent;
+    private Current mcCurrent;
 
-    private McCurrentCountService mcCurrentCountService;
+    private String waitQueueTaskId;
 
-    private McWaitQueueService mcWaitQueueService;
+    private RunQueueService runQueueService;
+
+    private WaitQueueService mcWaitQueueService;
 
     private long sleepTime = 200;
 
     public WaitQueueCallable() {
     }
 
-    public WaitQueueCallable(McCurrent mcCurrent) {
+    public WaitQueueCallable(Current mcCurrent) {
         this.mcCurrent = mcCurrent;
-        this.mcCurrentCountService = (McCurrentCountService) WebApplicationContextUtil.getBean("mcCurrentCountService");
-        this.mcWaitQueueService = (McWaitQueueService) WebApplicationContextUtil.getBean("mcWaitQueueService");
+        this.runQueueService = (RunQueueService) WebApplicationContextUtil.getBean("runQueueService");
+        this.mcWaitQueueService = (WaitQueueService) WebApplicationContextUtil.getBean("waitQueueService");
     }
 
-    public WaitQueueCallable(McCurrent mcCurrent, long sleepTime) {
+    public WaitQueueCallable(Current mcCurrent, String waitQueueTaskId, long sleepTime) {
         this.mcCurrent = mcCurrent;
+        this.waitQueueTaskId = waitQueueTaskId;
         this.sleepTime = sleepTime;
-        this.mcCurrentCountService = (McCurrentCountService) WebApplicationContextUtil.getBean("mcCurrentCountService");
-        this.mcWaitQueueService = (McWaitQueueService) WebApplicationContextUtil.getBean("mcWaitQueueService");
+        this.runQueueService = (RunQueueService) WebApplicationContextUtil.getBean("runQueueService");
+        this.mcWaitQueueService = (WaitQueueService) WebApplicationContextUtil.getBean("waitQueueService");
     }
 
-    public McCurrent getMcCurrent() {
+    public Current getMcCurrent() {
         return mcCurrent;
     }
 
-    public void setMcCurrent(McCurrent mcCurrent) {
+    public void setMcCurrent(Current mcCurrent) {
         this.mcCurrent = mcCurrent;
     }
 
-    public McCurrentCountService getMcCurrentCountService() {
-        return mcCurrentCountService;
+    public RunQueueService getRunQueueService() {
+        return runQueueService;
     }
 
-    public void setMcCurrentCountService(McCurrentCountService mcCurrentCountService) {
-        this.mcCurrentCountService = mcCurrentCountService;
+    public void setRunQueueService(RunQueueService runQueueService) {
+        this.runQueueService = runQueueService;
     }
 
     public long getSleepTime() {
@@ -72,13 +75,13 @@ public class WaitQueueCallable<T> implements Callable<Boolean> {
             boolean checkFlg = false;
             boolean isFirst = false;
             //检查并发
-            checkFlg = mcCurrentCountService.checkCurrent(this.mcCurrent);
+            checkFlg = runQueueService.checkCurrent(this.mcCurrent);
             //执行队列不空闲
             if (!checkFlg) {
                 continue;
             }
             //检查任务是否是第一个
-            isFirst = mcWaitQueueService.checkWaitQueueIsFirst(mcCurrent);
+            isFirst = mcWaitQueueService.checkWaitQueueIsFirst(mcCurrent, waitQueueTaskId);
             if (isFirst) {
                 return true;
             }

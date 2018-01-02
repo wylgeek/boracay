@@ -8,6 +8,7 @@ ${extends("/goframe/function_layout.httl")}
         <input name="crtTime" class="nui-hidden"/>
         <input name="uptUser" class="nui-hidden"/>
         <input name="uptTime" class="nui-hidden"/>
+        <input name="status" class="nui-hidden"/>
         <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
             <tr>
                 <th class="nui-form-label"><label for="name">名称：</label></th>

@@ -1,78 +1,77 @@
 ${extends("/goframe/function_layout.httl")}
 <!--#macro(content)-->
 <div id="form1">
-		<input id="data" name="data" class="nui-hidden" />
-	</div>
-	<!-- 查询区 -->
-	<div style="text-align:center;line-height:23px;padding:5px;">
-		<div>
-			<span>登陆Id:</span>
-			<input id="searchUserId" class="nui-textbox" style="width:160px;" />
-			<a class="nui-button" style="width:50px;height:20px;" onclick="onClearClick">清除</a>
-		</div>
-		<div>
-			<span>登陆名:</span>
-			<input id="searchUserName" class="nui-textbox" style="width:160px;" />
-			<a class="nui-button" style="width:50px;height:20px;" onclick="onSearchClick">查找</a>
-		</div>
-	</div>
-	
-	<!-- 显示区 -->
-	<div style="padding-left:5px;padding-right:5px;">
-		<table cellpadding="0" cellspacing="0">
-			<tr>
-				<!-- 左边列表 -->
-				<td style="padding-left: 10px;">
-					<h4 style="margin:0;line-height:22px;font-size:12px;">用户列表：</h4>
-					<div id="serachGrid" class="nui-datagrid" style="width:250px;height:220px;" 
-					pageStyle="padding:2px;" multiSelect="true" idField="id" sortMode="client"
-					url="${basePath}/rc/userService/selectNotRelationUsers"
-					showPageSize="true" showPageIndex="true" sizeList="[10,20,40,80,160]" pageSize="20" >
-						<div property="columns">
-							<div type="checkcolumn"></div>
-							<div field="userId" with="180" headerAlign="center" allowSort="true">登陆Id</div>
-							<div field="userName" with="180" headerAlign="center" allowSort="true">登陆名</div>
-						</div>
-					</div>
-				</td>
-			    <td style="padding:5px;">
-				</td>
-				<td style="padding:5px;">
-					<input type="button" value="选择" style="width:50px;" onclick="addSelected()" />
-					<br />
-				</td>
-				<td style="padding:5px;">
-				</td>
-				<!-- 右边列表 -->
-				
-				<td>
-				    <h4 style="margin:0;line-height:22px;font-size:12px;">已选用户：</h4>
-					<div id="selectedList" class="nui-listbox" style="width:250px;height:220px;"  sortMode="client"
-					multiSelect="true" showCheckBox="true" showPager="false" idField="id"  >
-						<div property="columns">
-							<div field="userId" with="180" headerAlign="center" allowSort="true">登陆Id</div>
-							<div field="userName" with="180" headerAlign="center" allowSort="true">登陆名</div>
-						</div>
+    <input id="data" name="data" class="nui-hidden"/>
+</div>
+<!-- 查询区 -->
+<div style="text-align:center;line-height:23px;padding:5px;">
+    <div>
+        <span>登陆ID:</span>
+        <input id="searchUserId" class="nui-textbox" style="width:160px;"/>
+        <a class="nui-button" style="width:50px;height:20px;" onclick="onClearClick">清除</a>
+    </div>
+    <div>
+        <span>登陆名:</span>
+        <input id="searchUserName" class="nui-textbox" style="width:160px;"/>
+        <a class="nui-button" style="width:50px;height:20px;" onclick="onSearchClick">查找</a>
+    </div>
+</div>
+
+<!-- 显示区 -->
+<div style="padding-left:5px;padding-right:5px;">
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <!-- 左边列表 -->
+            <td style="padding-left: 10px;">
+                <h4 style="margin:0;line-height:22px;font-size:12px;">用户列表：</h4>
+                <div id="serachGrid" class="nui-datagrid" style="width:250px;height:220px;"
+                     pageStyle="padding:2px;" multiSelect="true" idField="id" sortMode="client"
+                     url="${basePath}/rc/userService/selectNotRelationUsers"
+                     showPageSize="true" showPageIndex="true" sizeList="[10,20,40,80,160]" pageSize="20">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="userId" with="180" headerAlign="center" allowSort="true">登陆Id</div>
+                        <div field="userName" with="180" headerAlign="center" allowSort="true">登陆名</div>
                     </div>
-				</td>
-				 <td style="padding:5px;">
-				</td>
-				<td style="padding:5px;">
-										<input type="button" value="删除" style="width:50px;margin-bottom:2px;" onclick="removeSelecteds()" />
-					<br />
-					<input type="button" value="清空" style="width:50px;" onclick="removeAllSelecteds()" />
-					<br />		
-				</td>
-				 <td style="padding:5px;">
-				</td>
-			</tr>
-		</table>
-	</div>
-	<!-- 按钮区 -->
-	<div style="padding:15px;text-align:center;">
-		<a class="nui-button" style="width:60px;margin-right:20px;" onclick="onOk" >确定</a>
-		<a class="nui-button" style="width:60px;" onclick="onCancel" >取消</a>
-	</div>
+                </div>
+            </td>
+            <td style="padding:5px;">
+            </td>
+            <td style="padding:5px;">
+                <input type="button" value="选择" style="width:50px;" onclick="addSelected()"/>
+                <br/>
+            </td>
+            <td style="padding:5px;">
+            </td>
+            <!-- 右边列表 -->
+            <td>
+                <h4 style="margin:0;line-height:22px;font-size:12px;">已选用户：</h4>
+                <div id="selectedList" class="nui-listbox" style="width:250px;height:220px;" sortMode="client"
+                     multiSelect="true" showCheckBox="true" showPager="false" idField="id">
+                    <div property="columns">
+                        <div field="userId" with="180" headerAlign="center" allowSort="true">登陆ID</div>
+                        <div field="userName" with="180" headerAlign="center" allowSort="true">登陆名</div>
+                    </div>
+                </div>
+            </td>
+            <td style="padding:5px;">
+            </td>
+            <td style="padding:5px;">
+                <input type="button" value="删除" style="width:50px;margin-bottom:2px;" onclick="removeSelecteds()"/>
+                <br/>
+                <input type="button" value="清空" style="width:50px;" onclick="removeAllSelecteds()"/>
+                <br/>
+            </td>
+            <td style="padding:5px;">
+            </td>
+        </tr>
+    </table>
+</div>
+<!-- 按钮区 -->
+<div style="padding:15px;text-align:center;">
+    <a class="nui-button" style="width:60px;margin-right:20px;" onclick="onOk">确定</a>
+    <a class="nui-button" style="width:60px;" onclick="onCancel">取消</a>
+</div>
 
 <script type="text/javascript">
     var form;
@@ -81,150 +80,149 @@ ${extends("/goframe/function_layout.httl")}
     var selectedList;
     var searchUserId;
     var searchUserName;
-	var serviceIds;
+    var serviceIds;
 
     require(['nui'], function (nui) {
-        form            = new nui.Form("#form1");
-        win             = nui.get("selectWindow");
-        serachGrid      = nui.get("serachGrid");
-        selectedList    = nui.get("selectedList");
-        searchUserId    = nui.get("searchUserId");
-        searchUserName  = nui.get("searchUserName");
+        form = new nui.Form("#form1");
+        win = nui.get("selectWindow");
+        serachGrid = nui.get("serachGrid");
+        selectedList = nui.get("selectedList");
+        searchUserId = nui.get("searchUserId");
+        searchUserName = nui.get("searchUserName");
     });
 
-	// 父页面调用：设置数据
-	function SetData(data){
-        require(['nui','jquery'], function (nui,jquery) {
-			serachGrid = nui.get("serachGrid");
-			var rcUserServiceView={};
-			rcUserServiceView.serviceIds=data.serviceIds;
-			serviceIds=data.serviceIds;
-			serachGrid.load(rcUserServiceView,function(){
-				findRowsSelected(data.userIds);
-				addSelected();
-			});
+    // 父页面调用：设置数据
+    function SetData(data) {
+        require(['nui', 'jquery'], function (nui, jquery) {
+            serachGrid = nui.get("serachGrid");
+            var rcUserServiceView = {};
+            rcUserServiceView.serviceIds = data.serviceIds;
+            serviceIds = data.serviceIds;
+            serachGrid.load(rcUserServiceView, function () {
+                findRowsSelected(data.userIds);
+                addSelected();
+            });
         });
-	}
+    }
 
 
-	function contain(array,object){
-		var flg=false;
-		$.each(array,function(index,item){
-			if(object==item){
-				flg=true;
-				return;
-			}
-		});
-		return flg;
-	}
+    function contain(array, object) {
+        var flg = false;
+        $.each(array, function (index, item) {
+            if (object == item) {
+                flg = true;
+                return;
+            }
+        });
+        return flg;
+    }
 
-	function findRowsSelected(data){
-		var userIdArray=data.split(",");
-		var rows = serachGrid.findRows(function(row){
-			if(contain(userIdArray,row.userId)){
-				return true;
-			}
-		});
-		serachGrid.selects(rows);
-	}
+    function findRowsSelected(data) {
+        var userIdArray = data.split(",");
+        var rows = serachGrid.findRows(function (row) {
+            if (contain(userIdArray, row.userId)) {
+                return true;
+            }
+        });
+        serachGrid.selects(rows);
+    }
 
-	// 父页面调用：获取数据
-	function GetData(){
-		var rows = selectedList.getData();
-		var values = [];
-		var names=[];
-		var userObject={};
-		for(var i=0,l=rows.length; i<l; i++){
-			values.push(rows[i].userId);
-			names.push(rows[i].userName)
-		}
-		userObject.userIds = values.join(",");
-		userObject.userNames = names.join(",");
-		return userObject;
-	}
-	
-
-	
-	// 确定
-	function onOk(e){
-		CloseWindow("ok");
-	}
-	
-	function onCancel(e) {
-		CloseWindow("cancel");
-	}
-
-	// 关闭窗口
-	function CloseWindow(action){
-		if(action=="close" && form1.isChanged()){
-			if(confirm("数据已改变,是否先保存?")){
-				return false;
-			}
-		}else if(window.CloseOwnerWindow){
-			return window.CloseOwnerWindow(action);
-		}else{
-			return window.close();
-		}
-	}
-
-	// 查找
-	function onSearchClick(){
-		serachGrid.load({
-			userId : searchUserId.value,
-			userName : searchUserName.value,
-			serviceIds:serviceIds
-		});
-	}
-	
-	// 清除查找条件
-	function onClearClick(){
-		searchUserId.setValue("");
-		searchUserName.setValue("");
-	}
+    // 父页面调用：获取数据
+    function GetData() {
+        var rows = selectedList.getData();
+        var values = [];
+        var names = [];
+        var userObject = {};
+        for (var i = 0, l = rows.length; i < l; i++) {
+            values.push(rows[i].userId);
+            names.push(rows[i].userName)
+        }
+        userObject.userIds = values.join(",");
+        userObject.userNames = names.join(",");
+        return userObject;
+    }
 
 
-	function addSelected(){
-		var items = serachGrid.getSelecteds();
-		//把已选中的数据，用key-value缓存，以便进一步快速匹配
-		var maps = {};
-		var selecteds = selectedList.getData();
-		for(var i=0,l=selecteds.length; i<l; i++){
-			var selected = selecteds[i];
-			var key = selected.id;
-			var value = selected.userId;
-			var name =selected.userName;
-			maps[key] = value;
-		}
-		
-		//去重，并重新组织
-		var newItems = [];
-		for(var i=0,l=items.length; i<l; i++){
-			var item = items[i];
-			var key = item.id;
-			var value = item.userId;
-			var name =item.userName;
-			if(maps[key] == null){
-				newItems.push({
-					id : key,
-					userId : value,
-					userName:name
-				});
-			}
-		}
-		//console.warn(newItems);
-		selectedList.addItems(newItems);
-	}
+    // 确定
+    function onOk(e) {
+        CloseWindow("ok");
+    }
 
-	//删除已选项
-	function removeSelecteds(){
-		var items = selectedList.getSelecteds();
-		selectedList.removeItems(items);
-	}
-	
-	//清空已选项
-	function removeAllSelecteds(){
-		selectedList.removeAll();
-	}
-	
- </script>
+    function onCancel(e) {
+        CloseWindow("cancel");
+    }
+
+    // 关闭窗口
+    function CloseWindow(action) {
+        if (action == "close" && form1.isChanged()) {
+            if (confirm("数据已改变,是否先保存?")) {
+                return false;
+            }
+        } else if (window.CloseOwnerWindow) {
+            return window.CloseOwnerWindow(action);
+        } else {
+            return window.close();
+        }
+    }
+
+    // 查找
+    function onSearchClick() {
+        serachGrid.load({
+            userId: searchUserId.value,
+            userName: searchUserName.value,
+            serviceIds: serviceIds
+        });
+    }
+
+    // 清除查找条件
+    function onClearClick() {
+        searchUserId.setValue("");
+        searchUserName.setValue("");
+    }
+
+
+    function addSelected() {
+        var items = serachGrid.getSelecteds();
+        //把已选中的数据，用key-value缓存，以便进一步快速匹配
+        var maps = {};
+        var selecteds = selectedList.getData();
+        for (var i = 0, l = selecteds.length; i < l; i++) {
+            var selected = selecteds[i];
+            var key = selected.id;
+            var value = selected.userId;
+            var name = selected.userName;
+            maps[key] = value;
+        }
+
+        //去重，并重新组织
+        var newItems = [];
+        for (var i = 0, l = items.length; i < l; i++) {
+            var item = items[i];
+            var key = item.id;
+            var value = item.userId;
+            var name = item.userName;
+            if (maps[key] == null) {
+                newItems.push({
+                    id: key,
+                    userId: value,
+                    userName: name
+                });
+            }
+        }
+        //console.warn(newItems);
+        selectedList.addItems(newItems);
+    }
+
+    //删除已选项
+    function removeSelecteds() {
+        var items = selectedList.getSelecteds();
+        selectedList.removeItems(items);
+    }
+
+    //清空已选项
+    function removeAllSelecteds() {
+        selectedList.removeAll();
+    }
+
+</script>
 <!--#end-->

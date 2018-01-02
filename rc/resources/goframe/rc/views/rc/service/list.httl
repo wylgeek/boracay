@@ -146,14 +146,12 @@ ${extends("/goframe/function_layout.httl")}
         <div property="columns">
             <div type="checkcolumn" width="20"></div>
             <div field="name" headerAlign="center" allowSort="true" >名称</div>
-            <div field="dsType" headerAlign="center" allowSort="true" renderer="renderServiceType">应用类型</div>
-            <!--<div field="appName" headerAlign="center" allowSort="true">应用类型</div>-->
-
             <div field="describe" headerAlign="center" allowSort="true">说明</div>
+            <div field="dsType" headerAlign="center" allowSort="true" renderer="renderServiceType">应用类型</div>
             <div field="status" headerAlign="center" allowSort="true" renderer="renderServiceStatus">服务状态</div>
             <div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat">创建时间</div>
             <div field="uptTime" headerAlign="center" allowSort="true" renderer="timeFormat">更新时间</div>
-            <div name="operation" headerAlign="center" align="center" allowSort="true" renderer="operation">服务授权情况</div>
+            <div name="operation" headerAlign="center" align="center" allowSort="true" renderer="operation">授权操作</div>
         </div>
     </div>
 </div>
@@ -260,7 +258,7 @@ ${extends("/goframe/function_layout.httl")}
         nui.open({
             url: "${basePath}/goframe/p/rc.service.add",
             title: "添加",
-            width: 640,
+            width: 800,
             height:280,
             onload: function () {
             },
@@ -285,7 +283,7 @@ ${extends("/goframe/function_layout.httl")}
         nui.open({
             url: "${basePath}/goframe/p/rc.service.edit?pkId=" + row.pkId,
             title: "编辑",
-            width: 640,
+            width: 800,
             height:280,
             onload: function () {
             },
@@ -464,7 +462,7 @@ ${extends("/goframe/function_layout.httl")}
             url: "${basePath}/goframe/p/rc.service.info/?pkId=" + row.pkId,
             title: "详情-" + row.name,
             width: 640,
-            height:400,
+            height:320,
             onload: function () {
             },
             ondestroy: function (action) {

@@ -59,7 +59,7 @@
     OPERATOR, LABEL
     from IM_MODEL_FILTER_COLUMN
     where MODEL_ID = #{mid}
-    ORDER BY SEQ
+    ORDER BY SEQ asc
   </select>
 
   <delete id="deleteByMid" parameterType="java.lang.String">

@@ -18,10 +18,13 @@ import java.util.Map;
  */
 public class JdbcUtil {
     private static Logger logger = LogManager.getLogger(JdbcUtil.class);
-    private static Map<String, BasicDataSource> dataSourcePool = new HashMap<String, BasicDataSource>();
+    private static Map<String, BasicDataSource> dataSourcePool;
 
     public static synchronized BasicDataSource getDataSource(JdbcDatasource datasource) {
         String dsId = datasource.getId();
+        if (dataSourcePool == null) {
+            dataSourcePool = new HashMap<>();
+        }
         BasicDataSource dataSource = dataSourcePool.get(dsId);
         if (dataSource == null) {
             dataSource = new BasicDataSource();
@@ -58,6 +61,12 @@ public class JdbcUtil {
                 dataSource.setTestOnBorrow(Boolean.valueOf(datasource.getTestOnBorrow()));
             if (StringUtils.isNotBlank(datasource.getTestOnReturn()))
                 dataSource.setTestOnReturn(Boolean.valueOf(datasource.getTestOnReturn()));
+            //解决oracle获取元数据时获取字段注释
+            if (StringUtils.isNotBlank(datasource.getRemarksReporting()))
+                dataSource.addConnectionProperty("remarksReporting", "true");
+            //解决mysql获取元数据时获取字段注释
+            if (StringUtils.isNotBlank(datasource.getUserInformationSchema()))
+                dataSource.addConnectionProperty("userInformationSchema", datasource.getUserInformationSchema());
             dataSourcePool.put(dsId, dataSource);
         }
         return dataSource;
@@ -72,17 +81,15 @@ public class JdbcUtil {
         return conn;
     }
 
-    public static boolean createEngineSchema(JdbcDatasource datasource, String dbName, String updateSql) throws SQLException {
+    public static void createEngineSchema(JdbcDatasource datasource, String dbName, String updateSql) throws SQLException {
         String sql = HiveSqlUtil.createDatabase(true, dbName);
-        return executeUpdate(datasource, sql) && executeUpdate(datasource, updateSql);
+        executeUpdate(datasource, sql);
+        executeUpdate(datasource, updateSql);
     }
 
-    public static boolean executeUpdate(JdbcDatasource datasource, String updateSql) throws SQLException {
-        return executeUpdate2(datasource, updateSql) == 0 ? true : false;
-    }
-
-    public static int executeUpdate2(JdbcDatasource datasource, String updateSql) throws SQLException {
-        logger.debug("UPDATE SQL:" + updateSql);
+    public static int executeUpdate(JdbcDatasource datasource, String updateSql) throws SQLException {
+        logger.info("JDBC EXECUTE UPDATE SQL [START]");
+        logger.info("UPDATE SQL: \n" + updateSql);
         Connection conn = null;
         Statement stmt = null;
         int rs = -1;
@@ -90,19 +97,20 @@ public class JdbcUtil {
             conn = JdbcUtil.getConnection(datasource);
             stmt = conn.createStatement();
             rs = stmt.executeUpdate(updateSql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException(e);
         } finally {
             com.hex.bigdata.metadata.db.util.JdbcUtil.close(stmt);
             com.hex.bigdata.metadata.db.util.JdbcUtil.close(conn);
+            logger.info("JDBC EXECUTE UPDATE SQL [END]");
         }
         return rs;
     }
 
-    public static boolean executeUpdate(JdbcDatasource datasource, List<String> updateSqls) throws SQLException {
+    public static void executeUpdate(JdbcDatasource datasource, List<String> updateSqls) throws SQLException {
         for (String updateSql : updateSqls) {
-            if (!executeUpdate(datasource, updateSql)) {
-                return false;
-            }
+            executeUpdate(datasource, updateSql);
         }
-        return true;
     }
 }

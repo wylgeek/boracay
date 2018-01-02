@@ -18,6 +18,7 @@ import com.hex.bigdata.udsp.im.provider.impl.wrapper.JdbcWrapper;
 import com.hex.bigdata.udsp.im.provider.model.Metadata;
 import com.hex.bigdata.udsp.im.provider.model.ModelMapping;
 import com.hex.bigdata.udsp.im.util.ImUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -35,27 +36,29 @@ public class OracleProvider extends JdbcWrapper implements RealtimeTargetProvide
     private static Logger logger = LogManager.getLogger(OracleProvider.class);
 
     @Override
-    public boolean createSchema(Metadata metadata) throws Exception {
-        Datasource datasource = metadata.getDatasource();
-        OracleDatasource oracleDatasource = new OracleDatasource(datasource.getPropertyMap());
+    public void createSchema(Metadata metadata) throws Exception {
+        OracleDatasource oracleDatasource = new OracleDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String tableComment = metadata.getDescribe();
         List<TableColumn> columns = ImUtil.convertToTableColumnList(metadata.getMetadataCols());
         List<String> sqls = new ArrayList<>();
-        sqls.add(OracleSqlUtil.createTable(fullTbName, columns));
-        sqls.add(OracleSqlUtil.commentTable(fullTbName, tableComment));
-        sqls.addAll(OracleSqlUtil.createColComment(fullTbName, columns));
-        sqls.add(OracleSqlUtil.createPrimaryKey(fullTbName, columns));
-        return JdbcUtil.executeUpdate(oracleDatasource, sqls);
+        String createTableSql = OracleSqlUtil.createTable(fullTbName, columns);
+        if (StringUtils.isNotBlank(createTableSql)) sqls.add(createTableSql);
+        String commentTableSql = OracleSqlUtil.commentTable(fullTbName, tableComment);
+        if (StringUtils.isNotBlank(commentTableSql)) sqls.add(commentTableSql);
+        List<String> createColCommentSqls = OracleSqlUtil.createColComment(fullTbName, columns);
+        if (createColCommentSqls != null && createColCommentSqls.size() != 0) sqls.addAll(createColCommentSqls);
+        String createPrimaryKeySql = OracleSqlUtil.createPrimaryKey(fullTbName, columns);
+        if (StringUtils.isNotBlank(createPrimaryKeySql)) sqls.add(createPrimaryKeySql);
+         JdbcUtil.executeUpdate(oracleDatasource, sqls);
     }
 
     @Override
-    public boolean dropSchema(Metadata metadata) throws Exception {
-        Datasource datasource = metadata.getDatasource();
-        OracleDatasource oracleDatasource = new OracleDatasource(datasource.getPropertyMap());
+    public void dropSchema(Metadata metadata) throws Exception {
+        OracleDatasource oracleDatasource = new OracleDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String sql = OracleSqlUtil.dropTable(fullTbName);
-        return JdbcUtil.executeUpdate(oracleDatasource, sql);
+         JdbcUtil.executeUpdate(oracleDatasource, sql);
     }
 
     @Override
@@ -115,20 +118,20 @@ public class OracleProvider extends JdbcWrapper implements RealtimeTargetProvide
 
     @Override
     protected void insertInto(Metadata metadata, List<ModelMapping> modelMappings, List<ValueColumn> valueColumns) throws Exception {
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource().getPropertyMap());
-        JdbcUtil.executeUpdate2(jdbcDatasource, OracleSqlUtil.insert(metadata.getTbName(), valueColumns));
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
+        JdbcUtil.executeUpdate(jdbcDatasource, OracleSqlUtil.insert(metadata.getTbName(), valueColumns));
     }
 
     @Override
     protected void updateInsert(Metadata metadata, List<ModelMapping> modelMappings, List<ValueColumn> valueColumns, List<WhereProperty> whereProperties) throws Exception {
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource().getPropertyMap());
-        if (JdbcUtil.executeUpdate2(jdbcDatasource, OracleSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties)) == 0)
-            JdbcUtil.executeUpdate2(jdbcDatasource, OracleSqlUtil.insert(metadata.getTbName(), valueColumns));
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
+        if (JdbcUtil.executeUpdate(jdbcDatasource, OracleSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties)) == 0)
+            JdbcUtil.executeUpdate(jdbcDatasource, OracleSqlUtil.insert(metadata.getTbName(), valueColumns));
     }
 
     @Override
     protected void matchingUpdate(Metadata metadata, List<ModelMapping> modelMappings, List<ValueColumn> valueColumns, List<WhereProperty> whereProperties) throws Exception {
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource().getPropertyMap());
-        JdbcUtil.executeUpdate2(jdbcDatasource, OracleSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties));
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
+        JdbcUtil.executeUpdate(jdbcDatasource, OracleSqlUtil.update(metadata.getTbName(), valueColumns, whereProperties));
     }
 }

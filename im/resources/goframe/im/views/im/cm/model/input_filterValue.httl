@@ -10,24 +10,21 @@ ${extends("/goframe/function_layout.httl")}
     </div>
 
     <div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
-        <a class="nui-button" style="" iconCls="icon-save" onclick="save" id="saveButton">确定</a>
+        <a class="nui-button" style="" iconCls="icon-save" onclick="save">确定</a>
         <span style="display:inline-block;width:25px;"></span>
         <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">取消</a>
     </div>
 </div>
-
 <script type="text/javascript">
-    var filterCols;
     var returnData = {};
+    var filterCols;
 
-    function setModelFilterCols(data){
+
+    function loadForm(){
         /**
          * 按需加载资源文件
          */
         require(['jquery', 'nui'], function ($, nui) {
-            filterCols = data;
-            nui.parse();
-
             var count = 0;
             var html = "<table style='width:100%'>";
             $.each(filterCols, function (_index, record) {
@@ -38,63 +35,76 @@ ${extends("/goframe/function_layout.httl")}
                 var defaultVal = record.defaultVal ? record.defaultVal : "";
                 var operator = record.operator;
                 var tdHtml = "<td class='tit roleLabel' style='width: 10%;text-align: right'>" + describe + "：</td>"
-                    + "<td class='roleText' style='width: 90%'>"
-                    + "<input name='" + label + "' class='nui-textbox' style='width:98%;' value='" + defaultVal + "' required='" + isNeed + "' emptyText='进行\"" + operator + "\"匹配' describe='"+describe+"'/>"
-                    + "</td>";
+                        + "<td class='roleText' style='width: 23%'>"
+                        + "<input name='" + label + "' class='nui-textbox' style='width:98%;' value='" + defaultVal + "' required='" + isNeed + "' emptyText='进行\"" + operator
+                        + "\"匹配' id='"+label+"' describe='"+describe+"'/>"
+                        + "</td>";
                 count++;
-                if (count % 4 == 1) {
+                if (count % 3 == 1) {
                     html += "<tr>" + tdHtml;
-                } else if (count % 4 == 0) {
+                } else if (count % 3 == 0) {
                     html += tdHtml + "</tr>";
                 } else {
                     html += tdHtml;
                 }
             });
-            if (count % 4 != 0) {
+            if (count % 3 != 0) {
                 html += "</tr>";
             }
             html += "</table>";
-            console.info(html);
             $("#filterForm").empty();
-            $("#filterForm").append(html)
-
+            $("#filterForm").append(html);
+            nui.parse();
         });
     }
 
+    function setModelFilterCols(data){
+        filterCols = data;
+        loadForm();
+    }
+
     function save(){
-        CloseWindow("cancel");
-        // 获取内容失败！！！原因未知
-        /* var formObject =  new nui.Form("filterForm");
-         console.info(new nui.Form("filterForm").getData(true,true));
-         var modelfilterValue = formObject.getData(true, true);*/
         var result = true;
         var message;
         var modelfilterValue = [];
-        $.each($(".nui-textbox"), function (_index, record) {
-            //校验是否是必输
-            var isNeed = record.required;
-            var value = record.value.trim();
-            var name = record.name;
-            var describe = record.describe;
-            //比输入项为空
-            if(isNeed && (value == null || value == undefined || value == "")){
-                result = false;
-                message = describe+"不能为空";
-            }else{
-                modelfilterValue.push({"label":name,"value":value});
-            }
-        });
+        /*if($(".nui-textbox").length > 0){
+
+            $.each($(".nui-textbox"), function (_index, record) {
+                //校验是否是必输
+                var isNeed = record.required;
+                var value = $(record).val().trim();
+                var name = $(record).attr("name");
+                var describe = $(record).attr("describe");
+                //比输入项为空
+                if(isNeed && (value == null || value == undefined || value == "")){
+                    result = false;
+                    message = describe + "不能为空";
+                }else{
+                    modelfilterValue.push({"label":name,"value":value});
+                }
+            });
+        }else{*/
+        var filterForm = new nui.Form("#filterForm");
+        filterForm.validate();
+        if (filterForm.isValid() == false) {
+            result =  false;
+        }else{
+            var filterFormValue = filterForm.getData(true, true);
+            $.each(filterFormValue, function (_index, record) {
+                modelfilterValue.push({"label":_index,"value":record});
+            });
+        }
+        /*}*/
+
         //基础信息栏数据校验
 
         if (result == false) {
             returnData.status = false;
-            nui.console(message,"提示信息");
         }else{
             returnData.status = true;
             returnData.data = modelfilterValue;
             return window.CloseOwnerWindow(returnData);
         }
-
     }
 
     function cancel() {

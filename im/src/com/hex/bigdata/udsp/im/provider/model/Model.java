@@ -55,7 +55,7 @@ public class Model extends Base {
         super(propertyMap);
     }
 
-    public Model(List<Property> properties, Datasource srcDatasource){
+    public Model(List<Property> properties, Datasource srcDatasource) {
         this.sourceDatasource = srcDatasource;
         setProperties(properties);
     }

@@ -56,9 +56,10 @@ public class SqlClient extends ConsumerClient {
         this.checkBasicParams(request, SdkConstant.CONSUMER_TYPE_ASYNC, SdkConstant.CONSUMER_ENTITY_START);
         //业务参数检查
         this.checkStartBusinessParams(request);
-        AsyncResponse response = SdkHttpUtil.requestUdsp(request, this.getRequestUrl(),AsyncResponse.class);
+        AsyncResponse response = SdkHttpUtil.requestUdsp(request, this.getRequestUrl(), AsyncResponse.class);
         return this.transAsyncPackResponse(response);
     }
+
     /**
      * 联机查询应用客户端-异步status
      *
@@ -69,7 +70,7 @@ public class SqlClient extends ConsumerClient {
         //检查基础参数，参数错误则抛出异常
         this.checkBasicParams(request, SdkConstant.CONSUMER_TYPE_ASYNC, SdkConstant.CONSUMER_ENTITY_STATUS);
         this.checkStatusBusinessParams(request.getConsumeId());
-        StatusResponse response = SdkHttpUtil.requestUdsp(request, this.getRequestUrl(),StatusResponse.class);
+        StatusResponse response = SdkHttpUtil.requestUdsp(request, this.getRequestUrl(), StatusResponse.class);
         return this.transStatusResponse(response);
     }
 
@@ -77,7 +78,7 @@ public class SqlClient extends ConsumerClient {
     @Override
     protected void checkStartBusinessParams(UdspRequest udspRequest) {
         SqlRequest olqRequest = (SqlRequest) udspRequest;
-        if (StringUtils.isBlank(olqRequest.getSql())){
+        if (StringUtils.isBlank(olqRequest.getSql())) {
             throw new IllegalArgumentException("查询业务参数sql不能为空!");
         }
     }

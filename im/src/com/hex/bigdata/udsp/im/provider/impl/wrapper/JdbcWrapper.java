@@ -3,17 +3,21 @@ package com.hex.bigdata.udsp.im.provider.impl.wrapper;
 import com.hex.bigdata.metadata.db.model.Column;
 import com.hex.bigdata.udsp.common.constant.DataType;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
-import com.hex.bigdata.udsp.common.provider.model.Property;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
+import com.hex.bigdata.udsp.im.constant.DatasourceType;
 import com.hex.bigdata.udsp.im.provider.BatchSourceProvider;
 import com.hex.bigdata.udsp.im.provider.BatchTargetProvider;
 import com.hex.bigdata.udsp.im.provider.impl.model.datasource.HiveDatasource;
 import com.hex.bigdata.udsp.im.provider.impl.model.datasource.JdbcDatasource;
 import com.hex.bigdata.udsp.im.provider.impl.model.metadata.HiveMetadata;
+import com.hex.bigdata.udsp.im.provider.impl.model.metadata.JdbcMetadata;
 import com.hex.bigdata.udsp.im.provider.impl.model.modeling.JdbcModel;
 import com.hex.bigdata.udsp.im.provider.impl.util.HiveSqlUtil;
 import com.hex.bigdata.udsp.im.provider.impl.util.JdbcUtil;
+import com.hex.bigdata.udsp.im.provider.impl.util.SqlUtil;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.TableColumn;
 import com.hex.bigdata.udsp.im.provider.impl.util.model.TblProperty;
+import com.hex.bigdata.udsp.im.provider.impl.util.model.WhereProperty;
 import com.hex.bigdata.udsp.im.provider.model.Metadata;
 import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.im.provider.model.Model;
@@ -37,24 +41,23 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
     @Override
     public List<MetadataCol> columnInfo(Model model) {
         Datasource datasource = model.getSourceDatasource();
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(datasource.getPropertyMap());
-        JdbcModel jdbcModel =  new JdbcModel(model.getProperties(), model.getSourceDatasource());
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(datasource);
+        JdbcModel jdbcModel = new JdbcModel(model.getProperties(), model.getSourceDatasource());
         return getColumnInfo(jdbcDatasource, jdbcModel);
     }
 
     @Override
     public List<MetadataCol> columnInfo(Metadata metadata) {
-        Datasource datasource = metadata.getDatasource();
-        JdbcDatasource jdbcDatasource = new JdbcDatasource(datasource.getPropertyMap());
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
-        String[] strs = fullTbName.split(DATABASE_AND_TABLE_SEP);
+        String[] strs = fullTbName.split(DATABASE_AND_TABLE_SEP_TRANS);
         String dbName = null;
         String tbName = null;
         if (strs.length == 1) {
-            tbName = fullTbName.split(DATABASE_AND_TABLE_SEP)[0];
+            tbName = strs[0];
         } else if (strs.length == 2) {
-            dbName = fullTbName.split(DATABASE_AND_TABLE_SEP)[0];
-            tbName = fullTbName.split(DATABASE_AND_TABLE_SEP)[1];
+            dbName = strs[0];
+            tbName = strs[1];
         }
         return getMetadataCols(jdbcDatasource, dbName, tbName);
     }
@@ -66,7 +69,7 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
             conn = JdbcUtil.getConnection(datasource);
             metadataCols = getMetadataCols(conn, dbName, tbName);
         } catch (SQLException e) {
-            logger.warn(e.getMessage());
+            logger.warn(ExceptionUtil.getMessage(e));
         } finally {
             com.hex.bigdata.metadata.db.util.JdbcUtil.close(conn);
         }
@@ -81,7 +84,12 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
             selectSql = "SELECT * FROM (" + selectSql + ") UDSP_VIEW WHERE 1=0";
             return getMetadataCols(datasource, selectSql);
         }
-        if (StringUtils.isNotBlank(dbName) && StringUtils.isNotBlank(tbName)) {
+        if (StringUtils.isNotBlank(tbName)) {
+            // Oracle比较特殊，dbName实际上是Oracle用户名称（大写），tbName表名（大写）。
+            if (DatasourceType.ORACLE.getValue().equals(datasource.getType())) {
+                dbName = datasource.getUsername().toUpperCase();
+                tbName = tbName.toUpperCase();
+            }
             return getMetadataCols(datasource, dbName, tbName);
         }
         return null;
@@ -105,7 +113,7 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
                 }
             }
         } catch (SQLException e) {
-            logger.warn(e.getMessage());
+            logger.warn(ExceptionUtil.getMessage(e));
         } finally {
             com.hex.bigdata.metadata.db.util.JdbcUtil.close(rs);
             com.hex.bigdata.metadata.db.util.JdbcUtil.close(stmt);
@@ -115,24 +123,80 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
     }
 
     @Override
-    public boolean createSourceEngineSchema(Model model) throws SQLException {
+    public void createSourceEngineSchema(Model model) throws Exception {
         Datasource sDs = model.getSourceDatasource();
         String sDsId = sDs.getId();
         Datasource eDs = model.getEngineDatasource();
         String eDsId = eDs.getId();
         if (!sDsId.equals(eDsId)) { // 源、引擎的数据源不相同
-            HiveDatasource eHiveDs = new HiveDatasource(eDs.getPropertyMap());
-            String id = model.getId();
+
+            // 查询表名
+            String tableName = null;
             JdbcModel jdbcModel = new JdbcModel(model);
-            String fullTbName = jdbcModel.getDatabaseName() + DATABASE_AND_TABLE_SEP + jdbcModel.getTableName();
-            String tableName = getSourceTableName(id);
-            JdbcDatasource jdbcDs = new JdbcDatasource(sDs.getPropertyMap());
-            String sql = HiveSqlUtil.createStorageHandlerTable(true, true, tableName,
-                    getSourceColumns(model.getModelMappings()), "源的Hive引擎表", null,
-                    HIVE_ENGINE_STORAGE_HANDLER_CLASS, null, getTblProperties(jdbcDs, fullTbName));
-            return JdbcUtil.createEngineSchema(eHiveDs, HIVE_ENGINE_DATABASE_NAME, sql);
+            String dbName = jdbcModel.getDatabaseName();
+            String tbName = jdbcModel.getTableName();
+            String selectSql = jdbcModel.getSelectSql();
+            if (StringUtils.isNotBlank(dbName) && StringUtils.isNotBlank(tbName)) {
+                tableName = dbName + DATABASE_AND_TABLE_SEP + tbName;
+            } else if (StringUtils.isBlank(dbName) && StringUtils.isNotBlank(tbName)) {
+                tableName = tbName;
+            } else if (StringUtils.isBlank(tbName) && StringUtils.isBlank(selectSql)) {
+                throw new Exception("配置参数table.name和select.sql不能都为空");
+            }
+
+            // 查询SQL
+            String inputQuery = null;
+            if (StringUtils.isNotBlank(selectSql)) {
+                inputQuery = selectSql;
+            }
+
+            // 引擎表名
+            String engineSchemaName = getSourceTableName(model.getId());
+
+            createSourceEngineSchema(model, engineSchemaName, tableName, inputQuery);
         }
-        return true;
+    }
+
+    @Override
+    public void createSourceEngineSchema(Model model, String engineSchemaName) throws Exception {
+        // 查询表名
+        String tableName = null;
+        JdbcModel jdbcModel = new JdbcModel(model);
+        String dbName = jdbcModel.getDatabaseName();
+        String tbName = jdbcModel.getTableName();
+        String selectSql = jdbcModel.getSelectSql();
+        if (StringUtils.isNotBlank(dbName) && StringUtils.isNotBlank(tbName)) {
+            tableName = dbName + DATABASE_AND_TABLE_SEP + tbName;
+        } else if (StringUtils.isBlank(dbName) && StringUtils.isNotBlank(tbName)) {
+            tableName = tbName;
+        } else if (StringUtils.isBlank(tbName) && StringUtils.isBlank(selectSql)) {
+            throw new Exception("配置参数table.name和select.sql不能都为空");
+        }
+
+        // 动态SQL
+        String inputQuery = null;
+        Metadata metadata = model.getTargetMetadata();
+        List<ModelMapping> modelMappings = model.getModelMappings();
+        List<String> selectColumns = getSelectColumns(modelMappings, metadata);
+        List<WhereProperty> whereProperties = getWhereProperties(model.getModelFilterCols());
+        if (StringUtils.isNotBlank(selectSql)) {
+            inputQuery = SqlUtil.select2(selectColumns, selectSql, whereProperties);
+        } else {
+            inputQuery = SqlUtil.select(selectColumns, tableName, whereProperties);
+        }
+
+        createSourceEngineSchema(model, engineSchemaName, tableName, inputQuery);
+    }
+
+    private void createSourceEngineSchema(Model model, String engineSchemaName, String tableName, String inputQuery) throws Exception {
+        Datasource sDs = model.getSourceDatasource();
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(sDs);
+        Datasource eDs = model.getEngineDatasource();
+        HiveDatasource hiveDatasource = new HiveDatasource(eDs);
+        String sql = HiveSqlUtil.createStorageHandlerTable(true, true, engineSchemaName,
+                getSourceColumns(model.getModelMappings()), "源的Hive引擎表", null,
+                HIVE_ENGINE_STORAGE_HANDLER_CLASS, null, getTblProperties(jdbcDatasource, tableName, inputQuery));
+        JdbcUtil.createEngineSchema(hiveDatasource, HIVE_ENGINE_DATABASE_NAME, sql);
     }
 
     @Override
@@ -140,7 +204,7 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
         boolean canConnection = false;
         Connection conn = null;
         try {
-            conn = JdbcUtil.getConnection(new JdbcDatasource(datasource.getPropertyMap()));
+            conn = JdbcUtil.getConnection(new JdbcDatasource(datasource));
             if (conn != null && !conn.isClosed()) canConnection = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -151,27 +215,31 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
     }
 
     @Override
-    public boolean createTargetEngineSchema(Model model) throws SQLException {
+    public void createTargetEngineSchema(Model model) throws Exception {
         Datasource eDs = model.getEngineDatasource();
         String eDsId = eDs.getId();
         Metadata metadata = model.getTargetMetadata();
         Datasource tDs = metadata.getDatasource();
         String tDsId = tDs.getId();
+        String tDsType = tDs.getType();
         if (!tDsId.equals(eDsId)) { // 目标、引擎的数据源不相同
-            Datasource datasource = metadata.getDatasource();
-            Datasource engineDatasource = model.getEngineDatasource();
-            HiveDatasource eHiveDs = new HiveDatasource(engineDatasource.getPropertyMap());
+            if (DatasourceType.HIVE.getValue().equals(tDsType)) { // 目标是Hive数据源
+                /*
+                可以把数据插入目标，但是有编码问题还会有碎文件的问题。
+                 */
+                throw new Exception("目标是HIVE类型时必须与引擎是同一个数据源");
+            }
+            HiveDatasource eHiveDs = new HiveDatasource(model.getEngineDatasource());
             String id = model.getId();
             HiveMetadata hiveMetadata = new HiveMetadata(metadata);
             String fullTbName = hiveMetadata.getTbName();
             String tableName = getTargetTableName(id);
-            JdbcDatasource jdbcDs = new JdbcDatasource(datasource.getPropertyMap());
+            JdbcDatasource jdbcDs = new JdbcDatasource(metadata.getDatasource());
             String sql = HiveSqlUtil.createStorageHandlerTable(true, true, tableName,
                     getTargetColumns(model.getModelMappings()), "目标的Hive引擎表", null,
-                    HIVE_ENGINE_STORAGE_HANDLER_CLASS, null, getTblProperties(jdbcDs, fullTbName));
-            return JdbcUtil.executeUpdate(eHiveDs, sql);
+                    HIVE_ENGINE_STORAGE_HANDLER_CLASS, null, getTblProperties(jdbcDs, fullTbName, null));
+            JdbcUtil.executeUpdate(eHiveDs, sql);
         }
-        return true;
     }
 
     private List<TableColumn> getTargetColumns(List<ModelMapping> modelMappings) {
@@ -193,7 +261,7 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
         return columns;
     }
 
-    private List<TblProperty> getTblProperties(JdbcDatasource datasource, String tableName) {
+    private List<TblProperty> getTblProperties(JdbcDatasource datasource, String tableName, String inputQuery) {
         List<TblProperty> tblProperties = new ArrayList<>();
         tblProperties.add(new TblProperty("mapred.jdbc.driver.class", datasource.getDriverClass()));
         tblProperties.add(new TblProperty("mapred.jdbc.url", datasource.getJdbcUrl()));
@@ -201,8 +269,14 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
             tblProperties.add(new TblProperty("mapred.jdbc.username", datasource.getUsername()));
         if (StringUtils.isNotBlank(datasource.getPassword()))
             tblProperties.add(new TblProperty("mapred.jdbc.password", datasource.getPassword()));
-        tblProperties.add(new TblProperty("mapred.jdbc.input.table.name", tableName));
-        tblProperties.add(new TblProperty("mapred.jdbc.output.table.name", tableName));
+        if (StringUtils.isNotBlank(tableName))
+            tblProperties.add(new TblProperty("mapred.jdbc.input.table.name", tableName));
+        if (StringUtils.isNotBlank(inputQuery)) {
+            inputQuery = inputQuery.replaceAll("'", "\\\\'");
+            tblProperties.add(new TblProperty("mapred.jdbc.input.query", inputQuery));
+        }
+        if (StringUtils.isNotBlank(tableName))
+            tblProperties.add(new TblProperty("mapred.jdbc.output.table.name", tableName));
         tblProperties.add(new TblProperty("mapred.jdbc.hive.lazy.split", "false"));
         return tblProperties;
     }
@@ -283,25 +357,15 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
     protected List<String> getSelectColumns(List<ModelMapping> modelMappings, Metadata metadata) {
         if (modelMappings == null || modelMappings.size() == 0)
             return null;
-        List<java.lang.String> selectColumns = new ArrayList<>();
+        List<String> selectColumns = new ArrayList<>();
         for (ModelMapping mapping : modelMappings)
             selectColumns.add(mapping.getName());
         return selectColumns;
     }
 
     @Override
-    protected List<String> getInsertColumns(List<ModelMapping> modelMappings, Metadata metadata) {
-        if (modelMappings == null || modelMappings.size() == 0)
-            return null;
-        List<java.lang.String> insertColumns = new ArrayList<>();
-        for (ModelMapping mapping : modelMappings)
-            insertColumns.add(mapping.getMetadataCol().getName());
-        return insertColumns;
-    }
-
-    @Override
-    public boolean checkSchemaExists(Metadata metadata) throws SQLException {
-        JdbcDatasource datasource = new JdbcDatasource(metadata.getDatasource().getPropertyMap());
+    public boolean checkSchema(Metadata metadata) throws SQLException {
+        JdbcDatasource datasource = new JdbcDatasource(metadata.getDatasource());
         String tbName = metadata.getTbName();
         String sql = "select 1 from " + tbName;
         Connection conn = null;
@@ -312,7 +376,7 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
             stmt = conn.createStatement();
             stmt.executeQuery(sql);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(ExceptionUtil.getMessage(e));
             if (e.getMessage().indexOf("doesn't exist") != -1
                     || e.getMessage().indexOf("ORA-00942") != -1
                     || e.getMessage().indexOf("Table not found") != -1) {
@@ -323,6 +387,15 @@ public abstract class JdbcWrapper extends Wrapper implements BatchTargetProvider
             com.hex.bigdata.metadata.db.util.JdbcUtil.close(conn);
         }
         return exists;
+    }
+
+    @Override
+    protected void emptyDatas(Metadata metadata) throws Exception {
+        JdbcDatasource jdbcDatasource = new JdbcDatasource(metadata.getDatasource());
+        JdbcMetadata jdbcMetadata = new JdbcMetadata(metadata);
+        String tableName = jdbcMetadata.getTbName();
+        String updateSql = SqlUtil.truncateTable(tableName);
+        JdbcUtil.executeUpdate(jdbcDatasource, updateSql);
     }
 
     protected abstract DataType getColType(String type);

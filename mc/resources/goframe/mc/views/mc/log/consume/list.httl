@@ -147,18 +147,18 @@ ${extends("/goframe/function_layout.httl")}
             <div field="appName" headerAlign="center" allowSort="true">应用名</div>
             <div field="requestType" headerAlign="center" allowSort="true" renderer="renderRequestType">请求类型</div>
             <div field="syncType" headerAlign="center" allowSort="true" renderer="renderSyncType">同步/异步</div>
-
             <div field="requestContent" headerAlign="center" allowSort="true">请求内容</div>
             <div field="requestStartTime" headerAlign="center" allowSort="true" renderer="timeFormat">请求开始时间</div>
             <div field="requestEndTime" headerAlign="center" allowSort="true" renderer="timeFormat">请求结束时间</div>
-            <div field="requestInterval" headerAlign="center" renderer="renderRequestInterval">
-                请求耗时（s）
-            </div>
+            <div field="requestInterval" headerAlign="center" renderer="renderRequestInterval">请求耗时（s）</div>
+            <!--
             <div field="runStartTime" headerAlign="center" allowSort="true" renderer="timeFormat">执行开始时间</div>
             <div field="runEndTime" headerAlign="center" allowSort="true"  renderer="timeFormat">执行结束时间</div>
+            -->
             <div field="runInterval" headerAlign="center"  renderer="renderRunInterval">执行耗时（s）</div>
             <div field="status" headerAlign="center" allowSort="true" renderer="renderStatus">结果状态</div>
-            <div field="errorCode" headerAlign="center" allowSort="true" renderer="renderErrorCode">错误信息</div>
+            <div field="errorCode" headerAlign="center" allowSort="true" renderer="renderErrorCode">错误类型</div>
+            <div field="message" headerAlign="center" allowSort="true" >错误信息</div>
             <!--
             <div field="responseContent" headerAlign="center" allowSort="true">响应内容</div>
             -->

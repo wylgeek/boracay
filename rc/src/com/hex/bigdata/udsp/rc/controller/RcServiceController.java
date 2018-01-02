@@ -26,6 +26,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -214,7 +215,7 @@ public class RcServiceController extends BaseController {
 
     @RequestMapping("/shangeStatus/{serviceStatus}")
     @ResponseBody
-    public MessageResult serviceStatus(@PathVariable("serviceStatus") String serviceStatus,@RequestBody RcService[] rcServices) {
+    public MessageResult serviceStatus(@PathVariable("serviceStatus") String serviceStatus, @RequestBody RcService[] rcServices) {
         boolean status = true;
         String message = "服务状态修改成功";
         if (rcServices.length == 0) {
@@ -222,7 +223,7 @@ public class RcServiceController extends BaseController {
             message = "请求参数为空";
         }
         try {
-            if (!rcServiceService.statusChange(rcServices,serviceStatus)) {
+            if (!rcServiceService.statusChange(rcServices, serviceStatus)) {
                 status = false;
                 message = "服务状态修改失败";
             }
@@ -366,7 +367,7 @@ public class RcServiceController extends BaseController {
             message = "请求参数为空";
         } else {
             try {
-                if (!rcServiceService.checkAppIdAndType(type, appId)) {
+                if (!rcServiceService.checkAppUsed(type, appId)) {
                     status = false;
                     message = "检查完成，应用类型和应用名称不存在重复！";
                 }
@@ -384,43 +385,33 @@ public class RcServiceController extends BaseController {
         return new MessageResult(status, message);
     }
 
-    @RequestMapping({"/checkUsed/{model}/{pkId}"})
+    /**
+     * 检查应用是否被注册且是启用状态
+     *
+     * @param model
+     * @param applications
+     * @return
+     */
+    @RequestMapping({"/checkAppUsed/{model}"})
     @ResponseBody
-    public MessageResult checkUsed(@PathVariable String model, @PathVariable String pkId) {
+    public MessageResult checkAppUsed(@PathVariable String model, @RequestBody Map<String, String>[] applications) {
         boolean status = false;
         String message = "";
-        if (rcServiceService.checkAppIdAndType(model, pkId)) {
-            status = true;
-            if ("OLQ".equals(model)) {
-                message = "该数据源已被应用！";
-            } else {
-                message = "该应用已被注册服务！";
+        for (Map<String, String> application : applications) {
+            if (rcServiceService.checkAppUsedAndStart(model, application.get("pkId"))) {
+                status = true;
+                message += "名称为：【" + application.get("name") + "】";
+                if ("OLQ".equals(model)) {
+                    message += "的数据源已被注册且为启动状态，请停用或删除服务注册再进行编辑或删除操作！\n";
+                } else if ("IM".equals(model)) {
+                    message += "的模型已被注册且为启动状态，请停用或删除服务注册再进行编辑或删除操作！\n";
+                } else {
+                    message += "的应用已被注册且为启动状态，请停用或删除服务注册再进行编辑或删除操作！\n";
+                }
+                //break;
             }
         }
-
-        if (status) {
-            logger.debug(message);
-        } else {
-            logger.error(message);
-        }
-        return new MessageResult(status, message);
-    }
-
-    @RequestMapping({"/checkApplicationsUsed/{model}"})
-    @ResponseBody
-    public MessageResult checkApplicationsUsed(@PathVariable String model, @RequestBody Map<String, String>[] applications) {
-        boolean status = false;
-        String message = "";
-        Map<String, String> resultMap = rcServiceService.checkApplicationsUsed(model, applications);
-        if (resultMap != null) {
-            status = Boolean.valueOf(resultMap.get("status"));
-            message = resultMap.get("message");
-        }
-        if (status) {
-            logger.debug(message);
-        } else {
-            logger.error(message);
-        }
+        logger.debug(message);
         return new MessageResult(status, message);
     }
 

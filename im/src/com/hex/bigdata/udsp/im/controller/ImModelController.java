@@ -32,7 +32,7 @@ import java.util.Map;
 @RequestMapping("im/model")
 public class ImModelController {
 
-    private Logger log = LoggerFactory.getLogger(com.hex.bigdata.udsp.im.controller.ImModelController.class);
+    private Logger log = LoggerFactory.getLogger(ImModelController.class);
     @Autowired
     private ImModelService imModelService;
 

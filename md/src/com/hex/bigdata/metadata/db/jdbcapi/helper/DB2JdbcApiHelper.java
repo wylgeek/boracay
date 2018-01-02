@@ -34,7 +34,6 @@ public class DB2JdbcApiHelper extends BaseJdbcApiHelper {
     @Override
     public ResultSet getPrimaryKeysResultSet(DatabaseMetaData dbmd, String dbName, String tbName) throws SQLException {
         return dbmd.getPrimaryKeys(null, dbName, tbName);
-
     }
 
     @Override

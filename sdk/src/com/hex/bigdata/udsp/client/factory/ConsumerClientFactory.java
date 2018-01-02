@@ -41,7 +41,7 @@ public class ConsumerClientFactory {
      *
      * @return
      */
-    public static <T> T createDefaultClient(Class<T> T) {
+    public static <T> T createCustomClient(Class<T> T) {
         return createCustomClient(T, SdkClientConfig.consumeUrl);
     }
 }

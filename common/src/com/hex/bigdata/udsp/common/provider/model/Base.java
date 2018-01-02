@@ -12,9 +12,9 @@ import java.util.Map;
  */
 public class Base {
 
-    protected List<Property> properties; // 配置参数集合
+    protected List<Property> properties = new ArrayList<>(); // 配置参数集合
 
-    protected Map<String, Property> propertyMap; // 配置参数Map
+    protected Map<String, Property> propertyMap = new HashMap<>(); // 配置参数Map
 
     public Base() {
     }

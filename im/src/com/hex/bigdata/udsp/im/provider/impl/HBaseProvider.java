@@ -1,32 +1,24 @@
 package com.hex.bigdata.udsp.im.provider.impl;
 
-import com.hex.bigdata.udsp.common.constant.DataType;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
-import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.im.provider.impl.model.datasource.HBaseDatasource;
 import com.hex.bigdata.udsp.im.provider.impl.model.datasource.HiveDatasource;
 import com.hex.bigdata.udsp.im.provider.impl.model.metadata.HBaseMetadata;
 import com.hex.bigdata.udsp.im.provider.impl.util.HBaseUtil;
 import com.hex.bigdata.udsp.im.provider.impl.util.HiveSqlUtil;
 import com.hex.bigdata.udsp.im.provider.impl.util.JdbcUtil;
-import com.hex.bigdata.udsp.im.provider.impl.util.model.ValueColumn;
-import com.hex.bigdata.udsp.im.provider.impl.util.model.WhereProperty;
 import com.hex.bigdata.udsp.im.provider.impl.wrapper.HBaseWrapper;
 import com.hex.bigdata.udsp.im.provider.model.Metadata;
 import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.im.provider.model.Model;
 import com.hex.bigdata.udsp.im.provider.model.ModelMapping;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by JunjieM on 2017-9-5.
@@ -45,23 +37,21 @@ public class HBaseProvider extends HBaseWrapper {
     }
 
     @Override
-    public boolean createSchema(Metadata metadata) throws Exception {
+    public void createSchema(Metadata metadata) throws Exception {
         HBaseMetadata hBaseMetadata = new HBaseMetadata(metadata);
-        return HBaseUtil.createHTable(hBaseMetadata);
+        HBaseUtil.createHTable(hBaseMetadata, true);
     }
 
     @Override
-    public boolean dropSchema(Metadata metadata) throws Exception {
-        Datasource datasource = metadata.getDatasource();
-        HBaseDatasource hBaseDatasource = new HBaseDatasource(datasource.getPropertyMap());
-        return HBaseUtil.dropHTable(hBaseDatasource, metadata.getTbName());
+    public void dropSchema(Metadata metadata) throws Exception {
+        HBaseDatasource hBaseDatasource = new HBaseDatasource(metadata.getDatasource());
+        HBaseUtil.dropHTable(hBaseDatasource, metadata.getTbName(), true);
     }
 
     @Override
-    public boolean createTargetEngineSchema(Model model) throws Exception {
+    public void createTargetEngineSchema(Model model) throws Exception {
         Metadata metadata = model.getTargetMetadata();
-        Datasource engineDatasource = model.getEngineDatasource();
-        HiveDatasource eHiveDs = new HiveDatasource(engineDatasource.getPropertyMap());
+        HiveDatasource eHiveDs = new HiveDatasource(model.getEngineDatasource());
         String id = model.getId();
         HBaseMetadata hbaseMetadata = new HBaseMetadata(metadata);
         String fullTbName = hbaseMetadata.getTbName();
@@ -71,22 +61,20 @@ public class HBaseProvider extends HBaseWrapper {
                 getTargetColumns(modelMappings, hbaseMetadata), "目标的Hive引擎表", null,
                 HIVE_ENGINE_STORAGE_HANDLER_CLASS, getSerDeProperties(modelMappings, hbaseMetadata),
                 getTblProperties(fullTbName));
-        return JdbcUtil.createEngineSchema(eHiveDs, HIVE_ENGINE_DATABASE_NAME, sql);
+        JdbcUtil.createEngineSchema(eHiveDs, HIVE_ENGINE_DATABASE_NAME, sql);
     }
 
     @Override
-    public boolean checkSchemaExists(Metadata metadata) throws Exception {
-        HBaseDatasource datasource = new HBaseDatasource(metadata.getDatasource().getPropertyMap());
-        HBaseAdmin admin = HBaseUtil.getHBaseAdmin(datasource);
+    public boolean checkSchema(Metadata metadata) throws Exception {
+        HBaseDatasource datasource = new HBaseDatasource(metadata.getDatasource());
         String tableName = metadata.getTbName();
-        TableName hbaseTableName = TableName.valueOf(tableName);
-        return admin.isTableAvailable(hbaseTableName);
+        return HBaseUtil.isTableAvailable(datasource, tableName);
     }
 
     @Override
     public boolean testDatasource(Datasource datasource) {
         boolean canConnection = false;
-        HBaseDatasource hBaseDatasource = new HBaseDatasource(datasource.getProperties());
+        HBaseDatasource hBaseDatasource = new HBaseDatasource(datasource);
         HConnection conn = null;
         try {
             conn = HBaseUtil.getConnection(hBaseDatasource);
@@ -101,4 +89,9 @@ public class HBaseProvider extends HBaseWrapper {
         return canConnection;
     }
 
+    @Override
+    protected void emptyDatas(Metadata metadata) throws Exception {
+        HBaseMetadata hBaseMetadata = new HBaseMetadata(metadata);
+        HBaseUtil.emptyHTable(hBaseMetadata);
+    }
 }

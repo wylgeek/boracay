@@ -12,23 +12,13 @@ import java.util.Map;
  * Created by JunjieM on 2017-9-5.
  */
 public class SolrModel extends Model {
-    public SolrModel() {
-    }
-
-    public SolrModel(List<Property> properties) {
-        super(properties);
-    }
-
-    public SolrModel(Map<String, Property> propertyMap) {
-        super(propertyMap);
-    }
 
     public SolrModel(Model model) {
         super(model);
     }
 
-    public SolrModel(List<Property> properties, Datasource srcDatasource){
-        super(properties,srcDatasource);
+    public SolrModel(List<Property> properties, Datasource srcDatasource) {
+        super(properties, srcDatasource);
     }
 
     public String getCollectionName() {
@@ -36,5 +26,12 @@ public class SolrModel extends Model {
         if (StringUtils.isBlank(value))
             throw new IllegalArgumentException("solr.collection.name不能为空");
         return value;
+    }
+
+    public boolean getViolenceQuery() {
+        String value = getProperty("violence.query").getValue();
+        if (StringUtils.isBlank(value))
+            value = "true";
+        return Boolean.valueOf(value);
     }
 }

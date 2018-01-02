@@ -2,12 +2,12 @@ package com.hex.bigdata.udsp.iq.service;
 
 import com.hex.bigdata.udsp.common.constant.ComExcelEnums;
 import com.hex.bigdata.udsp.common.dao.ComDatasourceMapper;
-import com.hex.bigdata.udsp.common.model.ComDatasource;
-import com.hex.bigdata.udsp.common.model.ComExcelParam;
-import com.hex.bigdata.udsp.common.model.ComExcelProperties;
-import com.hex.bigdata.udsp.common.model.ComUploadExcelContent;
+import com.hex.bigdata.udsp.common.model.*;
+import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
 import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
+import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.iq.dao.IqMetadataMapper;
 import com.hex.bigdata.udsp.iq.dto.IqMetadataPropsView;
 import com.hex.bigdata.udsp.iq.dto.IqMetadataView;
@@ -44,7 +44,6 @@ public class IqMetadataService extends BaseService {
     private IqMetadataMapper iqMetadataMapper;
     @Autowired
     private IqMetadataColService iqMetadataColService;
-
     @Autowired
     private ComDatasourceMapper comDatasourceMapper;
 

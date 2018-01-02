@@ -2,14 +2,17 @@ package com.hex.bigdata.udsp.im.provider.impl;
 
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Property;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.im.provider.impl.model.datasource.KafkaDatasource;
 import com.hex.bigdata.udsp.im.provider.impl.model.modeling.KafkaModel;
 import com.hex.bigdata.udsp.im.provider.impl.util.KafkaUtil;
 import com.hex.bigdata.udsp.im.provider.impl.wrapper.KafkaWrapper;
+import com.hex.bigdata.udsp.im.provider.model.Metadata;
 import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.im.provider.model.Model;
 import kafka.consumer.ConsumerIterator;
+import kafka.consumer.ConsumerTimeoutException;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.javaapi.producer.Producer;
@@ -18,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,25 +54,35 @@ public class KafkaProvider extends KafkaWrapper {
                 ConsumerIterator<byte[], byte[]> iterator = stream.iterator();
                 while (iterator.hasNext()) {
                     String message = new String(iterator.next().message());
-                    logger.debug("kafka接收的信息为：" + message);
+                    logger.debug("KAFKA接收的信息为：" + message);
                     try {
                         Map<String, Object> map = JSONUtil.parseJSON2Map(message);
                         metadataCols = new ArrayList<>();
+                        int count = 1;
                         for (Map.Entry<String, Object> entry : map.entrySet()) {
                             MetadataCol metadataCol = new MetadataCol();
-                            metadataCol.setName(entry.getKey());
-                            metadataCol.setType(javaTransDBType(entry.getValue()));
+                            String name = entry.getKey();
+                            Object value = entry.getValue();
+                            metadataCol.setSeq((short) count++);
+                            metadataCol.setName(name);
+                            metadataCol.setType(javaTransDBType(value));
+                            metadataCol.setDescribe(name);
+                            metadataCol.setIndexed(false);
+                            metadataCol.setPrimary(false);
+                            metadataCol.setStored(true);
                             metadataCols.add(metadataCol);
                         }
-                        break;
+                        return metadataCols;
                     } catch (Exception e) {
-                        logger.debug(e.getMessage());
+                        logger.warn(ExceptionUtil.getMessage(e));
                     }
                 }
             }
+        } catch (ConsumerTimeoutException e) {
+            logger.debug("KAFKA消费超时！");
+            return metadataCols;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            logger.warn(ExceptionUtil.getMessage(e));
         } finally {
             KafkaUtil.close(consumer);
         }
@@ -80,7 +94,7 @@ public class KafkaProvider extends KafkaWrapper {
         boolean canConnection = true;
         Producer<String, String> producer = null;
         try {
-            producer = KafkaUtil.getProducer(new KafkaDatasource(datasource.getProperties()));
+            producer = KafkaUtil.getProducer(new KafkaDatasource(datasource));
             if (producer == null) {
                 canConnection = false;
             } else {

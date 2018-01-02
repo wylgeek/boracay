@@ -24,16 +24,21 @@ public class ImpalaJdbcApiHelper extends BaseJdbcApiHelper {
 
     @Override
     public ResultSet getTablesResultSet(DatabaseMetaData dbmd, String dbName) throws SQLException {
+        checkDatabaseName(dbName);
         return dbmd.getTables(null, dbName, null, new String[]{"TABLE", "VIEW"});
     }
 
     @Override
     public ResultSet getColumnsResultSet(DatabaseMetaData dbmd, String dbName, String tbName) throws SQLException {
+        checkDatabaseName(dbName);
+        checkTableName(tbName);
         return dbmd.getColumns(null, dbName, tbName, null);
     }
 
     @Override
     public ResultSet getPrimaryKeysResultSet(DatabaseMetaData dbmd, String dbName, String tbName) throws SQLException {
+        checkDatabaseName(dbName);
+        checkTableName(tbName);
         return dbmd.getPrimaryKeys(null, dbName, tbName);
     }
 

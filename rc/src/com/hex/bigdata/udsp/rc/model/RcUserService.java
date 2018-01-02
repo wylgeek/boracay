@@ -11,39 +11,21 @@ public class RcUserService implements Serializable {
 
     private String ipSection;
 
-    private int maxSyncNum;
+    private int maxSyncNum; // 执行队列大小（同步）
 
-    private int maxAsyncNum;
+    private int maxAsyncNum; // 执行队列大小（异步）
 
-    /**
-     * 等待队列大小（同步）
-     */
-    private int maxSyncWaitNum;
+    private int maxSyncWaitNum; //等待队列大小（同步）
 
-    /**
-     * 等待队列大小（异步）
-     */
-    private int maxAsyncWaitNum;
+    private int maxAsyncWaitNum; // 等待队列大小（异步）
 
-    /**
-     * 同步最大等待时间
-     */
-    private int maxSyncWaitTimeout;
+    private long maxSyncWaitTimeout = 0; // 最大等待时间（同步/毫秒）
 
-    /**
-     * 异步最大等待时间
-     */
-    private int maxAsyncWaitTimeout;
+    private long maxAsyncWaitTimeout = 0; // 最大等待时间（异步/毫秒）
 
-    /**
-     * 同步最大运行时间
-     */
-    private int maxSyncExecuteTimeout;
+    private long maxSyncExecuteTimeout = 0; // 最大运行时间（同步/毫秒）
 
-    /**
-     *异步最大运行时间
-     */
-    private int maxAsyncExecuteTimeout;
+    private long maxAsyncExecuteTimeout = 0; // 最大运行时间（异步/毫秒）
 
     private String delFlg;
 
@@ -54,6 +36,8 @@ public class RcUserService implements Serializable {
     private String uptUser;
 
     private String uptTime;
+
+    private String alarmType; // 告警方式
 
     public String getPkId() {
         return pkId;
@@ -119,35 +103,35 @@ public class RcUserService implements Serializable {
         this.maxAsyncWaitNum = maxAsyncWaitNum;
     }
 
-    public int getMaxSyncWaitTimeout() {
+    public long getMaxSyncWaitTimeout() {
         return maxSyncWaitTimeout;
     }
 
-    public void setMaxSyncWaitTimeout(int maxSyncWaitTimeout) {
+    public void setMaxSyncWaitTimeout(long maxSyncWaitTimeout) {
         this.maxSyncWaitTimeout = maxSyncWaitTimeout;
     }
 
-    public int getMaxAsyncWaitTimeout() {
+    public long getMaxAsyncWaitTimeout() {
         return maxAsyncWaitTimeout;
     }
 
-    public void setMaxAsyncWaitTimeout(int maxAsyncWaitTimeout) {
+    public void setMaxAsyncWaitTimeout(long maxAsyncWaitTimeout) {
         this.maxAsyncWaitTimeout = maxAsyncWaitTimeout;
     }
 
-    public int getMaxSyncExecuteTimeout() {
+    public long getMaxSyncExecuteTimeout() {
         return maxSyncExecuteTimeout;
     }
 
-    public void setMaxSyncExecuteTimeout(int maxSyncExecuteTimeout) {
+    public void setMaxSyncExecuteTimeout(long maxSyncExecuteTimeout) {
         this.maxSyncExecuteTimeout = maxSyncExecuteTimeout;
     }
 
-    public int getMaxAsyncExecuteTimeout() {
+    public long getMaxAsyncExecuteTimeout() {
         return maxAsyncExecuteTimeout;
     }
 
-    public void setMaxAsyncExecuteTimeout(int maxAsyncExecuteTimeout) {
+    public void setMaxAsyncExecuteTimeout(long maxAsyncExecuteTimeout) {
         this.maxAsyncExecuteTimeout = maxAsyncExecuteTimeout;
     }
 
@@ -191,4 +175,11 @@ public class RcUserService implements Serializable {
         this.uptTime = uptTime;
     }
 
+    public String getAlarmType() {
+        return alarmType;
+    }
+
+    public void setAlarmType(String alarmType) {
+        this.alarmType = alarmType;
+    }
 }

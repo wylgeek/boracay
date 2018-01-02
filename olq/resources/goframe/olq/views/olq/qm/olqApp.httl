@@ -21,11 +21,13 @@ ${extends("/goframe/function_layout.httl")}
                     <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
                 </td>
                 <td style="text-align: center;"><B id="dsDesc"></B></td>
+                <!--
                 <td style="text-align: right;width: 80px;">默认LIMIT数：</td>
                 <td style="text-align: right;width: 80px;">
                 <input name="defaultNum" id="defaultNum"  class="nui-textbox" style="width:99%"
                 value="200" vtype="range:1,10000" required="true"/>
                 </td>
+                -->
             </tr>
         </table>
     </div>
@@ -113,18 +115,17 @@ ${extends("/goframe/function_layout.httl")}
     function refreshGrid(data) {
         intGridColumns({});
         grid1.loading("正在加载，请稍等...");
-        var page = {};
-        page.pageIndex = 0;
-        page.pageSize = nui.get("defaultNum").value;
+        //var page = {};
+        //page.pageIndex = 0;
+        //page.pageSize = nui.get("defaultNum").value;
         var json = nui.encode({
             "appType": "OLQ_APP",
             "appId": appId,
             "type": "sync",
             "entity": "start",
-            "data": data.data,
-            "page":page
+            "data": data.data
+            //"page":page
         });
-
         $.ajax({
             url: "${basePath}/http/inner/consume",
             data: json,
@@ -163,6 +164,7 @@ ${extends("/goframe/function_layout.httl")}
                 intGridColumns(columns);
                 grid1.setData(records);
                 grid1.unmask();
+                nui.alert("加载成功!");
             }
         });
     }

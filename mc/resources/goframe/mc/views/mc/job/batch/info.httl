@@ -6,38 +6,51 @@ ${extends("/goframe/function_layout.httl")}
             <legend><span style="font-weight: bold">详情栏</span></legend>
             <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
                 <tr>
-                    <th class="nui-form-label"><label for="userName">用户名：</label></th>
+                    <th class="nui-form-label"><label for="host">主机：</label></th>
                     <td>
-                        <input id="userName" name="userName" class="nui-textbox" style="width: 97%" readonly="true"/>
+                        <input id="host" name="host" class="nui-textbox" style="width: 97%" readonly="true"/>
                     </td>
-                    <th class="nui-form-label"><label for="serviceName">服务名：</label></th>
+                    <th class="nui-form-label"><label for="modelName">模型名称：</label></th>
                     <td>
-                        <input id="serviceName" name="serviceName" class="nui-textbox" style="width: 97%"
+                        <input id="modelName" name="modelName" class="nui-textbox" style="width: 97%"
                                readonly="true"/>
                     </td>
                 </tr>
                 <tr>
-                    <th class="nui-form-label"><label for="appType">应用类型：</label></th>
+                    <th class="nui-form-label"><label for="percent">进度：</label></th>
                     <td>
-                        <input id="appType" name="appType" class="nui-dictcombobox" valueField="dictId"
-                               textField="dictName" dictTypeId="UDSP_SERVICE_TYPE" style="width:97%" readonly="true"/>
+                        <input id="percent" name="percent" class="nui-textbox" style="width: 97%"
+                               readonly="true"/>
                     </td>
-                    <th class="nui-form-label"><label for="appName">应用名：</label></th>
+                    <th class="nui-form-label"><label for="status">构建状态：</label></th>
                     <td>
-                        <input id="appName" name="appName" class="nui-textbox" style="width: 97%"
+                        <input id="status" name="status" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                               emptyText="全部" dictTypeId="IM_BATCH_JOB_STATUS" showNullItem="true" nullItemText="全部"
+                               style="width:98%;"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="startTime">开始时间：</label></th>
+                    <td>
+                        <input id="startTime" name="startTime" class="nui-textbox" style="width:99%"
+                               readonly="true"/>
+                    </td>
+                    <th class="nui-form-label"><label for="endTime">结束时间：</label></th>
+                    <td>
+                        <input id="endTime" name="endTime" class="nui-textbox" style="width:99%"
                                readonly="true"/>
                     </td>
                 </tr>
                 <tr>
-                    <th class="nui-form-label"><label for="requestType">请求类型：</label></th>
+                    <th class="nui-form-label"><label for="updateTime">更新时间：</label></th>
                     <td>
-                        <input id="requestType" name="requestType" class="nui-dictcombobox" valueField="dictId"
-                               textField="dictName" dictTypeId="UDSP_REQUEST_TYPE" style="width:97%" readonly="true"/>
+                        <input id="updateTime" name="updateTime" class="nui-textbox" style="width:99%"
+                               readonly="true"/>
                     </td>
-                    <th class="nui-form-label"><label for="syncType">异步/同步：</label></th>
+                    <th class="nui-form-label"><label for="interval">耗时：</label></th>
                     <td>
-                        <input id="syncType" name="syncType" class="nui-dictcombobox" valueField="dictId"
-                               textField="dictName" dictTypeId="UDSP_SYNC_TYPE" style="width:97%" readonly="true"/>
+                        <input id="interval" name="interval" class="nui-textbox" style="width:99%"
+                               readonly="true"/>
                     </td>
                 </tr>
                 <tr>
@@ -48,27 +61,10 @@ ${extends("/goframe/function_layout.httl")}
                     </td>
                 </tr>
                 <tr>
-                    <th class="nui-form-label"><label for="startTime">请求开始时间：</label></th>
-                    <td>
-                        <input id="startTime" name="startTime" class="nui-textbox" style="width:99%"
-                               readonly="true"/>
-                    </td>
-                    <th class="nui-form-label"><label for="host">服务器：</label></th>
-                    <td>
-                        <input id="host" name="host" class="nui-textbox" style="width:99%"
-                               readonly="true"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="nui-form-label"><label for="pid">线程ID：</label></th>
-                    <td>
-                        <input id="pid" name="pid" class="nui-textbox" style="width:99%"
-                               readonly="true"/>
-                    </td>
-                    <th class="nui-form-label"><label for="maxCurrentNum">最大并发数：</label></th>
-                    <td>
-                        <input id="maxCurrentNum" name="maxCurrentNum" class="nui-textbox" style="width:99%"
-                               readonly="true"/>
+                    <th class="nui-form-label"><label for="message">消息：</label></th>
+                    <td colspan="3">
+                        <input id="message" name="message" class="nui-textarea"
+                               style="height:80px; width:99%;" readonly="true"/>
                     </td>
                 </tr>
             </table>
@@ -91,12 +87,13 @@ ${extends("/goframe/function_layout.httl")}
         setData();
     });
 
+
     /**
      * 读取详情
      */
     function setData() {
         $.ajax({
-            url: "${basePath}/mc/current/select/${pkId}",
+            url: "${basePath}/im/job/batch/select/${pkId}",
             type: 'POST',
             data: null,
             cache: false,
@@ -106,9 +103,29 @@ ${extends("/goframe/function_layout.httl")}
                     data = result.data;
                     form1.setData(data);
                     form1.setChanged(false);
+                    nui.get("percent").setValue(data.percent + '%');
+                    var startTime = new Date(data.startTime);
+                    var updateTime = new Date(data.updateTime);
+                    nui.get("interval").setValue(renderInterval(updateTime, startTime));
+                    nui.get("status").setEnabled();
                 }
             }
         });
+    }
+
+    function renderInterval(updateTime, startTime) {
+        var interval = "0秒钟";
+        var time = Math.ceil((updateTime.getTime() - startTime.getTime()) / 1000);
+        if (time < 60) {
+            interval = time + "秒钟";
+        } else if (time < 3600) {
+            interval = (time / 60).toFixed(2) + "分钟";
+        } else if (time < 86400) {
+            interval = (time / 3600).toFixed(2) + "小时";
+        } else {
+            interval = (time / 86400).toFixed(2) + "天";
+        }
+        return interval;
     }
 
     /**
@@ -116,6 +133,16 @@ ${extends("/goframe/function_layout.httl")}
      */
     function cancel() {
         CloseWindow("onCancel");
+    }
+
+    /**
+     * 转换构建状态
+     */
+    function onBatchModleRenderer(e){
+        for(var i = 0, l = batchModleRenderer.length; i < l; i ++){
+            var g = batchModleRenderer[i];
+            if(g.value == e.value) return g.name;
+        }
     }
 
 </script>

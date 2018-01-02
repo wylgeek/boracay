@@ -5,13 +5,15 @@ import com.hex.bigdata.udsp.common.constant.Status;
 import com.hex.bigdata.udsp.common.constant.StatusCode;
 import com.hex.bigdata.udsp.common.provider.model.Page;
 import com.hex.bigdata.udsp.common.util.CreateFileUtil;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.FTPClientConfig;
 import com.hex.bigdata.udsp.common.util.FTPHelper;
 import com.hex.bigdata.udsp.model.Response;
-import com.hex.bigdata.udsp.olq.model.OLQQuerySql;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponse;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponseFetch;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponse;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponseFetch;
 import com.hex.bigdata.udsp.olq.service.OlqProviderService;
+import com.hex.bigdata.udsp.olq.utils.OlqCommUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,29 +41,56 @@ public class OlqSyncService {
     /**
      * 同步运行
      *
+     * @param consumeId
      * @param dsId
-     * @param olqQuerySql
+     * @param sql
+     * @param page
      * @return
      */
-    public Response syncStart(String dsId, OLQQuerySql olqQuerySql) {
-        Response response = new Response();
+    public Response syncStart(String consumeId, String dsId, String sql, Page page) {
+        Response response = checkResponseParam(sql);
+        if (response != null) return response;
+
+        response = new Response();
         try {
-            OLQResponse olqResponse = olqProviderService.select(dsId, olqQuerySql);
+            OlqResponse olqResponse = olqProviderService.select(consumeId, dsId, sql, page);
             response.setMessage(olqResponse.getMessage());
             response.setConsumeTime(olqResponse.getConsumeTime());
             response.setStatus(olqResponse.getStatus().getValue());
             response.setStatusCode(olqResponse.getStatusCode().getValue());
             response.setRecords(olqResponse.getRecords());
-            if (olqResponse != null && olqResponse.getColumns() != null) {
-                //返回字段名称及类型
-                response.setReturnColumns(olqResponse.getColumns());
-            }
+            response.setReturnColumns(olqResponse.getColumns());
+            response.setPage(olqResponse.getPage());
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            response.setMessage(ErrorCode.ERROR_000007.getName() +"："+e.getMessage());
+            logger.error(ExceptionUtil.getMessage(e));
+            e.printStackTrace();
+            response.setMessage(ErrorCode.ERROR_000007.getName() + "：" + e.getMessage());
             response.setStatus(Status.DEFEAT.getValue());
             response.setStatusCode(StatusCode.DEFEAT.getValue());
             response.setErrorCode(ErrorCode.ERROR_000007.getValue());
+        }
+        return response;
+    }
+
+    private Response checkResponseParam(String sql) {
+        Response response = null;
+        if (StringUtils.isBlank(sql)) {
+            response = new Response();
+            response.setStatus(Status.DEFEAT.getValue());
+            response.setStatusCode(StatusCode.DEFEAT.getValue());
+            response.setErrorCode(ErrorCode.ERROR_000009.getValue());
+            response.setMessage(ErrorCode.ERROR_000009.getName());
+        }
+        return response;
+    }
+
+    private OlqResponse checkOlqResponseParam(String sql) {
+        OlqResponse response = null;
+        if (StringUtils.isBlank(sql)) {
+            response = new OlqResponse();
+            response.setStatus(Status.DEFEAT);
+            response.setStatusCode(StatusCode.DEFEAT);
+            response.setMessage(ErrorCode.ERROR_000009.getName());
         }
         return response;
     }
@@ -73,12 +102,15 @@ public class OlqSyncService {
      * @param sql
      * @return
      */
-    public OLQResponse asyncStart(String dsId, String sql, String fileName, String userName) {
+    public OlqResponse asyncStart(String consumeId, String dsId, String sql, Page page, String fileName, String userName) {
+        OlqResponse response = checkOlqResponseParam(sql);
+        if (response != null) return response;
+
         Status status = Status.SUCCESS;
         StatusCode statusCode = StatusCode.SUCCESS;
         String message = "成功";
         String filePath = "";
-        OLQResponseFetch responseFetch = olqProviderService.selectFetch(dsId, sql);
+        OlqResponseFetch responseFetch = olqProviderService.selectFetch(consumeId, dsId, sql, page);
         Connection conn = responseFetch.getConnection();
         Statement stmt = responseFetch.getStatement();
         ResultSet rs = responseFetch.getResultSet();
@@ -97,10 +129,14 @@ public class OlqSyncService {
                     ftpHelper.connectFTPServer();
                     ftpHelper.uploadFile(localDataFilePath, dataFileName, ftpFileDir);
                     ftpHelper.uploadFile(localFlgFilePath, flgFileName, ftpFileDir);
+                    //filePath = "ftp://" + FTPClientConfig.getHostname() + ":" + FTPClientConfig.getPort() + ftpFilePath;
+                    filePath = ftpDataFilePath;
+                    message = localDataFilePath;
                 } catch (Exception e) {
                     status = Status.DEFEAT;
                     statusCode = StatusCode.DEFEAT;
-                    message = "FTP上传失败";
+                    message = "FTP上传失败！" + e.getMessage();
+                    e.printStackTrace();
                 } finally {
                     try {
                         ftpHelper.closeFTPClient();
@@ -108,13 +144,11 @@ public class OlqSyncService {
                         e.printStackTrace();
                     }
                 }
-                //filePath = "ftp://" + FTPClientConfig.getHostname() + ":" + FTPClientConfig.getPort() + ftpFilePath;
-                filePath = ftpDataFilePath;
-                message = localDataFilePath;
+
             } else {
                 status = Status.DEFEAT;
                 statusCode = StatusCode.DEFEAT;
-                message = "查询结果集失败";
+                message = response.getMessage();
             }
         } catch (Exception e) {
             status = Status.DEFEAT;
@@ -142,9 +176,10 @@ public class OlqSyncService {
                     e.printStackTrace();
                 }
             }
+            OlqCommUtil.removeStatement(consumeId);
         }
 
-        OLQResponse response = new OLQResponse();
+        response = new OlqResponse();
         response.setFilePath(filePath);
         response.setMessage(message);
         response.setStatus(status);

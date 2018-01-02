@@ -77,8 +77,10 @@
   <select id="selectModelUpdateKeys" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT IMC.PK_ID, IMC.MD_ID, IMC.SEQ, IMC.NAME, IMC.DESCRIBE, IMC.TYPE, IMC.LENGTH, IMC.NOTE, IMC.INDEXED, IMC.PRIMARY, IMC.STORED
     FROM IM_METADATA_COLUMN IMC
-    LEFT JOIN IM_MODEL_UPDATE_KEY IMUK ON IMUK.COL_ID = IMC.PK_ID
+    LEFT JOIN IM_MODEL_UPDATE_KEY IMUK
+    ON IMUK.COL_ID = IMC.PK_ID
     WHERE IMUK.MODEL_ID = #{MODELID}
+    order by IMC.SEQ asc
   </select>
 
   <select id="selectByNameAndMdId" resultMap="BaseResultMap">
@@ -86,5 +88,14 @@
     FROM IM_METADATA_COLUMN IMC
     WHERE IMC.NAME = #{name}
     AND IMC.MD_ID = #{mdId}
+  </select>
+
+  <select id="getImMMappingTargetCols" resultMap="BaseResultMap">
+    SELECT IMC.PK_ID, IMC.MD_ID, IMM.SEQ, IMC.NAME, IMC.DESCRIBE, IMC.TYPE, IMC.LENGTH, IMC.NOTE, IMC.INDEXED, IMC.PRIMARY, IMC.STORED
+    FROM IM_METADATA_COLUMN IMC
+    left join IM_MODEL_MAPPING IMM
+    on IMM.COL_ID = IMC.PK_ID
+    WHERE IMM.MODEL_ID = #{mid}
+    ORDER by IMM.SEQ asc
   </select>
 </mapper>

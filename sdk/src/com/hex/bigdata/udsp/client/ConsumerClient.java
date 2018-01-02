@@ -113,39 +113,41 @@ public abstract class ConsumerClient {
     /**
      * StatusResponse类型转换为StatusPackageResponse类型
      */
-    protected StatusPackResponse transStatusResponse(StatusResponse statusResponse){
-        if (statusResponse == null){
+    protected StatusPackResponse transStatusResponse(StatusResponse statusResponse) {
+        if (statusResponse == null) {
             return null;
         }
         StatusPackResponse packageResponse = new StatusPackResponse();
         packageResponse.setStatus(statusResponse.getStatus());
+        packageResponse.setStatusCode(EnumTrans.transStatusCode(statusResponse.getStatusCode()));
         packageResponse.setConsumeId(statusResponse.getConsumeId());
         packageResponse.setConsumeTime(statusResponse.getConsumeTime());
         packageResponse.setMessage(statusResponse.getMessage());
-        packageResponse.setStatusCode(EnumTrans.transStatusCode(statusResponse.getStatusCode()));
+        packageResponse.setErrorCode(EnumTrans.transErrorCode(statusResponse.getErrorCode()));
         return packageResponse;
     }
 
     /**
      * SyncResponse类型转换为SyncPackResponse类型
      */
-    protected SyncPackResponse transSyncPackResponse(SyncResponse syncResponse){
-        if (syncResponse == null){
+    protected SyncPackResponse transSyncPackResponse(SyncResponse syncResponse) {
+        if (syncResponse == null) {
             return null;
         }
         SyncPackResponse syncPackResponse = new SyncPackResponse();
         syncPackResponse.setStatus(syncResponse.getStatus());
+        syncPackResponse.setStatusCode(EnumTrans.transStatusCode(syncResponse.getStatusCode()));
         syncPackResponse.setConsumeId(syncResponse.getConsumeId());
         syncPackResponse.setConsumeTime(syncResponse.getConsumeTime());
         syncPackResponse.setMessage(syncResponse.getMessage());
         syncPackResponse.setErrorCode(EnumTrans.transErrorCode(syncResponse.getErrorCode()));
-        if (syncResponse.getPage()!=null){
+        if (syncResponse.getPage() != null) {
             syncPackResponse.setPage(syncResponse.getPage());
         }
-        if (syncResponse.getReturnColumns()!=null){
+        if (syncResponse.getReturnColumns() != null) {
             syncPackResponse.setReturnColumns(syncResponse.getReturnColumns());
         }
-        if (syncResponse.getRecords()!=null){
+        if (syncResponse.getRecords() != null) {
             syncPackResponse.setRecords(syncResponse.getRecords());
         }
         return syncPackResponse;
@@ -154,12 +156,13 @@ public abstract class ConsumerClient {
     /**
      * AsyncResponse类型转换为AsyncPackResponse类型
      */
-    protected AsyncPackResponse transAsyncPackResponse(AsyncResponse asyncResponse){
-        if (asyncResponse == null){
+    protected AsyncPackResponse transAsyncPackResponse(AsyncResponse asyncResponse) {
+        if (asyncResponse == null) {
             return null;
         }
         AsyncPackResponse asyncPackResponse = new AsyncPackResponse();
         asyncPackResponse.setStatus(asyncResponse.getStatus());
+        asyncPackResponse.setStatusCode(EnumTrans.transStatusCode(asyncResponse.getStatusCode()));
         asyncPackResponse.setConsumeId(asyncResponse.getConsumeId());
         asyncPackResponse.setConsumeTime(asyncResponse.getConsumeTime());
         asyncPackResponse.setMessage(asyncResponse.getMessage());

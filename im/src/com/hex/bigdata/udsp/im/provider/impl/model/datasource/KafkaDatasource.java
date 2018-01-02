@@ -1,7 +1,5 @@
 package com.hex.bigdata.udsp.im.provider.impl.model.datasource;
 
-import com.hex.bigdata.udsp.common.model.ComDatasource;
-import com.hex.bigdata.udsp.common.model.ComProperties;
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.provider.model.Property;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +11,6 @@ import java.util.Map;
  * Created by JunjieM on 2017-9-5.
  */
 public class KafkaDatasource extends Datasource {
-
     public KafkaDatasource(List<Property> properties) {
         super(properties);
     }
@@ -22,8 +19,8 @@ public class KafkaDatasource extends Datasource {
         super(propertieMap);
     }
 
-    public KafkaDatasource(ComDatasource comDatasource, List<ComProperties> comPropertieList) {
-        super(comDatasource, comPropertieList);
+    public KafkaDatasource(Datasource datasource) {
+        super(datasource);
     }
 
     public int getThreadNum() {
@@ -53,9 +50,9 @@ public class KafkaDatasource extends Datasource {
         return getProperty("zookeeper.sync.time.ms").getValue();
     }
 
-//    public String getConsumerTimeoutMs() {
-//        return getProperty("consumer.timeout.ms").getValue();
-//    }
+    public String getConsumerTimeoutMs() {
+        return getProperty("consumer.timeout.ms").getValue();
+    }
 
     public String getAutoCommitEnable() {
         return getProperty("auto.commit.enable").getValue();
@@ -77,9 +74,9 @@ public class KafkaDatasource extends Datasource {
         return getProperty("rebalance.backoff.ms").getValue();
     }
 
-//    public String getGroupId() {
-//        return getProperty("group.id").getValue();
-//    }
+    public String getGroupId() {
+        return getProperty("group.id").getValue();
+    }
 
     public String getSerializerClass() {
         String value = getProperty("serializer.class").getValue();

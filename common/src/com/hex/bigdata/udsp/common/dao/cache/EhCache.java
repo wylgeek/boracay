@@ -69,11 +69,11 @@ public class EhCache<T> implements Cache<T> {
     }
 
     public boolean insertCache(String key, T t) {
-        return insert(key, t);
+        return insert(key, cloneObj(t));
     }
 
     public boolean updateCache(String key, T t) {
-        return update(key, t);
+        return update(key, cloneObj((T) t));
     }
 
     public boolean deleteCache(String key) {
@@ -88,12 +88,12 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public boolean insertListCache(String key, List<T> list) {
-        return insert(key, list);
+        return insert(key, cloneList(list));
     }
 
     @Override
     public boolean updateListCache(String key, List<T> list) {
-        return update(key, list);
+        return update(key, cloneList((List<T>) list));
     }
 
     @Override
@@ -148,7 +148,7 @@ public class EhCache<T> implements Cache<T> {
     @Override
     public boolean insertTimeoutCache(String key, T t, long timeout) {
         synchronized (key.intern()) {
-            Element element = new Element(key, t);
+            Element element = new Element(key, cloneObj(t));
             element.setTimeToIdle((int) timeout / 1000);
             if (StringUtils.isNotBlank(key) && t != null) {
                 cacheManager.getCache(UDSP_EHCACHE_NAME).put(element);
@@ -167,8 +167,20 @@ public class EhCache<T> implements Cache<T> {
         T t = null;
         if (obj != null) {
             try {
-                t = (T) obj.getClass().newInstance();
-                ObjectUtil.copyObject(obj, t);
+                if (obj instanceof Integer) {
+                    t = (T) new Integer((Integer) obj);
+                } else if (obj instanceof Long) {
+                    t = (T) new Long((Long) obj);
+                } else if (obj instanceof Short) {
+                    t = (T) new Short((Short) obj);
+                } else if (obj instanceof Double) {
+                    t = (T) new Double((Double) obj);
+                } else if (obj instanceof Float) {
+                    t = (T) new Float((Float) obj);
+                } else {
+                    t = (T) obj.getClass().newInstance();
+                    ObjectUtil.copyObject(obj, t);
+                }
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
