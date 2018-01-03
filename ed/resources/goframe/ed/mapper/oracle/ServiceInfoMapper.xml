@@ -40,7 +40,7 @@
         <if test="endTime != null and endTime != ''">and i.CRT_TIME &lt;= to_date(#{endTime},'yyyy-mm-dd')</if>
     </select>
 
-    <select id="selectByServiceName" resultMap="BaseResultMap" parameterType="java.lang.String">
+    <select id="getServiceInfoByServiceName" resultMap="BaseResultMap" parameterType="java.lang.String">
         SELECT i.PK_ID, i.SERVICE_NAME, i.SERVICE_CN_NAME, i.VALID_TIME, i.REQ_URL, i.SERVICE_DESC, i.SERVICE_TYPE,
         i.SERVICE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
         FROM EDAP_SERVICE_INFO i

@@ -28,8 +28,8 @@ public class ServiceInfoMapper extends BaseMapper {
         return list;
     }
 
-    public ServiceInfo selectByServiceName(String serviceName) {
-        return this.sqlSessionTemplate.selectOne("com.hex.bigdata.udsp.ed.dao.ServiceInfoMapper.selectByServiceName",
+    public ServiceInfo getServiceInfoByServiceName(String serviceName) {
+        return this.sqlSessionTemplate.selectOne("com.hex.bigdata.udsp.ed.dao.ServiceInfoMapper.getServiceInfoByServiceName",
                 serviceName);
     }
 
