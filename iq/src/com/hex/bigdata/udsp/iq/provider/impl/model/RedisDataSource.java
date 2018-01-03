@@ -10,12 +10,12 @@ import java.util.Map;
 /**
  * Created by PC on 2017/6/28.
  */
-public class RedisDatasource extends Datasource {
-    public RedisDatasource(List<Property> properties) {
+public class RedisDataSource extends Datasource {
+    public RedisDataSource(List<Property> properties) {
         super(properties);
     }
 
-    public RedisDatasource(Map<String, Property> propertieMap) {
+    public RedisDataSource(Map<String, Property> propertieMap) {
         super(propertieMap);
     }
 

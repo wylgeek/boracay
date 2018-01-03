@@ -7,7 +7,7 @@ import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.iq.provider.Provider;
 import com.hex.bigdata.udsp.iq.provider.impl.factory.RedisConnectionPoolFactory;
-import com.hex.bigdata.udsp.iq.provider.impl.model.RedisDatasource;
+import com.hex.bigdata.udsp.iq.provider.impl.model.RedisDataSource;
 import com.hex.bigdata.udsp.iq.provider.model.*;
 import com.hex.bigdata.udsp.iq.util.IqCommonUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -88,7 +88,7 @@ public class RedisProvider implements Provider {
         Datasource datasource = metadata.getDatasource();
         //获取元数据返回字段
         List<DataColumn> metaReturnColumns = metadata.getReturnColumns();
-        RedisDatasource redisDatasource = new RedisDatasource(datasource.getPropertyMap());
+        RedisDataSource redisDatasource = new RedisDataSource(datasource.getPropertyMap());
         String tableName = metadata.getTbName();
         String query = getRedisQuery(metadata.getQueryColumns(), queryColumns, tableName);
         String fqSep = redisDatasource.getSeprator();
@@ -148,7 +148,7 @@ public class RedisProvider implements Provider {
 
     //-------------------------------------------分割线---------------------------------------------
 
-    private synchronized RedisConnectionPoolFactory getDataSource(RedisDatasource datasource) {
+    private synchronized RedisConnectionPoolFactory getDataSource(RedisDataSource datasource) {
         String dsId = datasource.getId();
         if (dataSourcePool == null) {
             dataSourcePool = new HashMap<String, RedisConnectionPoolFactory>();
@@ -161,7 +161,7 @@ public class RedisProvider implements Provider {
         return factory;
     }
 
-    private Jedis getConnection(RedisDatasource datasource) {
+    private Jedis getConnection(RedisDataSource datasource) {
         try {
             return getDataSource(datasource).getConnection();
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class RedisProvider implements Provider {
     }
 
 
-    private List<Map<String, String>> search(String fqSep, String queryString, RedisDatasource datasource, List<DataColumn> returnColumns, int startRow, int endRow, int maxNum) {
+    private List<Map<String, String>> search(String fqSep, String queryString, RedisDataSource datasource, List<DataColumn> returnColumns, int startRow, int endRow, int maxNum) {
         RedisConnectionPoolFactory redisConnectionPoolFactory = getDataSource(datasource);
         Jedis jedis = redisConnectionPoolFactory.getConnection();
 
@@ -206,7 +206,7 @@ public class RedisProvider implements Provider {
     }
 
 
-    private int getCountNum(String queryString, RedisDatasource datasource) {
+    private int getCountNum(String queryString, RedisDataSource datasource) {
         RedisConnectionPoolFactory redisConnectionPoolFactory = getDataSource(datasource);
         Jedis jedis = redisConnectionPoolFactory.getConnection();
         //获取模糊匹配的key
@@ -221,7 +221,7 @@ public class RedisProvider implements Provider {
     }
 
 
-    private List<Map<String, String>> search(String fqSep, String queryString, RedisDatasource datasource, List<DataColumn> returnColumns, int maxNum) {
+    private List<Map<String, String>> search(String fqSep, String queryString, RedisDataSource datasource, List<DataColumn> returnColumns, int maxNum) {
         RedisConnectionPoolFactory redisConnectionPoolFactory = getDataSource(datasource);
         Jedis jedis = redisConnectionPoolFactory.getConnection();
 
@@ -261,7 +261,7 @@ public class RedisProvider implements Provider {
     public boolean testDatasource(Datasource datasource) {
         boolean canConnection = false;
         Jedis jedis = null;
-        RedisDatasource redisDatasource = new RedisDatasource(datasource.getPropertyMap());
+        RedisDataSource redisDatasource = new RedisDataSource(datasource.getPropertyMap());
         try {
             jedis = getConnection(redisDatasource);
             canConnection = jedis.isConnected();
