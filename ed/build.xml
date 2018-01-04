@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<project default="jar" basedir="." name="udsp.olq">
+<project default="jar" basedir="." name="udsp.ed">
     <!-- 设置属性 -->
-    <property name="project.name" value="udsp.olq"/>
+    <property name="project.name" value="udsp.ed"/>
     <property name="project.version" value="3.0.1"/>
     <property name="company.name" value="HexInfo"/>
 
     <!-- 工程名称 -->
     <property name="prj.root" value="./"/>
     <property name="lib" value="../lib"/>
-    <property name="jar.dir" value="../../lib/olq"/>
+    <property name="jar.dir" value="../../lib/ed"/>
 
     <property name="build.bin" value="${prj.root}/bin"/>
 
@@ -17,7 +17,7 @@
     <taskdef name="mybatisGenerator" classname="org.mybatis.generator.ant.GeneratorAntTask" classpath="${lib}/tools/mybatis-generator-core-1.3.2.jar"/>
 
     <target name="mybatisGeneratorMysql">
-        <mybatisGenerator configfile="${prj.root}/resources/goframe/olq/mapper/generator.oracle.config.xml" overwrite="true"  >
+        <mybatisGenerator configfile="${prj.root}/resources/goframe/ed/mapper/generator.oracle.config.xml" overwrite="true"  >
         </mybatisGenerator>
     </target>
 
