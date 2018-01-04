@@ -100,7 +100,7 @@ ${extends("/goframe/function_layout.httl")}
         var json = nui.encode(data);
         var messageBox = nui.loading("保存中...","提示");
         $.ajax({
-            url:"${basePath}/serviceInfo/addServiceInfo",
+            url:"${basePath}/interfaceInfo/addServiceInfo",
             type:'POST',
             data:json,
             cache:false,
@@ -127,7 +127,7 @@ ${extends("/goframe/function_layout.httl")}
     /*验证服务编码是否存在*/
     function onServiceNameChanged(e) {
         $.ajax({
-            url:"${basePath}/serviceInfo/getServiceInfoByServiceName?serviceName="+e.value,
+            url:"${basePath}/interfaceInfo/getServiceInfoByServiceName?serviceName="+e.value,
             type:'GET',
             cache:false,
             contentType:'application/json',
@@ -144,7 +144,7 @@ ${extends("/goframe/function_layout.httl")}
 
     function onButtonEdit() {
         nui.open({
-            url:"${basePath}/goframe/p/ed.serviceInfo.validTime",
+            url:"${basePath}/goframe/p/ed.interfaceInfo.validTime",
             title:"缓存时间选择",
             width:450,
             height:400,

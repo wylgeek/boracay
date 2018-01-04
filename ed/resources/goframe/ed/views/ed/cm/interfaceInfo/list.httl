@@ -68,7 +68,7 @@ ${extends("/goframe/function_layout.httl")}
 </div>
 <div class="nui-fit">
     <div id="datagrid1" class="nui-datagrid" style="width:100%;height:100%;" idField="pkId"
-         url="${basePath}/serviceInfo/getServiceInfoList" onrowdblclick="detail"
+         url="${basePath}/interfaceInfo/getServiceInfoList" onrowdblclick="detail"
          sizeList=[5,10,20,50,100] multiSelect="true" pageSize="20" onselectionchanged="selectionChanged">
         <div property="columns">
             <div type="checkcolumn"></div>
@@ -112,7 +112,7 @@ ${extends("/goframe/function_layout.httl")}
     /*增加服务信息*/
     function add() {
         nui.open({
-            url:"${basePath}/goframe/p/ed.serviceInfo.addServiceInfo",
+            url:"${basePath}/goframe/p/ed.interfaceInfo.addServiceInfo",
             title:"新增服务",
             width:600,
             height:420,
@@ -132,7 +132,7 @@ ${extends("/goframe/function_layout.httl")}
         var row = grid.getSelected();
         if(row != null || row != ''){
             nui.open({
-                url:"${basePath}/goframe/p/ed.serviceInfo.updateServiceInfo",
+                url:"${basePath}/goframe/p/ed.interfaceInfo.updateServiceInfo",
                 title:"编辑服务",
                 width:600,
                 height:420,
@@ -156,7 +156,7 @@ ${extends("/goframe/function_layout.httl")}
         var row = grid.getSelected();
         if(row!=null){
             nui.open({
-                url:"${basePath}/goframe/p/ed.serviceInfo.ServiceInfoDetail",
+                url:"${basePath}/goframe/p/ed.interfaceInfo.ServiceInfoDetail",
                 title:"服务详情",
                 width:600,
                 height:420,
@@ -179,7 +179,7 @@ ${extends("/goframe/function_layout.httl")}
                 var json = nui.encode(rows);
                 var messageBox = nui.loading("正在删除中，请稍后...","提示");
                 $.ajax({
-                    url:"${basePath}/serviceInfo/deleteServiceInfo",
+                    url:"${basePath}/interfaceInfo/deleteServiceInfo",
                     type:'POST',
                     data:json,
                     cache:false,

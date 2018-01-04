@@ -1,11 +1,10 @@
 package com.hex.bigdata.udsp.ed.controller;
 
-import com.hex.bigdata.udsp.ed.dto.ServiceInfoDto;
-import com.hex.bigdata.udsp.ed.model.ServiceInfo;
-import com.hex.bigdata.udsp.ed.service.ServiceInfoService;
+import com.hex.bigdata.udsp.ed.dto.InterfaceInfoDto;
+import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
+import com.hex.bigdata.udsp.ed.service.InterfaceInfoService;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
-import io.netty.util.internal.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,22 +24,22 @@ import java.util.Map;
  * Time:16:49
  */
 @Controller
-@RequestMapping("/serviceInfo")
-public class ServiceInfoController {
-    private static Logger logger = LoggerFactory.getLogger(ServiceInfoController.class);
+@RequestMapping("/interfaceInfo")
+public class InterfaceInfoController {
+    private static Logger logger = LoggerFactory.getLogger(InterfaceInfoController.class);
 
     @Autowired
-    private ServiceInfoService serviceInfoService;
+    private InterfaceInfoService interfaceInfoService;
 
-    @RequestMapping("/getServiceInfoByPkId")
+    @RequestMapping("/getInterfaceInfoByPkId")
     @ResponseBody
-    public MessageResult getServiceInfoByPkId(String pkId) {
+    public MessageResult getInterfaceInfoByPkId(String pkId) {
         try{
             if(StringUtils.isBlank(pkId)){
                 return new MessageResult(false,"参数为空！");
             }
-            ServiceInfo serviceInfo = serviceInfoService.getServiceInfoByPkId(pkId);
-            return new MessageResult(true,serviceInfo);
+            InterfaceInfo interfaceInfo = interfaceInfoService.getInterfaceInfoByPkId(pkId);
+            return new MessageResult(true, interfaceInfo);
         } catch (Exception e){
             logger.info("服务请求异常{}",this.getClass().getName());
             e.printStackTrace();
@@ -48,13 +47,13 @@ public class ServiceInfoController {
         }
     }
 
-    @RequestMapping("/getServiceInfoList")
+    @RequestMapping("/getInterfaceInfoList")
     @ResponseBody
-    public Map getServiceInfoList(ServiceInfoDto serviceInfoDto, Page page) {
+    public Map getInterfaceInfoList(InterfaceInfoDto interfaceInfoDto, Page page) {
         try {
-            List<ServiceInfo> serviceInfos = serviceInfoService.getServiceInfoList(serviceInfoDto, page);
+            List<InterfaceInfo> interfaceInfos = interfaceInfoService.getInterfaceInfoList(interfaceInfoDto,page);
             HashMap map = new HashMap();
-            map.put("data", serviceInfos);
+            map.put("data", interfaceInfos);
             map.put("total", Integer.valueOf(page.getTotalCount()));
             return map;
         } catch (Exception e) {
@@ -64,15 +63,15 @@ public class ServiceInfoController {
         }
     }
 
-    @RequestMapping("/addServiceInfo")
+    @RequestMapping("/addInterfaceInfo")
     @ResponseBody
-    public MessageResult addServiceInfo(@RequestBody ServiceInfo serviceInfo) {
+    public MessageResult addInterfaceInfo(@RequestBody InterfaceInfo interfaceInfo) {
         try {
-            if (serviceInfo == null || StringUtils.isBlank(serviceInfo.getServiceName())) {
+            if (interfaceInfo == null || StringUtils.isBlank(interfaceInfo.getInterfaceCode())) {
                 return new MessageResult(false, "参数为空1");
             }
 
-            return serviceInfoService.addServiceInfo(serviceInfo);
+            return interfaceInfoService.addInterfaceInfo(interfaceInfo);
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
@@ -80,19 +79,19 @@ public class ServiceInfoController {
         }
     }
 
-    @RequestMapping("/getServiceInfoByServiceName")
+    @RequestMapping("/getInterfaceInfoByInterfaceCode")
     @ResponseBody
-    public MessageResult getServiceInfoByServiceName(String serviceName) {
+    public MessageResult getInterfaceInfoByInterfaceCode(String interfaceCode) {
         try {
-            if (StringUtils.isBlank(serviceName)) {
+            if (StringUtils.isBlank(interfaceCode)) {
                 return new MessageResult(false, "参数为空！");
             }
-            ServiceInfo serviceInfo = serviceInfoService.getServiceInfoByServiceName(serviceName);
+            InterfaceInfo interfaceInfo = interfaceInfoService.getInterfaceInfoByInterfaceCode(interfaceCode);
 
-            if (serviceInfo == null) {
+            if (interfaceInfo == null) {
                 return new MessageResult(false, "请求的数据不存在！");
             }
-            return new MessageResult(true, serviceInfo);
+            return new MessageResult(true, interfaceInfo);
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
@@ -100,14 +99,14 @@ public class ServiceInfoController {
         }
     }
 
-    @RequestMapping("/updateServiceInfoByPkId")
+    @RequestMapping("/updateInterfaceInfoByPkId")
     @ResponseBody
-    public MessageResult updateServiceInfoByPkId(@RequestBody ServiceInfo serviceInfo) {
+    public MessageResult updateInterfaceInfoByPkId(@RequestBody InterfaceInfo interfaceInfo) {
         try {
-            if (serviceInfo == null || StringUtils.isBlank(serviceInfo.getPkId())) {
+            if (interfaceInfo == null || StringUtils.isBlank(interfaceInfo.getPkId())) {
                 return new MessageResult(false, "参数为空！");
             }
-            return serviceInfoService.updateServiceInfoByPkId(serviceInfo);
+            return interfaceInfoService.updateInterfaceInfoByPkId(interfaceInfo);
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
@@ -115,14 +114,14 @@ public class ServiceInfoController {
         }
     }
 
-    @RequestMapping("/deleteServiceInfo")
+    @RequestMapping("/deleteInterfaceInfo")
     @ResponseBody
-    public MessageResult deleteServiceInfo(@RequestBody ServiceInfo[] serviceInfos) {
+    public MessageResult deleteInterfaceInfo(@RequestBody InterfaceInfo[] interfaceInfos) {
         try{
-            if(serviceInfos.length <= 0){
+            if(interfaceInfos.length <= 0){
                 return new MessageResult(false,"参数为空！");
             }
-            return serviceInfoService.deleteServiceInfo(serviceInfos);
+            return interfaceInfoService.deleteInterfaceInfo(interfaceInfos);
         } catch (Exception e){
             logger.info("服务请求异常{}",this.getClass().getName());
             e.printStackTrace();
