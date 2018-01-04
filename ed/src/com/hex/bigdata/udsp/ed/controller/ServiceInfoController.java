@@ -102,7 +102,7 @@ public class ServiceInfoController {
 
     @RequestMapping("/updateServiceInfoByPkId")
     @ResponseBody
-    public MessageResult updateServiceInfoByPkId(ServiceInfo serviceInfo) {
+    public MessageResult updateServiceInfoByPkId(@RequestBody ServiceInfo serviceInfo) {
         try {
             if (serviceInfo == null || StringUtils.isBlank(serviceInfo.getPkId())) {
                 return new MessageResult(false, "参数为空！");
@@ -115,7 +115,9 @@ public class ServiceInfoController {
         }
     }
 
-    public MessageResult deleteServiceInfo(ServiceInfo[] serviceInfos) {
+    @RequestMapping("/deleteServiceInfo")
+    @ResponseBody
+    public MessageResult deleteServiceInfo(@RequestBody ServiceInfo[] serviceInfos) {
         try{
             if(serviceInfos.length <= 0){
                 return new MessageResult(false,"参数为空！");

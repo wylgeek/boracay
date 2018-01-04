@@ -21,7 +21,7 @@
         SELECT i.PK_ID, i.SERVICE_NAME, i.SERVICE_CN_NAME, i.VALID_TIME, i.REQ_URL, i.SERVICE_DESC, i.SERVICE_TYPE,
         i.SERVICE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
         FROM EDAP_SERVICE_INFO i
-        WHERE PK_ID = {pkId,jdbcType="VARCHAR"} and IS_DEL = '0'
+        WHERE PK_ID = #{pkId,jdbcType=VARCHAR} and IS_DEL = '0'
     </select>
 
     <select id="getServiceInfoList" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.ed.dto.ServiceInfoDto">
@@ -44,7 +44,7 @@
         SELECT i.PK_ID, i.SERVICE_NAME, i.SERVICE_CN_NAME, i.VALID_TIME, i.REQ_URL, i.SERVICE_DESC, i.SERVICE_TYPE,
         i.SERVICE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
         FROM EDAP_SERVICE_INFO i
-        WHERE SERVICE_NAME = {serviceName,jdbcType="VARCHAR"} and IS_DEL = '0'
+        WHERE SERVICE_NAME = #{serviceName,jdbcType=VARCHAR} and IS_DEL = '0'
     </select>
 
     <insert id="addServiceInfo" parameterType="com.hex.bigdata.udsp.ed.model.ServiceInfo">
@@ -52,31 +52,32 @@
         (PK_ID, SERVICE_NAME, SERVICE_CN_NAME, VALID_TIME, REQ_URL, SERVICE_DESC, SERVICE_TYPE,
         SERVICE_COMPANY, CRT_USER, CRT_TIME)
         VALUES
-        (#{pkId,jdbcType="VARCHAR"},#{serviceName,jdbcType="VARCHAR"},#{serviceCnName,jdbcType="VARCHAR"},#{validTime,jdbcType="INTEGER"},
-        #{reqUrl,jdbcType="VARCHAR"},#{serviceDesc,jdbcType="VARCHAR"},#{serviceType,jdbcType="VARCHAR"}
-        #{serviceCompany,jdbcType="VARCHAR"},#{crtUser,jdbcType="VARCHAR"},#{crtTime,jdbcType="TIMESTAMP"})
+        (#{pkId,jdbcType=VARCHAR},#{serviceName,jdbcType=VARCHAR},#{serviceCnName,jdbcType=VARCHAR},#{validTime,jdbcType=INTEGER},
+        #{reqUrl,jdbcType=VARCHAR},#{serviceDesc,jdbcType=VARCHAR},#{serviceType,jdbcType=VARCHAR},
+        #{serviceCompany,jdbcType=VARCHAR},#{crtUser,jdbcType=VARCHAR},#{crtTime,jdbcType=TIMESTAMP})
     </insert>
 
     <update id="updateServiceInfoByPkId" parameterType="com.hex.bigdata.udsp.ed.model.ServiceInfo">
         UPDATE EDAP_SERVICE_INFO
         SET
-        SERVICE_TYPE = #{serviceType,jdbcType="VARCHAR"},
-        SERVICE_COMPANY = #{serviceCompany,jdbcType="VARCHAR"},
-        SERVICE_NAME = #{serviceName,jdbcType="VARCHAR"},
-        SERVICE_CN_NAME = #{serviceCnName,jdbcType="VARCHAR"},
-        VALID_TIME = #{validTime,jdbcType="INTEGER"},
-        REQ_URL = #{reqUrl,jdbcType="VARCHAR"},
+        SERVICE_TYPE = #{serviceType,jdbcType=VARCHAR},
+        SERVICE_COMPANY = #{serviceCompany,jdbcType=VARCHAR},
+        SERVICE_NAME = #{serviceName,jdbcType=VARCHAR},
+        SERVICE_CN_NAME = #{serviceCnName,jdbcType=VARCHAR},
+        VALID_TIME = #{validTime,jdbcType=INTEGER},
+        REQ_URL = #{reqUrl,jdbcType=VARCHAR},
         <if test="serviceDesc != null and serviceDesc != ''">
-            SERVICE_DESC = #{serviceDesc,jdbcType="VARCHAR"},
+            SERVICE_DESC = #{serviceDesc,jdbcType=VARCHAR},
         </if>
-        UPDATE_USER = #{updateUser,jdbcType="VARCHAR"},
-        UPDATE_TIME = #{updateTime,jdbcType="TIMESTAMP"},
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where PK_ID = #{pkId,jdbcType=VARCHAR}
     </update>
     
     <update id="deleteServiceInfo" parameterType="java.lang.String">
         UPDATE EDAP_SERVICE_INFO
         SET
         IS_DEL = '1'
-        WHERE PK_ID = {pkId,jdbcType="VARCHAR"}
+        WHERE PK_ID = #{pkId,jdbcType=VARCHAR}
     </update>
 </mapper>

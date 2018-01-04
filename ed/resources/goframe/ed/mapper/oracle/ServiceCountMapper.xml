@@ -15,16 +15,16 @@
     <resultMap id="BaseResultMapExtends" type="com.hex.bigdata.udsp.ed.dto.ServiceCountDto" extends="BaseResultMap">
         <result column="REQ_URL" property="reqUrl" jdbcType="VARCHAR" />
         <result column="SERVICE_DESC" property="serviceDesc" jdbcType="VARCHAR" />
-        <result column="VALID_TIME" property="validTime" jdbcType="VARCHAR" />
+        <result column="VALID_TIME" property="validTime" jdbcType="INTEGER" />
     </resultMap>
 
     <insert id="addServiceCount" parameterType="com.hex.bigdata.udsp.ed.model.ServiceCount">
         INSERT INTO EDAP_SERVICE_COUNT
         (PK_ID, SERVICE_INFO_ID, SERVICE_NAME, SERVICE_CN_NAME, SERVICE_TYPE, SERVICE_COMPANY, REQUEST_USER, REQUEST_TIME)
         VALUES
-        (#{pkId,jdbcType="VARCHAR"},#{serviceInfoId,jdbcType="VARCHAR"},#{serviceName,jdbcType="VARCHAR"},
-        #{serviceCnName,jdbcType="VARCHAR"},#{serviceType,jdbcType="VARCHAR"},#{serviceCompany,jdbcType="VARCHAR"},
-        #{requestUser,jdbcType="VARCHAR"},#{requestTime,jdbcType="TIMESTAMP"})
+        (#{pkId,jdbcType=VARCHAR},#{serviceInfoId,jdbcType=VARCHAR},#{serviceName,jdbcType=VARCHAR},
+        #{serviceCnName,jdbcType=VARCHAR},#{serviceType,jdbcType=VARCHAR},#{serviceCompany,jdbcType=VARCHAR},
+        #{requestUser,jdbcType=VARCHAR},#{requestTime,jdbcType=TIMESTAMP})
     </insert>
     <select id="getServiceCountList" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.ed.dto.ServiceCountDto">
         SELECT c.PK_ID, c.SERVICE_INFO_ID, c.SERVICE_NAME, c.SERVICE_CN_NAME, c.SERVICE_TYPE, c.SERVICE_COMPANY,
