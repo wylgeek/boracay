@@ -8,5 +8,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="common" level="project" />
+    <orderEntry type="library" name="goframe" level="project" />
+    <orderEntry type="library" name="hbase" level="project" />
+    <orderEntry type="library" name="jdbc" level="project" />
+    <orderEntry type="library" name="mybatis" level="project" />
+    <orderEntry type="library" name="spring" level="project" />
+    <orderEntry type="library" name="tools" level="project" />
+    <orderEntry type="module" module-name="common" />
   </component>
 </module>

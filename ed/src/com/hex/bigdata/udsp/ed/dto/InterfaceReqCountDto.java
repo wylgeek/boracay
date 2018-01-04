@@ -1,17 +1,13 @@
 package com.hex.bigdata.udsp.ed.dto;
 
-import com.hex.bigdata.udsp.ed.model.ServiceCount;
+import com.hex.bigdata.udsp.ed.model.InterfaceReqCount;
 
-/**
- * Created by jc.zhao
- * Date:2018/1/3
- * Time:11:32
- */
-public class ServiceCountDto extends ServiceCount {
+public class InterfaceReqCountDto extends InterfaceReqCount {
+
     private String startTime;
     private String endTime;
     private String reqUrl;
-    private String serviceDesc;
+    private String interfaceDesc;
     private long validTime;
     private String count;
     private String intervalTime;
@@ -40,12 +36,12 @@ public class ServiceCountDto extends ServiceCount {
         this.reqUrl = reqUrl;
     }
 
-    public String getServiceDesc() {
-        return serviceDesc;
+    public String getInterfaceDesc() {
+        return interfaceDesc;
     }
 
-    public void setServiceDesc(String serviceDesc) {
-        this.serviceDesc = serviceDesc;
+    public void setInterfaceDesc(String interfaceDesc) {
+        this.interfaceDesc = interfaceDesc;
     }
 
     public long getValidTime() {
