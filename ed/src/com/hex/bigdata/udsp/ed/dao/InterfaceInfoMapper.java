@@ -47,4 +47,9 @@ public class InterfaceInfoMapper extends BaseMapper {
         return this.sqlSessionTemplate.update("com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper.deleteInterfaceInfo",
                 pkId);
     }
+
+    public List<InterfaceInfo> getInterfaceInfoList() {
+        List list = this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper.getInterfaceInfoAll");
+        return list;
+    }
 }

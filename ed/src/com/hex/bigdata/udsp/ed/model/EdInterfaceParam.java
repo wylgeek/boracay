@@ -1,6 +1,6 @@
 package com.hex.bigdata.udsp.ed.model;
 
-public class EdApplicationParam {
+public class EdInterfaceParam {
     private String pkId;
 
     private String interfaceId;

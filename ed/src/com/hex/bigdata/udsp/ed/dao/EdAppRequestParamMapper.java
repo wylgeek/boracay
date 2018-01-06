@@ -1,16 +1,49 @@
 package com.hex.bigdata.udsp.ed.dao;
 
 import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
+import com.hex.goframe.dao.BaseMapper;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
-public interface EdAppRequestParamMapper {
-    int deleteByPrimaryKey(String pkId);
+/**
+ * Created by jc.zhao
+ * Date:2018/1/4
+ * Time:19:42
+ */
+@Repository
+public class EdAppRequestParamMapper extends BaseMapper {
+    public int deleteByPrimaryKey(String pkId) {
+        return this.sqlSessionTemplate.delete("com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper.deleteByPrimaryKey",
+                pkId);
+    }
 
-    int insert(EdAppRequestParam record);
+    public int updateByPrimaryKey(EdAppRequestParam edAppRequestParam) {
+        return this.sqlSessionTemplate.update("com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper.updateByPrimaryKey",
+                edAppRequestParam);
+    }
 
-    EdAppRequestParam selectByPrimaryKey(String pkId);
+    public EdAppRequestParam selectByPrimaryKey(String pkId) {
+        return this.sqlSessionTemplate.selectOne("com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper.selectByPrimaryKey",
+                pkId);
+    }
 
-    List<EdAppRequestParam> selectAll();
+    public List<EdAppRequestParam> selectAll() {
+        return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper.selectAll");
+    }
 
-    int updateByPrimaryKey(EdAppRequestParam record);
+    public int addEdAppRequestParam(EdAppRequestParam edAppRequestParam) {
+        return this.sqlSessionTemplate.insert("com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper.addEdAppRequestParam",
+                edAppRequestParam);
+    }
+
+    public List<EdAppRequestParam> getEdAppRequestParamByAppId(String appId) {
+        return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper.getEdAppRequestParamByAppId",
+                appId);
+    }
+
+    public int deleteEdAppRequestParamByAppId(String appId) {
+        return this.sqlSessionTemplate.delete("com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper.deleteEdAppRequestParamByAppId",
+                appId);
+    }
 }

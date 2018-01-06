@@ -1,10 +1,12 @@
 package com.hex.bigdata.udsp.ed.controller;
 
 import com.hex.bigdata.udsp.ed.dto.InterfaceInfoDto;
+import com.hex.bigdata.udsp.ed.dto.InterfaceInfoParamDto;
 import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
 import com.hex.bigdata.udsp.ed.service.InterfaceInfoService;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
+import com.hex.goframe.model.PageListResult;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,13 +67,13 @@ public class InterfaceInfoController {
 
     @RequestMapping("/addInterfaceInfo")
     @ResponseBody
-    public MessageResult addInterfaceInfo(@RequestBody InterfaceInfo interfaceInfo) {
+    public MessageResult addInterfaceInfo(@RequestBody InterfaceInfoParamDto interfaceInfoParamDto) {
         try {
-            if (interfaceInfo == null || StringUtils.isBlank(interfaceInfo.getInterfaceCode())) {
+            if (interfaceInfoParamDto == null || StringUtils.isBlank(interfaceInfoParamDto.getInterfaceInfo().getInterfaceCode())) {
                 return new MessageResult(false, "参数为空1");
             }
 
-            return interfaceInfoService.addInterfaceInfo(interfaceInfo);
+            return interfaceInfoService.addInterfaceInfo(interfaceInfoParamDto);
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
@@ -101,12 +103,12 @@ public class InterfaceInfoController {
 
     @RequestMapping("/updateInterfaceInfoByPkId")
     @ResponseBody
-    public MessageResult updateInterfaceInfoByPkId(@RequestBody InterfaceInfo interfaceInfo) {
+    public MessageResult updateInterfaceInfoByPkId(@RequestBody InterfaceInfoParamDto interfaceInfoParamDto) {
         try {
-            if (interfaceInfo == null || StringUtils.isBlank(interfaceInfo.getPkId())) {
+            if (interfaceInfoParamDto == null) {
                 return new MessageResult(false, "参数为空！");
             }
-            return interfaceInfoService.updateInterfaceInfoByPkId(interfaceInfo);
+            return interfaceInfoService.updateInterfaceInfoByPkId(interfaceInfoParamDto);
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
@@ -126,6 +128,19 @@ public class InterfaceInfoController {
             logger.info("服务请求异常{}",this.getClass().getName());
             e.printStackTrace();
             return new MessageResult(false,"请求失败，请重试！");
+        }
+    }
+
+    @RequestMapping("/selectInterfaceInfoList")
+    @ResponseBody
+    public PageListResult selectInterfaceInfoList() {
+        try {
+            List<InterfaceInfo> interfaceInfos = interfaceInfoService.getInterfaceInfoList();
+            return new PageListResult(interfaceInfos);
+        } catch (Exception e) {
+            logger.info("服务请求异常{}", this.getClass().getName());
+            e.printStackTrace();
+            return null;
         }
     }
 }

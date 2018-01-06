@@ -12,12 +12,6 @@
     delete from ED_APPLICATION_RESPONSE_PARAM
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.hex.bigdata.udsp.ed.model.EdAppResponseParam" >
-    insert into ED_APPLICATION_RESPONSE_PARAM (PK_ID, SEQ, NAME, 
-      DESCRIBE, APP_ID)
-    values (#{pkId,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, 
-      #{describe,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR})
-  </insert>
   <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.ed.model.EdAppResponseParam" >
     update ED_APPLICATION_RESPONSE_PARAM
     set SEQ = #{seq,jdbcType=DECIMAL},
@@ -35,4 +29,20 @@
     select PK_ID, SEQ, NAME, DESCRIBE, APP_ID
     from ED_APPLICATION_RESPONSE_PARAM
   </select>
+
+  <insert id="addEdAppResponseParam" parameterType="com.hex.bigdata.udsp.ed.model.EdAppResponseParam" >
+    insert into ED_APPLICATION_RESPONSE_PARAM (PK_ID, SEQ, NAME,
+    DESCRIBE, APP_ID)
+    values (#{pkId,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR},
+    #{describe,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR})
+  </insert>
+  <select id="getEdAppResponseParamByAppId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, SEQ, NAME, DESCRIBE, APP_ID
+    from ED_APPLICATION_RESPONSE_PARAM
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteEdAppResponseParamByAppId" parameterType="java.lang.String" >
+    delete from ED_APPLICATION_RESPONSE_PARAM
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

@@ -24,9 +24,6 @@
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
-        <table tableName="ED_APPLICATION" domainObjectName="EdApplication"/>
-        <table tableName="ED_INTERFACE_PARAM" domainObjectName="EdApplicationParam"/>
-        <table tableName="ED_APPLICATION_REQUEST_PARAM" domainObjectName="EdAppRequestParam"/>
-        <table tableName="ED_APPLICATION_RESPONSE_PARAM" domainObjectName="EdAppResponseParam"/>
-  </context>
+        <table tableName="ED_INTERFACE_PARAM" domainObjectName="EdInterfaceParam"/>
+    </context>
 </generatorConfiguration>

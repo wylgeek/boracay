@@ -14,14 +14,6 @@
     delete from ED_APPLICATION_REQUEST_PARAM
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.hex.bigdata.udsp.ed.model.EdAppRequestParam" >
-    insert into ED_APPLICATION_REQUEST_PARAM (PK_ID, SEQ, NAME, 
-      DESCRIBE, IS_NEED, DEFAULT_VAL, 
-      APP_ID)
-    values (#{pkId,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, 
-      #{describe,jdbcType=VARCHAR}, #{isNeed,jdbcType=CHAR}, #{defaultVal,jdbcType=VARCHAR}, 
-      #{appId,jdbcType=VARCHAR})
-  </insert>
   <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.ed.model.EdAppRequestParam" >
     update ED_APPLICATION_REQUEST_PARAM
     set SEQ = #{seq,jdbcType=DECIMAL},
@@ -41,4 +33,22 @@
     select PK_ID, SEQ, NAME, DESCRIBE, IS_NEED, DEFAULT_VAL, APP_ID
     from ED_APPLICATION_REQUEST_PARAM
   </select>
+
+  <insert id="addEdAppRequestParam" parameterType="com.hex.bigdata.udsp.ed.model.EdAppRequestParam" >
+    insert into ED_APPLICATION_REQUEST_PARAM (PK_ID, SEQ, NAME,
+    DESCRIBE, IS_NEED, DEFAULT_VAL,
+    APP_ID)
+    values (#{pkId,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR},
+    #{describe,jdbcType=VARCHAR}, #{isNeed,jdbcType=CHAR}, #{defaultVal,jdbcType=VARCHAR},
+    #{appId,jdbcType=VARCHAR})
+  </insert>
+  <select id="getEdAppRequestParamByAppId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, SEQ, NAME, DESCRIBE, IS_NEED, DEFAULT_VAL, APP_ID
+    from ED_APPLICATION_REQUEST_PARAM
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteEdAppRequestParamByAppId" parameterType="java.lang.String" >
+    delete from ED_APPLICATION_REQUEST_PARAM
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

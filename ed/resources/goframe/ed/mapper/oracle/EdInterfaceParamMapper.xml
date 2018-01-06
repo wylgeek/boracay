@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.hex.bigdata.udsp.ed.dao.EdApplicationParamMapper" >
-  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.ed.model.EdApplicationParam" >
+<mapper namespace="com.hex.bigdata.udsp.ed.dao.EdInterfaceParamMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.ed.model.EdInterfaceParam" >
     <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
     <result column="INTERFACE_ID" property="interfaceId" jdbcType="VARCHAR" />
     <result column="SEQ" property="seq" jdbcType="DECIMAL" />
@@ -15,7 +15,7 @@
     delete from ED_INTERFACE_PARAM
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.hex.bigdata.udsp.ed.model.EdApplicationParam" >
+  <insert id="insert" parameterType="com.hex.bigdata.udsp.ed.model.EdInterfaceParam" >
     insert into ED_INTERFACE_PARAM (PK_ID, INTERFACE_ID, SEQ, 
       NAME, DESCRIBE, TYPE, 
       NOTE, COL_TYPE)
@@ -23,7 +23,7 @@
       #{name,jdbcType=VARCHAR}, #{describe,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, 
       #{note,jdbcType=VARCHAR}, #{colType,jdbcType=VARCHAR})
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.ed.model.EdApplicationParam" >
+  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.ed.model.EdInterfaceParam" >
     update ED_INTERFACE_PARAM
     set INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR},
       SEQ = #{seq,jdbcType=DECIMAL},
@@ -43,4 +43,31 @@
     select PK_ID, INTERFACE_ID, SEQ, NAME, DESCRIBE, TYPE, NOTE, COL_TYPE
     from ED_INTERFACE_PARAM
   </select>
+
+  <select id="selectList" resultMap="BaseResultMap" >
+    select PK_ID, INTERFACE_ID, SEQ, NAME, DESCRIBE, TYPE, NOTE, COL_TYPE
+    from ED_INTERFACE_PARAM
+    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+      <if test="pkId!='' and pkId!=null ">and PK_ID = #{pkId}</if>
+      <if test="interfaceId!='' and interfaceId!=null ">and INTERFACE_ID = #{interfaceId}</if>
+      <if test="name!='' and name!=null ">and NAME like '%'||#{name}||'%'</if>
+      <if test="describe!='' and describe!=null ">and DESCRIBE like '%'||#{describe}||'%'</if>
+      <if test="note!='' and note!=null ">and NOTE like '%'||#{note}||'%'</if>
+      <if test="type!='' and type!=null ">and TYPE = #{type}</if>
+      <if test="seq!='' and seq!=null ">and SEQ = #{seq}</if>
+      <if test="colType!='' and colType!=null ">and COL_TYPE = #{colType}</if>
+    </trim>
+    order by SEQ asc
+  </select>
+
+  <select id="selectByInterfaceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, INTERFACE_ID, SEQ, NAME, DESCRIBE, TYPE, NOTE, COL_TYPE
+    from ED_INTERFACE_PARAM
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByInterfaceId" parameterType="java.lang.String" >
+    delete from ED_INTERFACE_PARAM
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+  </delete>
 </mapper>
