@@ -7,15 +7,15 @@ import java.util.Date;
  * Date:2018/1/3
  * Time:11:32
  */
-public class ServiceInfo {
+public class InterfaceInfo {
     private String pkId;
-    private String serviceName;
-    private String serviceCnName;
+    private String interfaceCode;
+    private String interfaceName;
     private long validTime;
     private String reqUrl;
-    private String serviceDesc;
-    private String serviceType;
-    private String serviceCompany;
+    private String interfaceDesc;
+    private String interfaceType;
+    private String interfaceCompany;
     private String crtUser;
     private Date crtTime;
     private String updateUser;
@@ -30,20 +30,20 @@ public class ServiceInfo {
         this.pkId = pkId;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public String getInterfaceCode() {
+        return interfaceCode;
     }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public void setInterfaceCode(String interfaceCode) {
+        this.interfaceCode = interfaceCode;
     }
 
-    public String getServiceCnName() {
-        return serviceCnName;
+    public String getInterfaceName() {
+        return interfaceName;
     }
 
-    public void setServiceCnName(String serviceCnName) {
-        this.serviceCnName = serviceCnName;
+    public void setInterfaceName(String interfaceName) {
+        this.interfaceName = interfaceName;
     }
 
     public long getValidTime() {
@@ -62,28 +62,28 @@ public class ServiceInfo {
         this.reqUrl = reqUrl;
     }
 
-    public String getServiceDesc() {
-        return serviceDesc;
+    public String getInterfaceDesc() {
+        return interfaceDesc;
     }
 
-    public void setServiceDesc(String serviceDesc) {
-        this.serviceDesc = serviceDesc;
+    public void setInterfaceDesc(String interfaceDesc) {
+        this.interfaceDesc = interfaceDesc;
     }
 
-    public String getServiceType() {
-        return serviceType;
+    public String getInterfaceType() {
+        return interfaceType;
     }
 
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
+    public void setInterfaceType(String interfaceType) {
+        this.interfaceType = interfaceType;
     }
 
-    public String getServiceCompany() {
-        return serviceCompany;
+    public String getInterfaceCompany() {
+        return interfaceCompany;
     }
 
-    public void setServiceCompany(String serviceCompany) {
-        this.serviceCompany = serviceCompany;
+    public void setInterfaceCompany(String interfaceCompany) {
+        this.interfaceCompany = interfaceCompany;
     }
 
     public String getCrtUser() {

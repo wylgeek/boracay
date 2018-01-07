@@ -23,7 +23,7 @@ ${extends("/goframe/function_layout.httl")}
         nui.parse();
         grid = nui.get("dictG");
         var GFDict = new Object();
-        GFDict.dictTypeId = 'EDAP_CACHE_TIME';
+        GFDict.dictTypeId = 'ED_CACHE_TIME';
         grid.load(GFDict);
     });
 

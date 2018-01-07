@@ -24,6 +24,6 @@
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
-        <table tableName="ED_INTERFACE_COUNT" domainObjectName="InterfaceReqCount"/>
-  </context>
+        <table tableName="ED_INTERFACE_PARAM" domainObjectName="EdInterfaceParam"/>
+    </context>
 </generatorConfiguration>

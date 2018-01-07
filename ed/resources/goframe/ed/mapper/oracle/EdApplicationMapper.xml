@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.ed.dao.EdApplicationMapper" >
+    <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.ed.model.EdApplication" >
+        <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+        <result column="INTERFACE_ID" property="interfaceId" jdbcType="VARCHAR" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="DESCRIBE" property="describe" jdbcType="VARCHAR" />
+        <result column="MAX_NUM" property="maxNum" jdbcType="DECIMAL" />
+        <result column="DEL_FLG" property="delFlg" jdbcType="CHAR" />
+        <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR" />
+        <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR" />
+        <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR" />
+        <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR" />
+        <result column="NOTE" property="note" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="BaseResultMapExtends" type="com.hex.bigdata.udsp.ed.dto.EdApplicationDto" extends="BaseResultMap">
+        <result column="INTERFACE_CODE" property="interfaceCode" jdbcType="VARCHAR" />
+        <result column="INTERFACE_NAME" property="interfaceName" jdbcType="VARCHAR" />
+    </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from ED_APPLICATION
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </delete>
+
+
+  <insert id="addEdApplication" parameterType="com.hex.bigdata.udsp.ed.model.EdApplication" >
+    insert into ED_APPLICATION (PK_ID, INTERFACE_ID, NAME, 
+      DESCRIBE, MAX_NUM, DEL_FLG, 
+      CRT_USER, CRT_TIME, NOTE)
+    values (#{pkId,jdbcType=VARCHAR}, #{interfaceId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{describe,jdbcType=VARCHAR}, #{maxNum,jdbcType=DECIMAL}, '0',
+      #{crtUser,jdbcType=VARCHAR}, #{crtTime,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateEdApplication" parameterType="com.hex.bigdata.udsp.ed.model.EdApplication" >
+    update ED_APPLICATION
+    set INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESCRIBE = #{describe,jdbcType=VARCHAR},
+      MAX_NUM = #{maxNum,jdbcType=DECIMAL},
+      UPT_USER = #{uptUser,jdbcType=VARCHAR},
+      UPT_TIME = #{uptTime,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR}
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+
+    <update id="deleteEdApplication" parameterType="com.hex.bigdata.udsp.ed.model.EdApplication" >
+        update ED_APPLICATION
+        set
+        UPT_USER = #{uptUser,jdbcType=VARCHAR},
+        UPT_TIME = #{uptTime,jdbcType=VARCHAR},
+        DEL_FLG = '1'
+        where PK_ID = #{pkId,jdbcType=VARCHAR}
+    </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME, 
+    UPT_USER, UPT_TIME, NOTE
+    from ED_APPLICATION
+    where PK_ID = #{pkId,jdbcType=VARCHAR} and DEL_FLG = '0'
+  </select>
+  <select id="getEdApplicationAll" resultMap="BaseResultMap" >
+    select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME, 
+    UPT_USER, UPT_TIME, NOTE
+    from ED_APPLICATION
+    WHERE DEL_FLG = '0'
+  </select>
+
+    <select id="getEdApplicationInfoPage" parameterType="com.hex.bigdata.udsp.ed.dto.EdApplicationDto" resultMap="BaseResultMapExtends" >
+        select app.PK_ID, app.INTERFACE_ID, app.NAME, app.DESCRIBE, app.MAX_NUM, app.DEL_FLG, app.CRT_USER, app.CRT_TIME,
+        app.UPT_USER, app.UPT_TIME, app.NOTE, info.INTERFACE_CODE, info.INTERFACE_NAME
+        from ED_APPLICATION app
+        left JOIN ED_INTERFACE_INFO info
+        ON info.PK_ID = app.INTERFACE_ID
+        WHERE app.DEL_FLG = '0'
+        <if test="name!='' and name!=null ">and app.NAME like '%'||#{name}||'%'</if>
+        <if test="describe!='' and describe!=null ">and app.DESCRIBE like '%'||#{describe}||'%'</if>
+        <if test="interfaceCode!='' and interfaceCode!=null ">and info.INTERFACE_CODE like #{interfaceCode}||'%'</if>
+        <if test="interfaceName!='' and interfaceName!=null ">and info.INTERFACE_NAME like '%'||#{interfaceName}||'%'</if>
+        <if test="crtTimeStart!=null and crtTimeStart!='' ">and app.CRT_TIME >= #{crtTimeStart}</if>
+        <if test="crtTimeEnd!=null and crtTimeEnd!='' ">and #{crtTimeEnd} >= app.CRT_TIME</if>
+        <if test="uptTimeStart!=null and uptTimeStart!='' ">and app.UPT_TIME >= #{uptTimeStart}</if>
+        <if test="uptTimeEnd!=null and uptTimeEnd!='' ">and #{uptTimeEnd} >= app.UPT_TIME</if>
+        <if test="crtUser!='' and crtUser!=null ">and app.CRT_USER like '%'||#{crtUser}||'%'</if>
+        <if test="uptUser!='' and uptUser!=null ">and app.UPT_USER like '%'||#{uptUser}||'%'</if>
+        order by app.UPT_TIME desc, app.CRT_TIME desc, app.NAME asc
+    </select>
+
+    <select id="getEdApplicationByName" parameterType="java.lang.String" resultMap="BaseResultMap" >
+        select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME,
+        UPT_USER, UPT_TIME, NOTE
+        from ED_APPLICATION
+        WHERE NAME = #{name,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

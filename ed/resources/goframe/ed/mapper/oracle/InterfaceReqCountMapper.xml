@@ -56,7 +56,7 @@
 
 
   <!-- 以下需要修改 -->
-  <select id="getServiceCountList" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.ed.dto.ServiceCountDto">
+  <select id="getServiceCountList" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.ed.dto.InterfaceReqCountDto">
     SELECT c.PK_ID, c.SERVICE_INFO_ID, c.SERVICE_NAME, c.SERVICE_CN_NAME, c.SERVICE_TYPE, c.SERVICE_COMPANY,
     c.REQUEST_USER, c.REQUEST_TIME
     FROM EDAP_SERVICE_COUNT c
