@@ -176,26 +176,26 @@ public class EdApplicationController {
 
     @RequestMapping("/upload")
     @ResponseBody
-    public MessageResult upload(MultipartFile excelFile){
+    public MessageResult upload(MultipartFile excelFile) {
         boolean status = true;
         String message = "上传成功";
 
         //判断结尾是否为xl或者xlsx
-        if (((CommonsMultipartFile)excelFile).getFileItem().getName().endsWith(".xls")
-                || ((CommonsMultipartFile)excelFile).getFileItem().getName().endsWith(".xlsx")) {
+        if (((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xls")
+                || ((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xlsx")) {
             //将文件放到项目上传文件目录中
             String uploadFilePath = FileUtil.uploadFile(FileUtil
                     .getRealUploadPath("EXCEL_UPLOAD"), excelFile);
-            Map<String,String> result = edApplicationService.uploadExcel(uploadFilePath);
-            if("false".equals(result.get("status"))){
+            Map<String, String> result = edApplicationService.uploadExcel(uploadFilePath);
+            if ("false".equals(result.get("status"))) {
                 status = false;
                 message = result.get("message");
             }
-        }else{
+        } else {
             status = false;
             message = "请上传正确格式的文件！";
         }
-        return new MessageResult(status,message);
+        return new MessageResult(status, message);
     }
 
     @ResponseBody

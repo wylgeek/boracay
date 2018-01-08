@@ -4,6 +4,7 @@ import com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper;
 import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.util.Util;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,9 @@ public class EdAppRequestParamService {
      * @return
      */
     public MessageResult updateByPrimaryKey(EdAppRequestParam edAppRequestParam) {
+        if(StringUtils.isBlank(edAppRequestParam.getIsNeed())) {
+            edAppRequestParam.setIsNeed("0");
+        }
         int result = edAppRequestParamMapper.updateByPrimaryKey(edAppRequestParam);
         if (result == 1) {
             return new MessageResult(true, "修改成功");
@@ -65,6 +69,9 @@ public class EdAppRequestParamService {
 
     public int addEdAppRequestParam(EdAppRequestParam edAppRequestParam) {
         edAppRequestParam.setPkId(Util.uuid());
+        if(StringUtils.isBlank(edAppRequestParam.getIsNeed())) {
+            edAppRequestParam.setIsNeed("1");
+        }
         return edAppRequestParamMapper.addEdAppRequestParam(edAppRequestParam);
     }
 
@@ -76,19 +83,19 @@ public class EdAppRequestParamService {
         return edAppRequestParamMapper.deleteEdAppRequestParamByAppId(appId);
     }
 
-    @Transactional(rollbackFor=Exception.class)
-    public MessageResult addEdAppRequestParam(List<EdAppRequestParam> edAppRequestParams) throws Exception{
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResult addEdAppRequestParam(List<EdAppRequestParam> edAppRequestParams) throws Exception {
         for (EdAppRequestParam edAppRequestParam : edAppRequestParams) {
             int result = this.addEdAppRequestParam(edAppRequestParam);
             if (result != 1) {
                 throw new Exception();
             }
         }
-        return new MessageResult(true,"添加成功");
+        return new MessageResult(true, "添加成功");
     }
 
-    @Transactional(rollbackFor=Exception.class)
-    public MessageResult addEdAppRequestParam(String pkId,List<EdAppRequestParam> edAppRequestParams) throws Exception{
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResult addEdAppRequestParam(String pkId, List<EdAppRequestParam> edAppRequestParams) throws Exception {
         for (EdAppRequestParam edAppRequestParam : edAppRequestParams) {
             edAppRequestParam.setAppId(pkId);
             int result = this.addEdAppRequestParam(edAppRequestParam);
@@ -96,7 +103,7 @@ public class EdAppRequestParamService {
                 throw new Exception();
             }
         }
-        return new MessageResult(true,"添加成功");
+        return new MessageResult(true, "添加成功");
     }
 
 }

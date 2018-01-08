@@ -1,8 +1,6 @@
 package com.hex.bigdata.udsp.ed.service;
 
-import com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper;
 import com.hex.bigdata.udsp.ed.dao.EdAppResponseParamMapper;
-import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
 import com.hex.bigdata.udsp.ed.model.EdAppResponseParam;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.util.Util;
@@ -92,7 +90,7 @@ public class EdAppResponseParamService {
     @Transactional(rollbackFor = Exception.class)
     public MessageResult addEdAppResponseParam(String pkId, List<EdAppResponseParam> edAppResponseParams) throws Exception {
         for (EdAppResponseParam edAppResponseParam : edAppResponseParams) {
-                edAppResponseParam.setAppId(pkId);
+            edAppResponseParam.setAppId(pkId);
             int result = this.addEdAppResponseParam(edAppResponseParam);
             if (result != 1) {
                 throw new Exception();

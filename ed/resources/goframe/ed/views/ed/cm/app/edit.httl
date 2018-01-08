@@ -490,6 +490,7 @@ ${extends("/goframe/function_layout.httl")}
                 return;
             }
             if (isExist(e.value)) {
+                nui.alert("名称已存在");
                 e.errorText = "名称已存在";
                 e.isValid = false;
             }

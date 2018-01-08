@@ -2,13 +2,10 @@ package com.hex.bigdata.udsp.ed.controller;
 
 import com.hex.bigdata.udsp.ed.model.EdInterfaceParam;
 import com.hex.bigdata.udsp.ed.service.EdInterfaceParamService;
-import com.hex.goframe.model.Page;
-import com.hex.goframe.model.PageList;
 import com.hex.goframe.model.PageListResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 

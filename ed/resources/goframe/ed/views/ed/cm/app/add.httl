@@ -417,8 +417,8 @@ ${extends("/goframe/function_layout.httl")}
                 e.errorText = "只能包含字母、数字、下划线，且以字母开头";
                 e.isValid = false;
             }
-            var result = isExist(e.value);
-            if (result.status) {
+            if (isExist(e.value)) {
+                nui.alert("名称已存在");
                 e.errorText = "名称已存在";
                 e.isValid = false;
             }

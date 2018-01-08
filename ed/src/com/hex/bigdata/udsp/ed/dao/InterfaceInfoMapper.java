@@ -24,7 +24,6 @@ public class InterfaceInfoMapper extends BaseMapper {
     public List<InterfaceInfo> getInterfaceInfoList(InterfaceInfoDto interfaceInfoDto, Page page) {
         List list = this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper.getInterfaceInfoList",
                 interfaceInfoDto, page.toPageBounds());
-        page.totalCount(list);
         return list;
     }
 

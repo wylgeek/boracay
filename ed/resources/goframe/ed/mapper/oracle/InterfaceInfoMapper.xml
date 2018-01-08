@@ -86,5 +86,7 @@
         SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, i.INTERFACE_TYPE,
         i.INTERFACE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
         FROM ED_INTERFACE_INFO i
+        WHERE IS_DEL = '0'
+        order by i.CRT_TIME desc
     </select>
 </mapper>

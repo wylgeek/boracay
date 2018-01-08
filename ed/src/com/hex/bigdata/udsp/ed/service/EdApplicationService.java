@@ -9,6 +9,7 @@ import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
 import com.hex.bigdata.udsp.ed.dao.EdApplicationMapper;
 import com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper;
 import com.hex.bigdata.udsp.ed.dto.EdApplicationDto;
+import com.hex.bigdata.udsp.ed.dto.EdApplicationExlDto;
 import com.hex.bigdata.udsp.ed.dto.EdApplicationParamDto;
 import com.hex.bigdata.udsp.ed.dto.EdIndexDto;
 import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
@@ -63,10 +64,10 @@ public class EdApplicationService extends BaseService {
 
     static {
         comExcelParams.add(new ComExcelParam(1, 1, "name"));
-        comExcelParams.add(new ComExcelParam(1, 3, "interfaceId"));
+        comExcelParams.add(new ComExcelParam(1, 3, "interfaceCode"));
         comExcelParams.add(new ComExcelParam(2, 1, "describe"));
         comExcelParams.add(new ComExcelParam(2, 3, "maxNum"));
-        comExcelParams.add(new ComExcelParam(3, 3, "note"));
+        comExcelParams.add(new ComExcelParam(3, 1, "note"));
     }
 
     public int deleteByPrimaryKey(String pkId) {
@@ -74,6 +75,10 @@ public class EdApplicationService extends BaseService {
     }
 
     public String insert(EdApplication edApplication) throws Exception {
+        EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
+        if(edApplication1 != null){
+            return "";
+        }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String pkId = Util.uuid();
         edApplication.setPkId(pkId);
@@ -87,6 +92,10 @@ public class EdApplicationService extends BaseService {
     }
 
     public int addEdApplication(EdApplication edApplication) {
+        EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
+        if(edApplication1 != null){
+            return -1;
+        }
         SimpleDateFormat format = new SimpleDateFormat("yyyyy-MM-dd HH:mm:ss");
         edApplication.setPkId(Util.uuid());
         edApplication.setCrtUser(WebUtil.getCurrentUserId());
@@ -95,6 +104,10 @@ public class EdApplicationService extends BaseService {
     }
 
     public int updateEdApplication(EdApplication edApplication) {
+        EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
+        if(edApplication1 != null && !edApplication.getPkId().equals(edApplication1.getPkId())){
+            return -1;
+        }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         edApplication.setUptUser(WebUtil.getCurrentUserId());
         edApplication.setUptTime(format.format(new Date()));
@@ -138,11 +151,11 @@ public class EdApplicationService extends BaseService {
         String appId = edApplicationParamDto.getEdApplication().getPkId();
         int result2 = edAppRequestParamService.deleteEdAppRequestParamByAppId(appId);
         int result3 = edAppResponseParamService.deleteEdAppResponseParamByAppId(appId);
-        if (result1 != 1 || result2 != 1 || result3 != 1) {
+        if (result1 != 1 || result2 <= 0 || result3 <= 0) {
             throw new Exception();
         }
-        edAppRequestParamService.addEdAppRequestParam(edApplicationParamDto.getEdAppRequestParam());
-        edAppResponseParamService.addEdAppResponseParam(edApplicationParamDto.getEdAppResponseParam());
+        edAppRequestParamService.addEdAppRequestParam(appId, edApplicationParamDto.getEdAppRequestParam());
+        edAppResponseParamService.addEdAppResponseParam(appId, edApplicationParamDto.getEdAppResponseParam());
         return new MessageResult(true, "修改成功");
     }
 
@@ -153,7 +166,7 @@ public class EdApplicationService extends BaseService {
             int result1 = this.deleteByPrimaryKey(pkId);
             int result2 = edAppRequestParamService.deleteEdAppRequestParamByAppId(pkId);
             int result3 = edAppResponseParamService.deleteEdAppResponseParamByAppId(pkId);
-            if (result1 != 1 || result2 != 1 || result3 != 1) {
+            if (result1 != 1 || result2 <= 0 || result3 <= 0) {
                 throw new Exception();
             }
         }
@@ -312,7 +325,7 @@ public class EdApplicationService extends BaseService {
         }
 
         //设置内容
-        EdApplication edApp = edApplicationMapper.selectByPrimaryKey(edApplication.getPkId());
+        EdApplicationExlDto edApp = edApplicationMapper.getEdApplicationExl(edApplication.getPkId());
         //设置模型名称
         edApp.setInterfaceId(edApp.getInterfaceId());
         for (ComExcelParam comExcelParam : comExcelParams) {
