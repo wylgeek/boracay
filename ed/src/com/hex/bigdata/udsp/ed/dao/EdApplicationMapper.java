@@ -59,4 +59,8 @@ public class EdApplicationMapper extends BaseMapper {
         return this.sqlSessionTemplate.selectOne("com.hex.bigdata.udsp.ed.dao.EdApplicationMapper.getEdApplicationExl",
                 pkId);
     }
+
+    public List selectEnableAll() {
+        return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdApplicationMapper.getEdApplicationAll");
+    }
 }

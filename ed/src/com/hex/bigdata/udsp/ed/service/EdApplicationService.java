@@ -385,4 +385,8 @@ public class EdApplicationService extends BaseService {
         }
 
     }
+
+    public List selectAll() {
+        return this.edApplicationMapper.selectEnableAll();
+    }
 }

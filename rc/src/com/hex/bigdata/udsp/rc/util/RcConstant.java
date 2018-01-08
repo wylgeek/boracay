@@ -43,5 +43,9 @@ public class RcConstant {
      * 服务类型-联机查询应用
      */
     public final static String UDSP_SERVICE_TYPE_OLQ_APP="OLQ_APP";
+    /**
+     * 服务类型-外部数据
+     */
+    public final static String UDSP_SERVICE_TYPE_ED="ED";
 
 }
