@@ -23,6 +23,8 @@ public class EdApplication {
 
     private String note;
 
+    private String isCheck;
+
     public String getPkId() {
         return pkId;
     }
@@ -109,5 +111,13 @@ public class EdApplication {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getIsCheck() {
+        return isCheck;
+    }
+
+    public void setIsCheck(String isCheck) {
+        this.isCheck = isCheck;
     }
 }
