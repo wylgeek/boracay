@@ -23,13 +23,23 @@ ${extends("/goframe/function_layout.httl")}
                 <tr>
                     <th class="nui-form-label"><label for="describe">说明：</label></th>
                     <td >
-                        <input id="describe" name="describe" class="nui-textbox" style="width:99%" readonly="true"
+                        <input id="describe" name="describe" class="nui-textbox" style="width:97%" readonly="true"
                                vtype="maxLength:256"/>
                     </td>
                     <th class="nui-form-label"><label for="maxNum">最大返回数：</label></th>
                     <td >
-                        <input id="maxNum" name="maxNum" class="nui-textbox" style="width:99%" readonly="true"
+                        <input id="maxNum" name="maxNum" class="nui-textbox" style="width:97%" readonly="true"
                                vtype="maxLength:10;int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="isCheck">是否校验查询字段：</label></th>
+                    <td >
+                        <label><input id="noCheck" name="isCheck" type="radio" value="0" disabled/>否 </label>
+                        <label><input id="isCheck" name="isCheck" type="radio" value="1" disabled/>是 </label>
+                    </td>
+                    <th class="nui-form-label"></th>
+                    <td >
                     </td>
                 </tr>
                 <tr>
@@ -190,6 +200,11 @@ ${extends("/goframe/function_layout.httl")}
                 //console.warn(result);
                 if(result.status == true) {
                     form1.setData(result.data);
+                    if(result.data.isCheck == 0){
+                        document.getElementById("noCheck").checked = true;
+                    } else {
+                        document.getElementById("isCheck").checked = true;
+                    }
                     form1.setChanged(false);
                 }
             }

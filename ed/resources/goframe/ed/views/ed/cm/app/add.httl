@@ -27,13 +27,23 @@ ${extends("/goframe/function_layout.httl")}
                 <tr>
                     <th class="nui-form-label"><label for="describe">说明：</label></th>
                     <td >
-                        <input id="describe" name="describe" class="nui-textbox" style="width:99%" required="true"
+                        <input id="describe" name="describe" class="nui-textbox" style="width:97%" required="true"
                                vtype="maxLength:256"/>
                     </td>
                     <th class="nui-form-label"><label for="maxNum">最大返回数：</label></th>
                     <td >
-                        <input id="maxNum" name="maxNum" class="nui-textbox" style="width:99%"
+                        <input id="maxNum" name="maxNum" class="nui-textbox" style="width:97%"
                                vtype="maxLength:10;int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="isCheck">是否校验查询字段：</label></th>
+                    <td >
+                        <label><input name="isCheck" type="radio" value="0" />否 </label>
+                        <label><input id="isCheck" name="isCheck" type="radio" value="1" checked />是 </label>
+                    </td>
+                    <th class="nui-form-label"></th>
+                    <td >
                     </td>
                 </tr>
                 <tr>
@@ -300,11 +310,14 @@ ${extends("/goframe/function_layout.httl")}
      * 获取基础数据
      */
     function getBaseData() {
+        debugger;
         form1.validate();
         if (form1.isValid() == false) {
             return;
         }
         var baseData = form1.getData(true, true);
+        var isCheck = getRadioBoxValue();
+        baseData.isCheck = isCheck;
         return baseData;
     }
 
@@ -633,6 +646,17 @@ ${extends("/goframe/function_layout.httl")}
                 }
             }
         });
+    }
+
+    function getRadioBoxValue(){
+        var isCheck = '1';
+        var isCheckDom = document.getElementById('isCheck');
+        if(isCheckDom && isCheckDom.checked){
+            isCheck = '1';
+        } else {
+            isCheck = '0';
+        }
+        return isCheck;
     }
 </script>
 <!--#end-->

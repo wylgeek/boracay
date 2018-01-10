@@ -4,6 +4,7 @@ import com.hex.bigdata.udsp.ed.connect.service.ConnectService;
 import com.hex.bigdata.udsp.ed.controller.EdApplicationController;
 import com.hex.bigdata.udsp.ed.model.EdApplication;
 import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
+import com.hex.bigdata.udsp.ed.service.EdApplicationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class ConnectController {
     @Autowired
     private ConnectService connectService;
 
+    @Autowired
+    private EdApplicationService edApplicationService;
+
     @RequestMapping("/getData")
     @ResponseBody
     public String getData(Map reqParam, EdApplication edApplication){
@@ -45,8 +49,9 @@ public class ConnectController {
     @ResponseBody
     public String getDataTest1(){
         Map reqParam = new HashMap();
-        EdApplication edApplication = new EdApplication();
-        reqParam.put()
+        EdApplication edApplication = edApplicationService.selectByPrimaryKey("0fa00d237e29442e89e953712cc9b2c5");
+        reqParam.put("name","hahha");
+        reqParam.put("sex","男");
         try{
             String returnJson = connectService.getData(reqParam,edApplication);
             return returnJson;
@@ -61,8 +66,9 @@ public class ConnectController {
     @ResponseBody
     public String getDataTest2(){
         Map reqParam = new HashMap();
-        EdApplication edApplication = new EdApplication();
-        reqParam.put()
+        EdApplication edApplication = edApplicationService.selectByPrimaryKey("c4f4d97717f8448e9370e920a4831e4d");
+        reqParam.put("pkId","4c7e5e1087ae46eda79d70510faa12de");
+
         try{
             String returnJson = connectService.getData(reqParam,edApplication);
             return returnJson;

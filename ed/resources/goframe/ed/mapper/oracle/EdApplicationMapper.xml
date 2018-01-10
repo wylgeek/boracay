@@ -13,6 +13,7 @@
         <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR" />
         <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR" />
         <result column="NOTE" property="note" jdbcType="VARCHAR" />
+        <result column="IS_CHECK" property="isCheck" jdbcType="CHAR" />
     </resultMap>
     <resultMap id="BaseResultMapExtends" type="com.hex.bigdata.udsp.ed.dto.EdApplicationDto" extends="BaseResultMap">
         <result column="INTERFACE_CODE" property="interfaceCode" jdbcType="VARCHAR" />
@@ -32,10 +33,10 @@
   <insert id="addEdApplication" parameterType="com.hex.bigdata.udsp.ed.model.EdApplication" >
     insert into ED_APPLICATION (PK_ID, INTERFACE_ID, NAME, 
       DESCRIBE, MAX_NUM, DEL_FLG, 
-      CRT_USER, CRT_TIME, NOTE)
+      CRT_USER, CRT_TIME, NOTE, IS_CHECK)
     values (#{pkId,jdbcType=VARCHAR}, #{interfaceId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
       #{describe,jdbcType=VARCHAR}, #{maxNum,jdbcType=DECIMAL}, '0',
-      #{crtUser,jdbcType=VARCHAR}, #{crtTime,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR})
+      #{crtUser,jdbcType=VARCHAR}, #{crtTime,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR},#{isCheck,jdbcType=CHAR})
   </insert>
   <update id="updateEdApplication" parameterType="com.hex.bigdata.udsp.ed.model.EdApplication" >
     update ED_APPLICATION
@@ -45,7 +46,8 @@
       MAX_NUM = #{maxNum,jdbcType=DECIMAL},
       UPT_USER = #{uptUser,jdbcType=VARCHAR},
       UPT_TIME = #{uptTime,jdbcType=VARCHAR},
-      NOTE = #{note,jdbcType=VARCHAR}
+      NOTE = #{note,jdbcType=VARCHAR},
+      IS_CHECK = #{isCheck,jdbcType=CHAR}
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </update>
 
@@ -59,20 +61,20 @@
     </update>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME, 
-    UPT_USER, UPT_TIME, NOTE
+    UPT_USER, UPT_TIME, NOTE, IS_CHECK
     from ED_APPLICATION
     where PK_ID = #{pkId,jdbcType=VARCHAR} and DEL_FLG = '0'
   </select>
   <select id="getEdApplicationAll" resultMap="BaseResultMap" >
     select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME, 
-    UPT_USER, UPT_TIME, NOTE
+    UPT_USER, UPT_TIME, NOTE, IS_CHECK
     from ED_APPLICATION
     WHERE DEL_FLG = '0'
   </select>
 
     <select id="getEdApplicationInfoPage" parameterType="com.hex.bigdata.udsp.ed.dto.EdApplicationDto" resultMap="BaseResultMapExtends" >
         select app.PK_ID, app.INTERFACE_ID, app.NAME, app.DESCRIBE, app.MAX_NUM, app.DEL_FLG, app.CRT_USER, app.CRT_TIME,
-        app.UPT_USER, app.UPT_TIME, app.NOTE, info.INTERFACE_CODE, info.INTERFACE_NAME
+        app.UPT_USER, app.UPT_TIME, app.NOTE, app.IS_CHECK, info.INTERFACE_CODE, info.INTERFACE_NAME
         from ED_APPLICATION app
         left JOIN ED_INTERFACE_INFO info
         ON info.PK_ID = app.INTERFACE_ID
@@ -92,14 +94,14 @@
 
     <select id="getEdApplicationByName" parameterType="java.lang.String" resultMap="BaseResultMap" >
         select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME,
-        UPT_USER, UPT_TIME, NOTE
+        UPT_USER, UPT_TIME, NOTE, IS_CHECK
         from ED_APPLICATION
         WHERE NAME = #{name,jdbcType=VARCHAR} and DEL_FLG = '0'
     </select>
 
     <select id="getEdApplicationExl" parameterType="java.lang.String" resultMap="BaseResultMapExl" >
         select app.PK_ID, app.INTERFACE_ID, app.NAME, app.DESCRIBE, app.MAX_NUM, app.DEL_FLG, app.CRT_USER, app.CRT_TIME,
-        app.UPT_USER, app.UPT_TIME, app.NOTE, info.INTERFACE_CODE, info.INTERFACE_NAME
+        app.UPT_USER, app.UPT_TIME, app.NOTE, app.IS_CHECK, info.INTERFACE_CODE, info.INTERFACE_NAME
         from ED_APPLICATION app
         left JOIN ED_INTERFACE_INFO info
         ON info.PK_ID = app.INTERFACE_ID
