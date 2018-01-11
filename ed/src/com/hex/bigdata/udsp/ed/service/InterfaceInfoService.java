@@ -3,19 +3,15 @@ package com.hex.bigdata.udsp.ed.service;
 import com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper;
 import com.hex.bigdata.udsp.ed.dto.InterfaceInfoDto;
 import com.hex.bigdata.udsp.ed.dto.InterfaceInfoParamDto;
-import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
 import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.util.Util;
 import com.hex.goframe.util.WebUtil;
-import org.apache.commons.lang.StringUtils;
-import org.apache.zookeeper.server.quorum.QuorumCnxManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.callback.Callback;
-import java.beans.Transient;
 import java.util.Date;
 import java.util.List;
 
@@ -70,20 +66,28 @@ public class InterfaceInfoService {
         return messageResult;
     }
 
-    @Transient
-    public MessageResult updateInterfaceInfoByPkId(InterfaceInfoParamDto interfaceInfoParamDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResult updateInterfaceInfoByPkId(InterfaceInfoParamDto interfaceInfoParamDto) throws Exception {
         String interfaceId = interfaceInfoParamDto.getInterfaceInfo().getPkId();
         edInterfaceParamService.deleteByInterfaceId(interfaceId);
         MessageResult messageResult1 = updateInterfaceInfoByPkId(interfaceInfoParamDto.getInterfaceInfo());
-        MessageResult messageResult2 = edInterfaceParamService.insertRequestColList(interfaceId,interfaceInfoParamDto.getEdInterfaceParamsRequest());
-        MessageResult messageResult3 = edInterfaceParamService.insertResponseColList(interfaceId,interfaceInfoParamDto.getEdInterfaceParamsResponse());
+        MessageResult messageResult2 = edInterfaceParamService.insertRequestColList(interfaceId, interfaceInfoParamDto.getEdInterfaceParamsRequest());
+        MessageResult messageResult3 = edInterfaceParamService.insertResponseColList(interfaceId, interfaceInfoParamDto.getEdInterfaceParamsResponse());
 
-        if(messageResult1.isStatus() && messageResult2.isStatus() && messageResult3.isStatus()){
-            return new MessageResult(true,"修改成功");
+        if (messageResult1.isStatus() && messageResult2.isStatus() && messageResult3.isStatus()) {
+            return new MessageResult(true, "修改成功");
+        } else {
+            throw new Exception();
         }
-        return new MessageResult(false,"修改失败");
     }
+
     public MessageResult updateInterfaceInfoByPkId(InterfaceInfo interfaceInfo) {
+        //检查是否已经存在
+        InterfaceInfo interfaceInfo1 = getInterfaceInfoByInterfaceCode(interfaceInfo.getInterfaceCode());
+        if (interfaceInfo1 != null && !interfaceInfo.getPkId().equals(interfaceInfo1.getPkId())) {
+            return new MessageResult(false, "服务编码已存在，请重新输入！");
+        }
+
         interfaceInfo.setInterfaceCode(interfaceInfo.getInterfaceCode().trim());
         interfaceInfo.setReqUrl(interfaceInfo.getReqUrl().trim());
         interfaceInfo.setUpdateUser(WebUtil.getCurrentUserId());
@@ -95,40 +99,38 @@ public class InterfaceInfoService {
         return new MessageResult(true, "更新数据成功！");
     }
 
-    @Transient
-    public MessageResult deleteInterfaceInfo(InterfaceInfo[] interfaceInfos) {
-        int count = 0;
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResult deleteInterfaceInfo(InterfaceInfo[] interfaceInfos) throws Exception {
         for (InterfaceInfo interfaceInfo : interfaceInfos) {
             int result1 = interfaceInfoMapper.deleteInterfaceInfo(interfaceInfo.getPkId());
             int result2 = edInterfaceParamService.deleteByInterfaceId(interfaceInfo.getPkId());
-            if (result1 == 1 && result2 > 0) {
-                count++;
+            if (result1 == 0 && result2 <= 0) {
+                throw new Exception();
             }
-        }
-        if (count != interfaceInfos.length) {
-            return new MessageResult(false, "删除失败，请重试！");
         }
         return new MessageResult(true, "删除成功！");
     }
 
     /**
      * 保存接口配置
+     *
      * @param interfaceInfoParamDto
      * @return
      */
-    @Transient
-    public MessageResult addInterfaceInfo(InterfaceInfoParamDto interfaceInfoParamDto) throws Exception{
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResult addInterfaceInfo(InterfaceInfoParamDto interfaceInfoParamDto) throws Exception {
         MessageResult messageResult1 = this.addInterfaceInfo(interfaceInfoParamDto.getInterfaceInfo());
-        if(messageResult1.isStatus()){
+        if (messageResult1.isStatus()) {
             MessageResult messageResult2 = edInterfaceParamService.insertRequestColList(messageResult1.getMessage(),
                     interfaceInfoParamDto.getEdInterfaceParamsRequest());
             MessageResult messageResult3 = edInterfaceParamService.insertResponseColList(messageResult1.getMessage(),
                     interfaceInfoParamDto.getEdInterfaceParamsResponse());
-            if(messageResult2.isStatus() && messageResult3.isStatus()) {
-                return new MessageResult(true);
+            if (messageResult2.isStatus() && messageResult3.isStatus()) {
+                return new MessageResult(true, "保存成功");
             }
+            throw new Exception();
         }
-        return new MessageResult(false,"保存失败");
+        return new MessageResult(false, "保存失败");
     }
 
     public List<InterfaceInfo> getInterfaceInfoList() {

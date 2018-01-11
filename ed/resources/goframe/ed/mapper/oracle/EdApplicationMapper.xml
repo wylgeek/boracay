@@ -18,6 +18,11 @@
         <result column="INTERFACE_CODE" property="interfaceCode" jdbcType="VARCHAR" />
         <result column="INTERFACE_NAME" property="interfaceName" jdbcType="VARCHAR" />
     </resultMap>
+
+    <resultMap id="BaseResultMapExl" type="com.hex.bigdata.udsp.ed.dto.EdApplicationExlDto" extends="BaseResultMap">
+        <result column="INTERFACE_CODE" property="interfaceCode" jdbcType="VARCHAR" />
+        <result column="INTERFACE_NAME" property="interfaceName" jdbcType="VARCHAR" />
+    </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from ED_APPLICATION
     where PK_ID = #{pkId,jdbcType=VARCHAR}
@@ -89,7 +94,16 @@
         select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME,
         UPT_USER, UPT_TIME, NOTE
         from ED_APPLICATION
-        WHERE NAME = #{name,jdbcType=VARCHAR}
+        WHERE NAME = #{name,jdbcType=VARCHAR} and DEL_FLG = '0'
+    </select>
+
+    <select id="getEdApplicationExl" parameterType="java.lang.String" resultMap="BaseResultMapExl" >
+        select app.PK_ID, app.INTERFACE_ID, app.NAME, app.DESCRIBE, app.MAX_NUM, app.DEL_FLG, app.CRT_USER, app.CRT_TIME,
+        app.UPT_USER, app.UPT_TIME, app.NOTE, info.INTERFACE_CODE, info.INTERFACE_NAME
+        from ED_APPLICATION app
+        left JOIN ED_INTERFACE_INFO info
+        ON info.PK_ID = app.INTERFACE_ID
+        WHERE app.PK_ID = #{pkId,jdbcType=VARCHAR} and app.DEL_FLG = '0'
     </select>
 
 </mapper>

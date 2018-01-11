@@ -86,5 +86,18 @@
         SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, i.INTERFACE_TYPE,
         i.INTERFACE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
         FROM ED_INTERFACE_INFO i
+        WHERE IS_DEL = '0'
+        order by i.CRT_TIME desc
+    </select>
+
+    <select id="getInterfaceInfoExl" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, d1.DICT_NAME as INTERFACE_TYPE,
+        d2.DICT_NAME as INTERFACE_COMPANY
+        FROM ED_INTERFACE_INFO i
+        left join T_GF_DICT d1
+        on d1.DICT_ID = i.INTERFACE_TYPE and d1.DICT_TYPE_ID = 'ED_INTERFACE_TYPE'
+        LEFT JOIN T_GF_DICT d2
+        on d2.DICT_ID = i.INTERFACE_COMPANY and d2.DICT_TYPE_ID = 'ED_INTERFACE_COMPANY'
+        WHERE i.PK_ID = #{pkId,jdbcType=VARCHAR} and i.IS_DEL = '0'
     </select>
 </mapper>

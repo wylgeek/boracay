@@ -220,11 +220,7 @@ ${extends("/goframe/function_layout.httl")}
                 if(text.status) {
                     CloseWindow("saveSuccess");
                 } else {
-                    nui.alert(text.message,"系统提示",function (action) {
-                        if(action == "ok" || action == "close") {
-                            CloseWindow("saveFailed");
-                        }
-                    });
+                    nui.alert(text.message,"系统提示");
                 }
             },
             error:function (text) {

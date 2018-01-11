@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.util.List;
 
 /**
@@ -40,19 +39,15 @@ public class EdInterfaceParamService extends BaseService{
         return new MessageResult(false,"添加失败！");
     }
 
-    @Transient
-    public MessageResult updateByPrimaryKey(List<EdInterfaceParam> edInterfaceParams) {
-        int count = 0;
+    @Transactional(rollbackFor=Exception.class)
+    public MessageResult updateByPrimaryKey(List<EdInterfaceParam> edInterfaceParams) throws Exception {
         for(EdInterfaceParam edInterfaceParam:  edInterfaceParams){
             int result = edInterfaceParamMapper.updateByPrimaryKey(edInterfaceParam);
-            if(result == 1) {
-                count++;
+            if(result != 1) {
+                throw new Exception();
             }
         }
-        if(count == edInterfaceParams.size()) {
-            return new MessageResult(true,"更新成功！");
-        }
-        return new MessageResult(false,"更新失败！");
+        return new MessageResult(true,"更新成功！");
     }
 
     public EdInterfaceParam selectByPrimaryKey(String pkId) {
@@ -78,40 +73,32 @@ public class EdInterfaceParamService extends BaseService{
     public int deleteByInterfaceId(String interfaceId) {
         return edInterfaceParamMapper.deleteByInterfaceId(interfaceId);
     }
-    @Transactional
-    public MessageResult insertRequestColList(String interfaceId, List<EdInterfaceParam> edInterfaceParams) {
-        int count = 0;
+    @Transactional(rollbackFor=Exception.class)
+    public MessageResult insertRequestColList(String interfaceId, List<EdInterfaceParam> edInterfaceParams) throws Exception {
         for(EdInterfaceParam edInterfaceParam:edInterfaceParams) {
             edInterfaceParam.setPkId(Util.uuid());
             edInterfaceParam.setType("1");
             edInterfaceParam.setInterfaceId(interfaceId);
             int result = edInterfaceParamMapper.insert(edInterfaceParam);
-            if(result == 1) {
-                count++;
+            if(result != 1) {
+                throw new Exception();
             }
         }
-        if(count == edInterfaceParams.size()) {
-            return new MessageResult(true,"输入参数插入成功");
-        }
-        return new MessageResult(false,"输入参数插入失败");
+        return new MessageResult(true,"输入参数插入成功");
     }
 
-    @Transactional
-    public MessageResult insertResponseColList(String interfaceId, List<EdInterfaceParam> edInterfaceParams) {
-        int count = 0;
+    @Transactional(rollbackFor=Exception.class)
+    public MessageResult insertResponseColList(String interfaceId, List<EdInterfaceParam> edInterfaceParams) throws Exception {
         for(EdInterfaceParam edInterfaceParam:edInterfaceParams) {
             edInterfaceParam.setPkId(Util.uuid());
             edInterfaceParam.setType("2");
             edInterfaceParam.setInterfaceId(interfaceId);
             int result = edInterfaceParamMapper.insert(edInterfaceParam);
-            if(result == 1) {
-                count++;
+            if(result != 1) {
+                throw new Exception();
             }
         }
-        if(count == edInterfaceParams.size()) {
-            return new MessageResult(true,"输出参数插入成功");
-        }
-        return new MessageResult(false,"输出参数插入失败");
+        return new MessageResult(true,"输出参数插入成功");
     }
 
     public List<EdInterfaceParam> selectList(EdInterfaceParam record) {
