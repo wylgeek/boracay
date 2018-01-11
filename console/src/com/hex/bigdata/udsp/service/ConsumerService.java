@@ -46,6 +46,7 @@ import com.hex.bigdata.udsp.rts.service.RtsConsumerService;
 import com.hex.bigdata.udsp.rts.service.RtsMatedataColService;
 import com.hex.bigdata.udsp.rts.service.RtsProducerService;
 import com.hex.bigdata.udsp.thread.WaitQueueCallable;
+import com.hex.bigdata.udsp.thread.sync.EdSyncServiceCallable;
 import com.hex.bigdata.udsp.thread.sync.ImSyncServiceCallable;
 import com.hex.bigdata.udsp.thread.sync.IqSyncServiceCallable;
 import com.hex.bigdata.udsp.thread.sync.OlqSyncServiceCallable;
@@ -688,7 +689,22 @@ public class ConsumerService {
                 this.setErrorResponse(response, consumeRequest, bef, ErrorCode.ERROR_000007.getValue(), ErrorCode.ERROR_000007.getName() + ":" + e.toString(), consumeId);
                 return response;
             }
+        } else if (RcConstant.UDSP_SERVICE_TYPE_ED.equals(appType)) {
+            //开始ED消费
+            logger.debug("execute ED SYNC START");
+            Future<Response> edFuture = executorService.submit(new EdSyncServiceCallable(appId, request.getData()));
+            try {
+                response = edFuture.get(maxSyncExecuteTimeout, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                this.setErrorResponse(response, consumeRequest, bef, ErrorCode.ERROR_000015.getValue(), ErrorCode.ERROR_000015.getName(), consumeId);
+                return response;
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.setErrorResponse(response, consumeRequest, bef, ErrorCode.ERROR_000007.getValue(), ErrorCode.ERROR_000007.getName() + ":" + e.toString(), consumeId);
+                return response;
+            }
         }
+
         runEnd = System.currentTimeMillis();
 
         response.setConsumeId(mcCurrent.getPkId());

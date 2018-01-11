@@ -8,8 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.UnsupportedEncodingException;
-
 /**
  * Created by jc.zhao
  * Date:2018/1/10

@@ -86,7 +86,8 @@ public class HbaseStoreServiceImpl implements DataStoreService {
     }
 
     @Override
-    public String putData(String tableName, final String rowId, final byte[] data, final byte[] crtTime) {
+    public String putData(String storeName, final String rowId, final byte[] data, final byte[] crtTime) {
+        String tableName = TableUtil.getTableName(storeName, paramService.getUdspStorePrefix());
         return hbaseTemplate.execute(tableName, new TableCallback<String>() {
             @Override
             public String doInTable(HTableInterface table) throws Throwable {
@@ -103,7 +104,8 @@ public class HbaseStoreServiceImpl implements DataStoreService {
     }
 
     @Override
-    public byte[] getDataInfo(String tableName, String rowKey) {
+    public byte[] getDataInfo(String storeName, String rowKey) {
+        String tableName = TableUtil.getTableName(storeName, paramService.getUdspStorePrefix());
         String familyName = new String(paramService.getHbaseDataFamily());
         String qualifier = new String(paramService.getHbaseDataColumn());
         return hbaseTemplate.get(tableName, rowKey, familyName, qualifier, new RowMapper<byte[]>() {
@@ -115,7 +117,8 @@ public class HbaseStoreServiceImpl implements DataStoreService {
     }
 
     @Override
-    public byte[] getDataCrtTime(String tableName, String rowKey) {
+    public byte[] getDataCrtTime(String storeName, String rowKey) {
+        String tableName = TableUtil.getTableName(storeName, paramService.getUdspStorePrefix());
         String familyName = new String(paramService.getHbaseDataFamily());
         String qualifier = new String(paramService.getHbaseCrtTimeColumn());
         return hbaseTemplate.get(tableName, rowKey, familyName, qualifier, new RowMapper<byte[]>() {

@@ -63,4 +63,9 @@ public class EdApplicationMapper extends BaseMapper {
     public List selectEnableAll() {
         return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdApplicationMapper.getEdApplicationAll");
     }
+
+    public List<EdApplication> selectByInterfaceId(String interfaceId) {
+        return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdApplicationMapper.selectByInterfaceId",
+                interfaceId);
+    }
 }

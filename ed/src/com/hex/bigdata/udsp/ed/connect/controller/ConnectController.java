@@ -32,9 +32,9 @@ public class ConnectController {
 
     @RequestMapping("/getData")
     @ResponseBody
-    public String getData(Map reqParam, EdApplication edApplication){
-        try{
-            String returnJson = connectService.getData(reqParam,edApplication);
+    public String getData(Map reqParam, EdApplication edApplication) {
+        try {
+            String returnJson = connectService.getData(reqParam, edApplication);
             return returnJson;
         } catch (Exception e) {
             logger.info("接口调用异常");
@@ -45,13 +45,13 @@ public class ConnectController {
 
     @RequestMapping("/getDataTest1")
     @ResponseBody
-    public String getDataTest1(){
+    public String getDataTest1() {
         Map reqParam = new HashMap();
         EdApplication edApplication = edApplicationService.selectByPrimaryKey("0fa00d237e29442e89e953712cc9b2c5");
-        reqParam.put("name","hahhhhha");
-        reqParam.put("sex","男");
-        try{
-            String returnJson = connectService.getData(reqParam,edApplication);
+        reqParam.put("name", "hahhhhha");
+        reqParam.put("sex", "男");
+        try {
+            String returnJson = connectService.getData(reqParam, edApplication);
             return returnJson;
         } catch (Exception e) {
             logger.info("接口调用异常");
@@ -62,13 +62,13 @@ public class ConnectController {
 
     @RequestMapping("/getDataTest2")
     @ResponseBody
-    public String getDataTest2(){
+    public String getDataTest2() {
         Map reqParam = new HashMap();
         EdApplication edApplication = edApplicationService.selectByPrimaryKey("c4f4d97717f8448e9370e920a4831e4d");
-        reqParam.put("pkId","4c7e5e1087ae46eda79d70510faa12de");
+        reqParam.put("pkId", "4c7e5e1087ae46eda79d70510faa12de");
 
-        try{
-            String returnJson = connectService.getData(reqParam,edApplication);
+        try {
+            String returnJson = connectService.getData(reqParam, edApplication);
             return returnJson;
         } catch (Exception e) {
             logger.info("接口调用异常");

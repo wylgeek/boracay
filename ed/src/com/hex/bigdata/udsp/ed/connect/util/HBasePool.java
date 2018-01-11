@@ -15,7 +15,7 @@ import java.util.Properties;
 public class HBasePool {
     private static final Logger logger = Logger.getLogger(HBasePool.class.getName());
     private static LinkedList<Connection> pool = new LinkedList<Connection>();
-    private static Configuration conf=null;
+    private static Configuration conf = null;
     private static String zkQuorum = null;
     private static String zkPort = null;
 
@@ -23,8 +23,8 @@ public class HBasePool {
         initHBaseConfig();
     }
 
-    private static void initHBaseConfig(){
-        if(conf==null){
+    private static void initHBaseConfig() {
+        if (conf == null) {
             conf = HBaseConfiguration.create();
             InputStream in = null;
 
@@ -34,7 +34,7 @@ public class HBasePool {
                 props.load(in);
 
                 zkQuorum = props.getProperty("hbase.zk.quorum");
-                zkPort = props.getProperty("hbase.zk.port","2181");
+                zkPort = props.getProperty("hbase.zk.port", "2181");
 
                 conf.set("hbase.zookeeper.quorum", zkQuorum);
                 conf.set("hbase.zookeeper.property.clientPort", zkPort);

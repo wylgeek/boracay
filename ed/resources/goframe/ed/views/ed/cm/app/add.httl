@@ -546,6 +546,10 @@ ${extends("/goframe/function_layout.httl")}
      */
     var count1 = 0;
     function colNameBeforeShowPopup1(e){
+        var str = interfaceIdObj.value;
+        if(str == null || str == "") {
+            return;
+        }
         // --下拉选项变化--
         if(count1 == 0) {
             e.source.load("${basePath}/interfaceParam/selectListRequest/" + interfaceIdObj.value);
@@ -558,6 +562,10 @@ ${extends("/goframe/function_layout.httl")}
      */
     var count2 = 0;
     function colNameBeforeShowPopup2(e){
+        var str = interfaceIdObj.value;
+        if(str == null || str == "") {
+            return;
+        }
         // --下拉选项变化--
         if(count2 == 0) {
             e.source.load("${basePath}/interfaceParam/selectListRequest/" + interfaceIdObj.value);

@@ -1,7 +1,5 @@
 package com.hex.bigdata.udsp.ed.dto;
 
-import com.hex.bigdata.udsp.ed.model.InterfaceReqCount;
-
 public class InterfaceReqCountDto extends InterfaceReqCount {
 
     private String startTime;

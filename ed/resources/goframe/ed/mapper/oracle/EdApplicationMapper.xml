@@ -108,4 +108,10 @@
         WHERE app.PK_ID = #{pkId,jdbcType=VARCHAR} and app.DEL_FLG = '0'
     </select>
 
+    <select id="selectByInterfaceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select PK_ID, INTERFACE_ID, NAME, DESCRIBE, MAX_NUM, DEL_FLG, CRT_USER, CRT_TIME,
+        UPT_USER, UPT_TIME, NOTE, IS_CHECK
+        from ED_APPLICATION
+        where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR} and DEL_FLG = '0'
+    </select>
 </mapper>
