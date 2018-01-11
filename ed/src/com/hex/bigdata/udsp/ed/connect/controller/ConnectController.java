@@ -3,13 +3,11 @@ package com.hex.bigdata.udsp.ed.connect.controller;
 import com.hex.bigdata.udsp.ed.connect.service.ConnectService;
 import com.hex.bigdata.udsp.ed.controller.EdApplicationController;
 import com.hex.bigdata.udsp.ed.model.EdApplication;
-import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
 import com.hex.bigdata.udsp.ed.service.EdApplicationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -50,7 +48,7 @@ public class ConnectController {
     public String getDataTest1(){
         Map reqParam = new HashMap();
         EdApplication edApplication = edApplicationService.selectByPrimaryKey("0fa00d237e29442e89e953712cc9b2c5");
-        reqParam.put("name","hahha");
+        reqParam.put("name","hahhhhha");
         reqParam.put("sex","男");
         try{
             String returnJson = connectService.getData(reqParam,edApplication);

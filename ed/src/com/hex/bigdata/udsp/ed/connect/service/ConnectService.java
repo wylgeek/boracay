@@ -8,8 +8,8 @@ import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
 import com.hex.bigdata.udsp.ed.model.EdApplication;
 import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
 import com.hex.bigdata.udsp.ed.service.EdAppRequestParamService;
-import com.hex.bigdata.udsp.ed.service.EdAppResponseParamService;
 import com.hex.bigdata.udsp.ed.service.InterfaceInfoService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,6 +82,9 @@ public class ConnectService {
     public String getDataFromRemote(String reqParam, InterfaceInfo interfaceInfo) {
         RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
         String returnJson = restTemplateUtil.post(reqParam, interfaceInfo.getReqUrl());
+        if (StringUtils.isBlank(returnJson)) {
+            return "查询结果为空！";
+        }
         return returnJson;
     }
 
@@ -114,11 +117,13 @@ public class ConnectService {
         }
         long crtTime = Bytes.toLong(crtTimeAsByte);
         long currentTime = new Date().getTime();
-        if (crtTime + interfaceInfo.getValidTime() * 60 * 1000 > currentTime) {
+        long validTime = interfaceInfo.getValidTime();
+        validTime = validTime * 60 * 1000;
+        if (crtTime + validTime > currentTime){
             //3、从缓存取数据
             String responseJson = new String(dataStoreService.getDataInfo(tableName, rowId), "UTF-8");
             return responseJson;
-        } else {
+        } else{
             return getDataFromSourceAndSave(reqParam, interfaceInfo, tableName, rowId);
         }
     }

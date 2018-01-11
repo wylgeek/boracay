@@ -140,13 +140,14 @@ public class InterfaceInfoController {
 
     /**
      * 测试使用接口
+     *
      * @param name
      * @param sex
      * @return
      */
     @RequestMapping("/selectInterfaceInfoTest")
     @ResponseBody
-    public PageListResult selectInterfaceInfoTest(@RequestBody String name,String sex) {
+    public PageListResult selectInterfaceInfoTest(@RequestBody String name, String sex) {
         try {
             List<InterfaceInfo> interfaceInfos = interfaceInfoService.getInterfaceInfoList();
             return new PageListResult(interfaceInfos);
@@ -159,22 +160,24 @@ public class InterfaceInfoController {
 
     /**
      * 测试使用接口
+     *
      * @param pkId
      * @return
      */
     @RequestMapping("/getInterfaceInfoTest")
     @ResponseBody
-    public MessageResult getInterfaceInfoTest(@RequestBody String pkId) {
+    public InterfaceInfo getInterfaceInfoTest(@RequestBody InterfaceInfo interfaceInfo) {
+        String pkId = interfaceInfo.getPkId();
         if (StringUtils.isBlank(pkId)) {
-            return new MessageResult(false, "参数为空！");
+            return null;
         }
         try {
-            InterfaceInfo interfaceInfo = interfaceInfoService.getInterfaceInfoByPkId(pkId);
-            return new MessageResult(true, interfaceInfo);
+            InterfaceInfo interfaceInfo2 = interfaceInfoService.getInterfaceInfoByPkId(pkId);
+            return interfaceInfo2;
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
-            return new MessageResult(false, "请求失败，请重试！");
+            return null;
         }
     }
 }
