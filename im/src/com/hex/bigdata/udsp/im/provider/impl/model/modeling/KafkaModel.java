@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Created by JunjieM on 2017-9-5.
  */
-public class KafkaModel extends MqModel{
+public class KafkaModel extends MqModel implements Serializable{
     public KafkaModel(){
     }
 

@@ -17,8 +17,6 @@ public class ImModelFilterService {
     private ImModelFilterColMapper imModelFilterColMapper;
 
     public List<ImModelFilterCol> getImModelFiltersByMid(String mid){
-
-
         return  imModelFilterColMapper.selectList(mid);
     }
 }

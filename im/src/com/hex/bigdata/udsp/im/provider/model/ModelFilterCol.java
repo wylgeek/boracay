@@ -4,10 +4,12 @@ import com.hex.bigdata.udsp.common.constant.DataType;
 import com.hex.bigdata.udsp.common.constant.Operator;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by JunjieM on 2017-9-5.
  */
-public class ModelFilterCol {
+public class ModelFilterCol implements Serializable {
 
     private Short seq;
 
