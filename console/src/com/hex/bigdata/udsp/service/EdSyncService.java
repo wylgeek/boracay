@@ -42,11 +42,11 @@ public class EdSyncService {
      * @param data
      * @return
      */
-    public Response start(String appId, Map<String, String> data) {
+    public Response start(String appId, Map<String, String> data, String udspUser) {
         Response response = new Response();
         try {
             EdApplication edApplication = edApplicationService.selectByPrimaryKey(appId);
-            String responseJson = connectService.getData(data, edApplication);
+            String responseJson = connectService.getData(data, edApplication,udspUser);
             responseJson = formatResponse(responseJson, appId);
 
             response.setResponseContent(responseJson);
@@ -72,12 +72,29 @@ public class EdSyncService {
     public String formatResponse(String jsonStr, String appId) {
         Map map = JsonUtil.parseJSON2Map(jsonStr);
         Map responseMap = new HashMap();
+        responseMap.put("consumeId",map.get("consumeId"));
+        responseMap.put("consumeTime",map.get("consumeTime"));
+        String status = (String)map.get("status");
+        responseMap.put("status",status);
+        //判断接口是否异常，如果异常则不返回数据。
+        if(Status.DEFEAT.getValue().equals(status)){
+            responseMap.put("message",map.get("message"));
+            responseMap.put("statusCode",ErrorCode.ERROR_500001.getValue());
+            String returnJson = JsonUtil.parseMap2JSON(responseMap);
+            return returnJson;
+        }
+        //处理要返回的数据
+        Object dataObj = map.get("retData");
+        String dataStr = JsonUtil.parseObj2JSON(dataObj);
+        Map dataMap = JsonUtil.parseJSON2Map(dataStr);
+        Map dataMapTemp = new HashMap();
         List<EdAppResponseParam> edAppResponseParams = edAppResponseParamService.getEdAppResponseParamByAppId(appId);
         for (EdAppResponseParam edAppResponseParam : edAppResponseParams) {
             String name = edAppResponseParam.getName();
-            Object value = map.get(name);
-            responseMap.put(name,value);
+            Object value = dataMap.get(name);
+            dataMapTemp.put(name,value);
         }
+        responseMap.put("retData",dataMapTemp);
         String returnJson = JsonUtil.parseMap2JSON(responseMap);
         return returnJson;
     }

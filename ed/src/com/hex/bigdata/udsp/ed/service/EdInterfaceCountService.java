@@ -21,9 +21,7 @@ public class EdInterfaceCountService extends BaseService {
 
     public Boolean insert(EdInterfaceCount edInterfaceCount) {
         String pkId = Util.uuid();
-        String userId = WebUtil.getCurrentUserId();
         edInterfaceCount.setPkId(pkId);
-        edInterfaceCount.setReqUser(userId);
         edInterfaceCount.setReqTime(new Date());
         int result = edInterfaceCountMapper.insert(edInterfaceCount);
         if(result == 1) {

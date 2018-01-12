@@ -34,7 +34,7 @@ public class ConnectController {
     @ResponseBody
     public String getData(Map reqParam, EdApplication edApplication) {
         try {
-            String returnJson = connectService.getData(reqParam, edApplication);
+            String returnJson = connectService.getData(reqParam, edApplication,"123");
             return returnJson;
         } catch (Exception e) {
             logger.info("接口调用异常");
@@ -51,7 +51,7 @@ public class ConnectController {
         reqParam.put("name", "hahhhhha");
         reqParam.put("sex", "男");
         try {
-            String returnJson = connectService.getData(reqParam, edApplication);
+            String returnJson = connectService.getData(reqParam, edApplication,"456");
             return returnJson;
         } catch (Exception e) {
             logger.info("接口调用异常");
@@ -68,7 +68,7 @@ public class ConnectController {
         reqParam.put("pkId", "4c7e5e1087ae46eda79d70510faa12de");
 
         try {
-            String returnJson = connectService.getData(reqParam, edApplication);
+            String returnJson = connectService.getData(reqParam, edApplication,"678");
             return returnJson;
         } catch (Exception e) {
             logger.info("接口调用异常");

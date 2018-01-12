@@ -1,5 +1,7 @@
 package com.hex.bigdata.udsp.ed.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.ed.dto.InterfaceInfoDto;
 import com.hex.bigdata.udsp.ed.dto.InterfaceInfoParamDto;
 import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
@@ -7,6 +9,7 @@ import com.hex.bigdata.udsp.ed.service.InterfaceInfoService;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.model.PageListResult;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jc.zhao
@@ -147,10 +151,11 @@ public class InterfaceInfoController {
      */
     @RequestMapping("/selectInterfaceInfoTest")
     @ResponseBody
-    public PageListResult selectInterfaceInfoTest(@RequestBody String name, String sex) {
+    public Object selectInterfaceInfoTest(@RequestBody String name, String sex) {
         try {
             List<InterfaceInfo> interfaceInfos = interfaceInfoService.getInterfaceInfoList();
-            return new PageListResult(interfaceInfos);
+            String str = JSONUtil.parseList2JSON(interfaceInfos);
+            return JSON.toJSON(interfaceInfos);
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
@@ -158,10 +163,15 @@ public class InterfaceInfoController {
         }
     }
 
+    public String getJsonStr() {
+        String str = "{\"consumeId\":\"Cfsfgsgfdssdssfsgasfaf\",\"consumeTime\":361,\"retData\":{\"jkmxs2\":[{\"sfzh\":\"235235\",\"rq\":\"35234\",\"zy\":\"3425235\",\"srje\":\"235235\"},{\"sfzh\":\"235235\",\"rq\":\"23452\",\"zy\":\"2435235\",\"srje\":\"2535423\"},{\"sfzh\":\"234542345\",\"rq\":\"23523542\",\"zy\":\"252352\",\"srje\":\"25234234\"}],\"jnxx2\":{\"rq\":\"201344\",\"yjje\":\"34535\",\"fgsd\":\"453\"},\"dkxxs\":[]},\"status\":\"SUCCESS\",\"statusCode\":\"000000\"}";
+        return str;
+    }
+
     /**
      * 测试使用接口
      *
-     * @param pkId
+     * @param interfaceInfo
      * @return
      */
     @RequestMapping("/getInterfaceInfoTest")
