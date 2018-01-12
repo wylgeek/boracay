@@ -1,0 +1,223 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding: 5px 5px 0px 5px;">
+    <div id="form1" method="post">
+        <fieldset style="border:dotted 1px #227EA0;">
+            <input name="pkId" class="nui-hidden"/>
+            <legend><span style="font-weight: bold">基础栏</span></legend>
+            <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
+                <tr>
+                    <th class="nui-form-label"><label for="name">名称：</label></th>
+                    <td>
+                        <input id="name" name="name" class="nui-textbox" style="width: 97%" readonly="true"
+                               vtype="maxLength:64" onvalidation="nameValidation"/>
+
+                    </td>
+                    <th class="nui-form-label"><label for="interfaceId">接口编码：</label></th>
+                    <td>
+                        <input id="interfaceId" name="interfaceId" class="nui-combobox" valueField="pkId" textField="interfaceCode"
+                               dataField="data" url="${basePath}/interfaceInfo/selectInterfaceInfoList" allowInput="true"
+                               style="width:97%" onvaluechanged="mdIdChanged" readonly="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="describe">说明：</label></th>
+                    <td >
+                        <input id="describe" name="describe" class="nui-textbox" style="width:97%" readonly="true"
+                               vtype="maxLength:256"/>
+                    </td>
+                    <th class="nui-form-label"><label for="maxNum">最大返回数：</label></th>
+                    <td >
+                        <input id="maxNum" name="maxNum" class="nui-textbox" style="width:97%" readonly="true"
+                               vtype="maxLength:10;int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="isCheck">是否校验查询字段：</label></th>
+                    <td >
+                        <label><input id="noCheck" name="isCheck" type="radio" value="0" disabled/>否 </label>
+                        <label><input id="isCheck" name="isCheck" type="radio" value="1" disabled/>是 </label>
+                    </td>
+                    <th class="nui-form-label"></th>
+                    <td >
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="note">备注：</label></th>
+                    <td colspan="3">
+                        <input name="note" id="note" class="nui-textarea" style="height:60px; width:99%;" readonly="true"
+                               vtype="maxLength:4000"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="crtUser">创建者：</label></th>
+                    <td >
+                        <input id="crtUser" name="crtUser" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                    <th class="nui-form-label"><label for="crtTime">创建时间：</label></th>
+                    <td >
+                        <input id="crtTime" name="crtTime" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="uptUser">更新者：</label></th>
+                    <td >
+                        <input id="uptUser" name="uptUser" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                    <th class="nui-form-label"><label for="uptTime">更新时间：</label></th>
+                    <td >
+                        <input id="uptTime" name="uptTime" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">字段栏</span></legend>
+
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>查询字段</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add1" enabled="false">添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove1" enabled="false"
+                                   id="remove1">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp1" enabled="false"
+                                   id="moveUp1">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown1" enabled="false"
+                                   id="moveDown1">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:150px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid1" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellEdit="false" allowCellSelect="true" sortMode="client"
+                     showPager="false" editNextOnEnterKey="true" editNextRowCell="true" onselectionchanged="selected1"
+                     url="${basePath}/edApp/getEdAppRequestParamByAppId/${pkId}">
+                    <div property="columns">
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="20">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:64"
+                                   onvalidation="colNameValidation1"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="20">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                        <div field="defaultVal" headerAlign="center" allowSort="true" width="15">默认值
+                            <input property="editor" class="nui-textbox" vtype="maxLength:64"/>
+                        </div>
+                        <div type="checkboxcolumn"  field="isNeed" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">必填
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>返回字段</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add2" enabled="false">添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove2" enabled="false"
+                                   id="remove2">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp2" enabled="false"
+                                   id="moveUp2">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown2" enabled="false"
+                                   id="moveDown2">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:200px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid2" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellEdit="false" allowCellSelect="true" sortMode="client"
+                     showPager="false" editNextOnEnterKey="true" editNextRowCell="true" onselectionchanged="selected2"
+                     url="${basePath}/edApp/getEdAppResponseParamByAppId/${pkId}">
+                    <div property="columns">
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="20">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:64"
+                                   onvalidation="colNameValidation2"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="20">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
+            <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">返回</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var form1;
+    var grid1;
+    var grid2;
+
+    /**
+     * 按需加载资源文件
+     */
+    require(['jquery', 'nui'], function ($, nui) {
+        nui.parse();
+        form1 = new nui.Form("#form1");
+        grid1 = nui.get("datagrid1");
+        grid2 = nui.get("datagrid2");
+        setData();
+        grid1.load();
+        grid2.load();
+    });
+
+    /**
+     * 读取详情
+     */
+    function setData(){
+        $.ajax({
+            url:"${basePath}/edApp/selectByPrimaryKey/${pkId}",
+            type:'POST',
+            data:null,
+            cache:false,
+            contentType:'application/json',
+            success:function(result){
+                //console.warn(result);
+                if(result.status == true) {
+                    form1.setData(result.data);
+                    if(result.data.isCheck == 0){
+                        document.getElementById("noCheck").checked = true;
+                    } else {
+                        document.getElementById("isCheck").checked = true;
+                    }
+                    form1.setChanged(false);
+                }
+            }
+        });
+    }
+
+    /**
+     * 返回
+     */
+    function cancel() {
+        CloseWindow("onCancel");
+    }
+
+
+</script>
+<!--#end-->
