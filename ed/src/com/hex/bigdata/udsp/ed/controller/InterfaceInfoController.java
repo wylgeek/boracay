@@ -151,16 +151,23 @@ public class InterfaceInfoController {
      */
     @RequestMapping("/selectInterfaceInfoTest")
     @ResponseBody
-    public Object selectInterfaceInfoTest(@RequestBody String name, String sex) {
+    public String selectInterfaceInfoTest(@RequestBody String name, String sex) {
         try {
             List<InterfaceInfo> interfaceInfos = interfaceInfoService.getInterfaceInfoList();
             String str = JSONUtil.parseList2JSON(interfaceInfos);
-            return JSON.toJSON(interfaceInfos);
+            System.out.println(str);
+            System.out.println("\""+str + "\"");
+            return str;
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String getJsonStr111() {
+        String str = "{\"consumeId\":\"Cfsfgsgfdssdssfsgasfaf\",\"consumeTime\":361,\"retData\":{\"jkmxs2\":[{\"sfzh\":\"235235\",\"rq\":\"35234\",\"zy\":\"3425235\",\"srje\":\"235235\"},{\"sfzh\":\"235235\",\"rq\":\"23452\",\"zy\":\"2435235\",\"srje\":\"2535423\"},{\"sfzh\":\"234542345\",\"rq\":\"23523542\",\"zy\":\"252352\",\"srje\":\"25234234\"}],\"jnxx2\":{\"rq\":\"201344\",\"yjje\":\"34535\",\"fgsd\":\"453\"},\"dkxxs\":[]},\"status\":\"SUCCESS\",\"statusCode\":\"000000\"}";
+        return str;
     }
 
     public String getJsonStr() {
