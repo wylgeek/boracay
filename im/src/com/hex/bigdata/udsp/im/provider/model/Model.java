@@ -9,13 +9,14 @@ import com.hex.bigdata.udsp.im.constant.ModelType;
 import com.hex.bigdata.udsp.im.constant.UpdateMode;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by JunjieM on 2017-9-5.
  */
-public class Model extends Base {
+public class Model extends Base implements Serializable {
     private String id; // 唯一键
 
     private String name;

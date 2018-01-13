@@ -6,6 +6,7 @@ import com.hex.bigdata.udsp.common.model.ComExcelProperties;
 import com.hex.bigdata.udsp.common.model.ComUploadExcelContent;
 import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
 import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
+import com.hex.bigdata.udsp.ed.constant.RcServiceStatus;
 import com.hex.bigdata.udsp.ed.dao.EdApplicationMapper;
 import com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper;
 import com.hex.bigdata.udsp.ed.dto.EdApplicationDto;
@@ -15,6 +16,8 @@ import com.hex.bigdata.udsp.ed.dto.EdIndexDto;
 import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
 import com.hex.bigdata.udsp.ed.model.EdAppResponseParam;
 import com.hex.bigdata.udsp.ed.model.EdApplication;
+import com.hex.bigdata.udsp.rc.model.RcService;
+import com.hex.bigdata.udsp.rc.service.RcServiceService;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.service.BaseService;
@@ -60,6 +63,9 @@ public class EdApplicationService extends BaseService {
     @Autowired
     private InterfaceInfoMapper interfaceInfoMapper;
 
+    @Autowired
+    private RcServiceService rcServiceService;
+
     private static List<ComExcelParam> comExcelParams = new ArrayList<>();
 
     static {
@@ -76,7 +82,7 @@ public class EdApplicationService extends BaseService {
 
     public String insert(EdApplication edApplication) throws Exception {
         EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
-        if(edApplication1 != null){
+        if (edApplication1 != null) {
             return "";
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -93,7 +99,7 @@ public class EdApplicationService extends BaseService {
 
     public int addEdApplication(EdApplication edApplication) {
         EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
-        if(edApplication1 != null){
+        if (edApplication1 != null) {
             return -1;
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyyy-MM-dd HH:mm:ss");
@@ -105,7 +111,7 @@ public class EdApplicationService extends BaseService {
 
     public int updateEdApplication(EdApplication edApplication) {
         EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
-        if(edApplication1 != null && !edApplication.getPkId().equals(edApplication1.getPkId())){
+        if (edApplication1 != null && !edApplication.getPkId().equals(edApplication1.getPkId())) {
             return -1;
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -147,8 +153,14 @@ public class EdApplicationService extends BaseService {
 
     @Transactional(rollbackFor = Exception.class)
     public MessageResult updateEdApplicationAndParam(EdApplicationParamDto edApplicationParamDto) throws Exception {
-        int result1 = this.updateEdApplication(edApplicationParamDto.getEdApplication());
         String appId = edApplicationParamDto.getEdApplication().getPkId();
+        //校验服务是否停止
+        RcService rcService = rcServiceService.selectByAppTypeAndAppId("ED", appId);
+        if (RcServiceStatus.START.getValue().equals(rcService.getStatus())) {  //启停标志（0：启动，1：停用）
+            return new MessageResult(false, "此服务正在使用，请停止服务后修改！");
+        }
+
+        int result1 = this.updateEdApplication(edApplicationParamDto.getEdApplication());
         int result2 = edAppRequestParamService.deleteEdAppRequestParamByAppId(appId);
         int result3 = edAppResponseParamService.deleteEdAppResponseParamByAppId(appId);
         if (result1 != 1 || result2 <= 0 || result3 <= 0) {
@@ -161,6 +173,21 @@ public class EdApplicationService extends BaseService {
 
     @Transactional(rollbackFor = Exception.class)
     public MessageResult deleteEdApplicationAndParam(EdApplication[] edApplications) throws Exception {
+        String str = "";
+        for (EdApplication edApplication : edApplications) {
+            String pkId = edApplication.getPkId();
+            //校验服务是否启动
+            RcService rcService = rcServiceService.selectByAppTypeAndAppId("ED", pkId);
+            if (RcServiceStatus.START.getValue().equals(rcService.getStatus())) {
+                String name = edApplication.getName();
+                String desc = edApplication.getDescribe();
+                str = str + "["+name+":" + desc+"];";
+            }
+        }
+        if (!"".equals(str)) {
+            return new MessageResult(false, str + "服务正在使用，请停止服务后修改！");
+        }
+
         for (EdApplication edApplication : edApplications) {
             String pkId = edApplication.getPkId();
             int result1 = this.deleteByPrimaryKey(pkId);
@@ -388,5 +415,9 @@ public class EdApplicationService extends BaseService {
 
     public List selectAll() {
         return this.edApplicationMapper.selectEnableAll();
+    }
+
+    public List<EdApplication> selectByInterfaceId(String interfaceId) {
+        return this.edApplicationMapper.selectByInterfaceId(interfaceId);
     }
 }

@@ -32,7 +32,7 @@ public class RealtimeJob implements Job {
         try {
             imProviderService.buildRealtime(id, model);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new JobExecutionException(e);
         }
         logger.debug("一次实时构建【结束】");
     }

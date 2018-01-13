@@ -32,9 +32,6 @@ ${extends("/goframe/function_layout.httl")}
                     #if(hasPermission("RC.service.list.remove"))
                     <a class="nui-button" iconCls="icon-remove" plain="true" onclick="remove" enabled="false" id="remove">删除</a>
                     #end
-                    #if(hasPermission("RC.service.list.auth"))
-                    <a class="nui-button" iconCls="icon-add" plain="true" onclick="auth" enabled="false" id="auth">授权</a>
-                    #end
                     #if(hasPermission("RC.service.list.start"))
                     <a class="nui-button" iconCls="icon-ok" plain="true" onclick="start_service" enabled="false" id="start_service">启用</a>
                     #end
@@ -203,19 +200,16 @@ ${extends("/goframe/function_layout.httl")}
         var rows = grid1.getSelecteds();
         if (rows.length == 1) {
             nui.get("edit").enable();
-            nui.get("auth").enable();
             nui.get("remove").enable();
             nui.get("start_service").enable();
             nui.get("stop_service").enable();
         } else if (rows.length == 0) {
             nui.get("edit").disable();
-            nui.get("auth").disable();
             nui.get("remove").disable();
             nui.get("start_service").disable();
             nui.get("stop_service").disable();
         } else {
             nui.get("edit").disable();
-            nui.get("auth").disable();
             nui.get("remove").enable();
             nui.get("start_service").enable();
             nui.get("stop_service").enable();

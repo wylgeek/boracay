@@ -2,6 +2,7 @@ package com.hex.bigdata.udsp.common.provider.model;
 
 import com.hex.goframe.util.Util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Map;
 /**
  * Created by JunjieM on 2017-9-5.
  */
-public class Base {
+public class Base implements Serializable {
 
     protected List<Property> properties = new ArrayList<>(); // 配置参数集合
 

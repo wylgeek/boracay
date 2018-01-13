@@ -9,14 +9,14 @@ insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED
 insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','1','同盾数据','1','default');
 insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','2','百融数据','1','default');
 
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','360','6小时','1','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','720','12小时','2','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','1440','1天','3','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','2880','2天','4','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','7200','5天','5','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','10080','7天','6','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','43200','30天','7','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','129600','90天','8','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','360','6小时','5','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','720','12小时','9','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','1440','1天','12','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','2880','2天','15','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','7200','5天','20','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','10080','7天','30','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','43200','30天','40','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','129600','90天','50','default');
 
 
 -- 新建接口信息表
@@ -74,34 +74,23 @@ alter table ED_INTERFACE_INFO
 -- Create table
 create table ED_INTERFACE_COUNT
 (
-  pk_id             VARCHAR2(32) not null,
-  interface_id      VARCHAR2(32) not null,
-  interface_code    VARCHAR2(128) not null,
-  interface_name    VARCHAR2(256),
-  interface_type    VARCHAR2(2),
-  interface_company VARCHAR2(2),
-  request_user      VARCHAR2(32) not null,
-  request_time      TIMESTAMP(6) not null
+  pk_id     VARCHAR2(32) not null,
+  app_id    VARCHAR2(32) not null,
+  req_user  VARCHAR2(32),
+  req_time  TIMESTAMP(6) not null,
+  req_param VARCHAR2(2000)
 );
 -- Add comments to the columns
 comment on column ED_INTERFACE_COUNT.pk_id
   is '主键ID';
-comment on column ED_INTERFACE_COUNT.interface_id
-  is '服务的主键ID';
-comment on column ED_INTERFACE_COUNT.interface_code
-  is '服务编码';
-comment on column ED_INTERFACE_COUNT.interface_name
-  is '服务中文名';
-comment on column ED_INTERFACE_COUNT.interface_type
-  is '服务类型';
-comment on column ED_INTERFACE_COUNT.interface_company
-  is '服务厂商';
-comment on column ED_INTERFACE_COUNT.request_user
+comment on column ED_INTERFACE_COUNT.app_id
+  is '应用ID';
+comment on column ED_INTERFACE_COUNT.req_user
   is '请求人';
-comment on column ED_INTERFACE_COUNT.request_time
-  is '请求时间';
--- Create/Recreate indexes
-create index IDX_SERVICE_COUNT on ED_INTERFACE_COUNT (INTERFACE_CODE);
+comment on column ED_INTERFACE_COUNT.req_time
+  is '请求发起时间';
+comment on column ED_INTERFACE_COUNT.req_param
+  is '请求参数（json字符串形式）';
 -- Create/Recreate primary, unique and foreign key constraints
 alter table ED_INTERFACE_COUNT
   add constraint PK_SERVICE_COUNT primary key (PK_ID);
@@ -151,19 +140,19 @@ alter table ED_INTERFACE_PARAM
 -- Create table
 create table ED_APPLICATION
 (
-  pk_id    VARCHAR2(32) not null,
+  pk_id        VARCHAR2(32) not null,
   interface_id VARCHAR2(32) not null,
-  name     VARCHAR2(64) not null,
-  describe VARCHAR2(256) not null,
-  max_num  NUMBER(10),
-  del_flg  CHAR(1) not null,
-  crt_user VARCHAR2(32) not null,
-  crt_time VARCHAR2(32) not null,
-  upt_user VARCHAR2(32) not null,
-  upt_time VARCHAR2(32) not null,
-  note     VARCHAR2(4000)
+  name         VARCHAR2(64) not null,
+  describe     VARCHAR2(256) not null,
+  max_num      NUMBER(10),
+  del_flg      CHAR(1) not null,
+  crt_user     VARCHAR2(32) not null,
+  crt_time     VARCHAR2(32) not null,
+  upt_user     VARCHAR2(32),
+  upt_time     VARCHAR2(32),
+  note         VARCHAR2(4000),
+  is_check     CHAR(1)
 );
-
 -- Add comments to the table
 comment on table ED_APPLICATION
   is '接口管理-应用表';
@@ -190,11 +179,14 @@ comment on column ED_APPLICATION.upt_time
   is '更新时间';
 comment on column ED_APPLICATION.note
   is '备注';
+comment on column ED_APPLICATION.is_check
+  is '是否校验输入参数(0：不校验，1：校验)';
 -- Create/Recreate indexes
 create index IDX_ED_APP_DELFLG on ED_APPLICATION (DEL_FLG);
 -- Create/Recreate primary, unique and foreign key constraints
 alter table ED_APPLICATION
   add constraint PK_ED_APPLICATION primary key (PK_ID);
+
 
 
 -- 接口管理-输入参数

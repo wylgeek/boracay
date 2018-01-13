@@ -1,9 +1,11 @@
 package com.hex.bigdata.udsp.common.provider.model;
 
+import java.io.Serializable;
+
 /**
  * Created by junjiem on 2017-3-2.
  */
-public class Property {
+public class Property implements Serializable {
 
     private String name;
 

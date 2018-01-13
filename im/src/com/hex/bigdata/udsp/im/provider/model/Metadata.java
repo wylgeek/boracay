@@ -7,13 +7,14 @@ import com.hex.bigdata.udsp.im.constant.MetadataStatus;
 import com.hex.bigdata.udsp.im.constant.MetadataType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by JunjieM on 2017-9-5.
  */
-public class Metadata extends Base {
+public class Metadata extends Base implements Serializable {
     private String name;
 
     private String describe;

@@ -3,10 +3,12 @@ package com.hex.bigdata.udsp.im.provider.model;
 import com.hex.bigdata.udsp.common.constant.DataType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
+
 /**
  * Created by JunjieM on 2017-9-5.
  */
-public class MetadataCol {
+public class MetadataCol implements Serializable {
     private Short seq;
 
     private String name;

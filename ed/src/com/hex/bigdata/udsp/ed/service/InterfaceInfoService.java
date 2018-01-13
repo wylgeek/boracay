@@ -1,9 +1,14 @@
 package com.hex.bigdata.udsp.ed.service;
 
+import com.hex.bigdata.udsp.ed.connect.service.ConnectService;
+import com.hex.bigdata.udsp.ed.constant.RcServiceStatus;
 import com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper;
 import com.hex.bigdata.udsp.ed.dto.InterfaceInfoDto;
 import com.hex.bigdata.udsp.ed.dto.InterfaceInfoParamDto;
+import com.hex.bigdata.udsp.ed.model.EdApplication;
 import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
+import com.hex.bigdata.udsp.rc.model.RcService;
+import com.hex.bigdata.udsp.rc.service.RcServiceService;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.util.Util;
@@ -27,6 +32,16 @@ public class InterfaceInfoService {
 
     @Autowired
     private EdInterfaceParamService edInterfaceParamService;
+
+    @Autowired
+    private EdApplicationService edApplicationService;
+
+    @Autowired
+    private RcServiceService rcServiceService;
+
+    @Autowired
+    private ConnectService connectService;
+
 
     public InterfaceInfo getInterfaceInfoByPkId(String pkId) {
         return interfaceInfoMapper.getInterfaceInfoByPkId(pkId);
@@ -68,7 +83,18 @@ public class InterfaceInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public MessageResult updateInterfaceInfoByPkId(InterfaceInfoParamDto interfaceInfoParamDto) throws Exception {
+        //判断服务编码是否修改
+        InterfaceInfo interfaceInfo = this.getInterfaceInfoByPkId(interfaceInfoParamDto.getInterfaceInfo().getPkId());
+        if(!interfaceInfo.getInterfaceCode().equals(interfaceInfoParamDto.getInterfaceInfo().getInterfaceCode())){
+            //在hbase中创建对应的表，如果表已经存在则返回false，正常创建则返回true，不成功抛出异常
+            connectService.createTable(interfaceInfoParamDto.getInterfaceInfo().getInterfaceCode());
+        }
         String interfaceId = interfaceInfoParamDto.getInterfaceInfo().getPkId();
+        String str = this.checkRcService(interfaceId);
+        if (!"".equals(str)) {
+            return new MessageResult(false, str + "服务正在使用，请停止服务后修改！");
+        }
+
         edInterfaceParamService.deleteByInterfaceId(interfaceId);
         MessageResult messageResult1 = updateInterfaceInfoByPkId(interfaceInfoParamDto.getInterfaceInfo());
         MessageResult messageResult2 = edInterfaceParamService.insertRequestColList(interfaceId, interfaceInfoParamDto.getEdInterfaceParamsRequest());
@@ -101,6 +127,15 @@ public class InterfaceInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public MessageResult deleteInterfaceInfo(InterfaceInfo[] interfaceInfos) throws Exception {
+        String str = "";
+        for (InterfaceInfo interfaceInfo : interfaceInfos) {
+            String interfaceId = interfaceInfo.getPkId();
+            str = str + this.checkRcService(interfaceId);
+        }
+        if(!"".equals(str)){
+            return new MessageResult(false,str+"服务正在使用，请停止服务后修改！");
+        }
+
         for (InterfaceInfo interfaceInfo : interfaceInfos) {
             int result1 = interfaceInfoMapper.deleteInterfaceInfo(interfaceInfo.getPkId());
             int result2 = edInterfaceParamService.deleteByInterfaceId(interfaceInfo.getPkId());
@@ -119,6 +154,9 @@ public class InterfaceInfoService {
      */
     @Transactional(rollbackFor = Exception.class)
     public MessageResult addInterfaceInfo(InterfaceInfoParamDto interfaceInfoParamDto) throws Exception {
+        //在hbase中创建对应的表，如果表已经存在则返回false，正常创建则返回true，不成功抛出异常
+        connectService.createTable(interfaceInfoParamDto.getInterfaceInfo().getInterfaceCode());
+        //数据库中添加信息
         MessageResult messageResult1 = this.addInterfaceInfo(interfaceInfoParamDto.getInterfaceInfo());
         if (messageResult1.isStatus()) {
             MessageResult messageResult2 = edInterfaceParamService.insertRequestColList(messageResult1.getMessage(),
@@ -135,5 +173,26 @@ public class InterfaceInfoService {
 
     public List<InterfaceInfo> getInterfaceInfoList() {
         return interfaceInfoMapper.getInterfaceInfoList();
+    }
+
+    /**
+     * 校验服务是否正在运行
+     * @param interfaceId
+     * @return
+     */
+    public String checkRcService(String interfaceId) {
+        //校验服务是否正在运行
+        String str = "";
+        List<EdApplication> edApplications = edApplicationService.selectByInterfaceId(interfaceId);
+        for (EdApplication edApplication : edApplications) {
+            String appId = edApplication.getPkId();
+            RcService rcService = rcServiceService.selectByAppTypeAndAppId("ED", appId);
+            if (RcServiceStatus.START.getValue().equals(rcService.getStatus())) {
+                String name = edApplication.getName();
+                String desc = edApplication.getDescribe();
+                str = str + "["+name+":" + desc+"];";
+            }
+        }
+        return str;
     }
 }
