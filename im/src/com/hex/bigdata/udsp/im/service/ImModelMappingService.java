@@ -23,7 +23,6 @@ public class ImModelMappingService {
     private ImMetadataColMapper imMetadataColMapper;
 
     public List<ImModelMapping> getImModelMappingsByMid(String mid) {
-
         return imModelMappingMapper.selectByModelId(mid);
     }
 

@@ -134,7 +134,7 @@ ${extends("/goframe/function_layout.httl")}
          allowCellSelect="false" onselectionchanged="selected" onrowdblclick="deteil">
         <div property="columns">
             <div type="checkcolumn" width="20"></div>
-            <div field="serviceName" headerAlign="center" allowSort="true">服务名称</div>
+            <div field="serviceName" headerAlign="center" allowSort="true" renderer="serviceRenderer">服务名称</div>
             <div field="serviceType" headerAlign="center" allowSort="true" renderer="renderServiceType">应用类型</div>
             <div field="userId" headerAlign="center" allowSort="true">用户名</div>
             <div field="ipSection" headerAlign="center" allowSort="true">IP段</div>
@@ -515,6 +515,32 @@ ${extends("/goframe/function_layout.httl")}
         });
     }
 
+    /**
+     * 服务注册渲染
+     * @param e
+     * @returns {string}
+     */
+    function serviceRenderer(e){
+        return "<a href='#' class='underline' onclick='showServiceInfo(\""+e.row.serviceId+"\",\""+e.row.serviceName+"\")'>"+e.row.serviceName+"</a>";
+    }
+
+    /**
+     * 显示服务注册信息
+     * @param pkId
+     * @param dbName
+     */
+    function showServiceInfo(serviceId, serviceName){
+        nui.open({
+            url: "${basePath}/goframe/p/rc.service.info/?pkId=" + serviceId,
+            title: "详情-" + serviceName,
+            width: 640,
+            height:320,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+            }
+        });
+    }
 </script>
 
 <!--#end-->

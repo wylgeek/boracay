@@ -5,6 +5,7 @@ import com.hex.bigdata.udsp.common.model.ComProperties;
 import com.hex.bigdata.udsp.common.util.PropertyUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * Created by junjiem on 2017-3-2.
  */
-public class Datasource extends Base {
+public class Datasource extends Base implements Serializable {
     private String name;
 
     private String describe;
