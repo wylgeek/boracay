@@ -18,5 +18,6 @@
     <orderEntry type="library" name="tools" level="project" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="library" name="poi" level="project" />
+    <orderEntry type="module" module-name="rc" />
   </component>
 </module>

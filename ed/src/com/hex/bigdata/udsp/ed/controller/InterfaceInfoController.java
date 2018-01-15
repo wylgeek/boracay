@@ -151,11 +151,13 @@ public class InterfaceInfoController {
      */
     @RequestMapping("/selectInterfaceInfoTest")
     @ResponseBody
-    public Object selectInterfaceInfoTest(@RequestBody String name, String sex) {
+    public String selectInterfaceInfoTest(@RequestBody String name, String sex) {
         try {
             List<InterfaceInfo> interfaceInfos = interfaceInfoService.getInterfaceInfoList();
             String str = JSONUtil.parseList2JSON(interfaceInfos);
-            return JSON.toJSON(interfaceInfos);
+            System.out.println(str);
+            System.out.println("\""+str + "\"");
+            return str;
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();

@@ -29,6 +29,16 @@ public class Response implements Serializable {
 
     public String responseContent;//返回信息
 
+    public Object responseData; //返回数据
+
+    public Object getResponseData() {
+        return responseData;
+    }
+
+    public void setResponseData(Object responseData) {
+        this.responseData = responseData;
+    }
+
     private LinkedHashMap<String,String> returnColumns;//返回字段信息
 
     public String getConsumeId() {
