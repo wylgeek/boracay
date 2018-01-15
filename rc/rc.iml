@@ -22,5 +22,6 @@
     <orderEntry type="module" module-name="olq" />
     <orderEntry type="module" module-name="rts" />
     <orderEntry type="module" module-name="im" />
+    <orderEntry type="module" module-name="ed" />
   </component>
 </module>
