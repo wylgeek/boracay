@@ -43,5 +43,8 @@
     <orderEntry type="module" module-name="rc" />
     <orderEntry type="module" module-name="rts" />
     <orderEntry type="module" module-name="im" />
+    <orderEntry type="module" module-name="ed" />
+    <orderEntry type="module" module-name="md" />
+    <orderEntry type="library" name="hadoop" level="project" />
   </component>
 </module>

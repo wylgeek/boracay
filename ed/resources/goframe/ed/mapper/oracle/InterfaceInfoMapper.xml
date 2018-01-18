@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.ed.dao.InterfaceInfoMapper" >
+    <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.ed.model.InterfaceInfo" >
+        <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+        <result column="INTERFACE_CODE" property="interfaceCode" jdbcType="VARCHAR" />
+        <result column="INTERFACE_NAME" property="interfaceName" jdbcType="VARCHAR" />
+        <result column="VALID_TIME" property="validTime" jdbcType="INTEGER" />
+        <result column="REQ_URL" property="reqUrl" jdbcType="VARCHAR" />
+        <result column="INTERFACE_DESC" property="interfaceDesc" jdbcType="CHAR" />
+        <result column="INTERFACE_TYPE" property="interfaceType" jdbcType="VARCHAR" />
+        <result column="INTERFACE_COMPANY" property="interfaceCompany" jdbcType="VARCHAR" />
+        <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR" />
+        <result column="CRT_TIME" property="crtTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="IS_DEL" property="isDel" jdbcType="CHAR" />
+    </resultMap>
+
+    <select id="getInterfaceInfoByPkId" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, i.INTERFACE_TYPE,
+        i.INTERFACE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
+        FROM ED_INTERFACE_INFO i
+        WHERE PK_ID = #{pkId,jdbcType=VARCHAR} and IS_DEL = '0'
+    </select>
+
+    <select id="getInterfaceInfoList" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.ed.dto.InterfaceInfoDto">
+        SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, i.INTERFACE_TYPE,
+        i.INTERFACE_COMPANY, nvl2(l1.USER_NAME,l1.USER_NAME,i.CRT_USER) AS CRT_USER, i.CRT_TIME,
+        nvl2(l2.USER_NAME,l2.USER_NAME,i.UPDATE_USER) AS UPDATE_USER, i.UPDATE_TIME
+        FROM ED_INTERFACE_INFO i
+        LEFT JOIN T_GF_LOGINUSER l1 ON i.CRT_USER = l1.USER_ID
+        LEFT JOIN T_GF_LOGINUSER l2 ON i.UPDATE_USER = l2.USER_ID
+        WHERE IS_DEL = '0'
+        <if test="interfaceCode != null and interfaceCode != ''">and i.INTERFACE_CODE like '${interfaceCode}%'</if>
+        <if test="interfaceName != null and interfaceName != ''">and i.INTERFACE_NAME like '%${interfaceName}%'</if>
+        <if test="interfaceType != null and interfaceType != ''">and i.INTERFACE_TYPE = #{interfaceType}</if>
+        <if test="interfaceCompany != null and interfaceCompany != ''">and i.INTERFACE_COMPANY = #{interfaceCompany}</if>
+        <if test="startTime != null and startTime != ''">and i.CRT_TIME &gt;= to_date(#{startTime},'yyyy-mm-dd')</if>
+        <if test="endTime != null and endTime != ''">and i.CRT_TIME &lt;= to_date(#{endTime},'yyyy-mm-dd')</if>
+        order by i.CRT_TIME desc
+    </select>
+
+    <select id="getInterfaceInfoByInterfaceCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, i.INTERFACE_TYPE,
+        i.INTERFACE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
+        FROM ED_INTERFACE_INFO i
+        WHERE INTERFACE_CODE = #{interfaceCode,jdbcType=VARCHAR} and IS_DEL = '0'
+    </select>
+
+    <insert id="addInterfaceInfo" parameterType="com.hex.bigdata.udsp.ed.model.InterfaceInfo">
+        INSERT INTO ED_INTERFACE_INFO
+        (PK_ID, INTERFACE_CODE, INTERFACE_NAME, VALID_TIME, REQ_URL, INTERFACE_DESC, INTERFACE_TYPE,
+        INTERFACE_COMPANY, CRT_USER, CRT_TIME)
+        VALUES
+        (#{pkId,jdbcType=VARCHAR},#{interfaceCode,jdbcType=VARCHAR},#{interfaceName,jdbcType=VARCHAR},#{validTime,jdbcType=INTEGER},
+        #{reqUrl,jdbcType=VARCHAR},#{interfaceDesc,jdbcType=VARCHAR},#{interfaceType,jdbcType=VARCHAR},
+        #{interfaceCompany,jdbcType=VARCHAR},#{crtUser,jdbcType=VARCHAR},#{crtTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <update id="updateInterfaceInfoByPkId" parameterType="com.hex.bigdata.udsp.ed.model.InterfaceInfo">
+        UPDATE ED_INTERFACE_INFO
+        SET
+        INTERFACE_TYPE = #{interfaceType,jdbcType=VARCHAR},
+        INTERFACE_COMPANY = #{interfaceCompany,jdbcType=VARCHAR},
+        INTERFACE_CODE = #{interfaceCode,jdbcType=VARCHAR},
+        INTERFACE_NAME = #{interfaceName,jdbcType=VARCHAR},
+        VALID_TIME = #{validTime,jdbcType=INTEGER},
+        REQ_URL = #{reqUrl,jdbcType=VARCHAR},
+        <if test="interfaceDesc != null and interfaceDesc != ''">
+            INTERFACE_DESC = #{interfaceDesc,jdbcType=VARCHAR},
+        </if>
+        UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+        where PK_ID = #{pkId,jdbcType=VARCHAR}
+    </update>
+    
+    <update id="deleteInterfaceInfo" parameterType="java.lang.String">
+        UPDATE ED_INTERFACE_INFO
+        SET
+        IS_DEL = '1'
+        WHERE PK_ID = #{pkId,jdbcType=VARCHAR}
+    </update>
+
+    <select id="getInterfaceInfoAll" resultMap="BaseResultMap" >
+        SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, i.INTERFACE_TYPE,
+        i.INTERFACE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
+        FROM ED_INTERFACE_INFO i
+        WHERE IS_DEL = '0'
+        order by i.CRT_TIME desc
+    </select>
+
+    <select id="getInterfaceInfoExl" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT i.PK_ID, i.INTERFACE_CODE, i.INTERFACE_NAME, i.VALID_TIME, i.REQ_URL, i.INTERFACE_DESC, d1.DICT_NAME as INTERFACE_TYPE,
+        d2.DICT_NAME as INTERFACE_COMPANY
+        FROM ED_INTERFACE_INFO i
+        left join T_GF_DICT d1
+        on d1.DICT_ID = i.INTERFACE_TYPE and d1.DICT_TYPE_ID = 'ED_INTERFACE_TYPE'
+        LEFT JOIN T_GF_DICT d2
+        on d2.DICT_ID = i.INTERFACE_COMPANY and d2.DICT_TYPE_ID = 'ED_INTERFACE_COMPANY'
+        WHERE i.PK_ID = #{pkId,jdbcType=VARCHAR} and i.IS_DEL = '0'
+    </select>
+</mapper>
