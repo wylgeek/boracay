@@ -269,7 +269,9 @@ public class ConsumerService {
         }
         // 管理员用户，直接访问
         if (isAdmin) {
-            if (ConsumerConstant.CONSUMER_TYPE_SYNC.equalsIgnoreCase(type)
+            if (!ConsumerConstant.CONSUMER_ENTITY_START.equalsIgnoreCase(request.getEntity())) {
+                mcCurrent = McCommonUtil.getMcCurrent(request, adminMaxSyncNum);
+            } else if (ConsumerConstant.CONSUMER_TYPE_SYNC.equalsIgnoreCase(type)
                     && ConsumerConstant.CONSUMER_ENTITY_START.equalsIgnoreCase(entity)) {
                 mcCurrent = runQueueService.checkSyncCurrent(request, adminMaxSyncNum);
             } else if (ConsumerConstant.CONSUMER_TYPE_ASYNC.equalsIgnoreCase(type)
@@ -349,13 +351,13 @@ public class ConsumerService {
                 return consumeRequest;
             } else { // 可以进入等待队列
                 if (!ConsumerConstant.CONSUMER_ENTITY_START.equalsIgnoreCase(request.getEntity())) {
-                    mcCurrent = McCommonUtil.getMcCurrent(consumeRequest.getRequest(), rcUserService.getMaxSyncNum());
+                    mcCurrent = McCommonUtil.getMcCurrent(request, rcUserService.getMaxSyncNum());
                 } else if (ConsumerConstant.CONSUMER_TYPE_SYNC.equalsIgnoreCase(request.getType())
                         && ConsumerConstant.CONSUMER_ENTITY_START.equalsIgnoreCase(request.getEntity())) {
-                    mcCurrent = McCommonUtil.getMcCurrent(consumeRequest.getRequest(), rcUserService.getMaxSyncNum());
+                    mcCurrent = McCommonUtil.getMcCurrent(request, rcUserService.getMaxSyncNum());
                 } else if (ConsumerConstant.CONSUMER_TYPE_ASYNC.equalsIgnoreCase(request.getType())
                         && ConsumerConstant.CONSUMER_ENTITY_START.equalsIgnoreCase(request.getEntity())) {
-                    mcCurrent = McCommonUtil.getMcCurrent(consumeRequest.getRequest(), rcUserService.getMaxAsyncNum());
+                    mcCurrent = McCommonUtil.getMcCurrent(request, rcUserService.getMaxAsyncNum());
                 }
                 String waitQueueTaskId = waitNumResult.getWaitQueueTaskId();
                 if (CommonConstant.REQUEST_SYNC.equalsIgnoreCase(type)) { // 同步

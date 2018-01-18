@@ -117,7 +117,7 @@ public class SolrHBaseProvider implements Provider {
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
 
-        logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 
@@ -178,7 +178,7 @@ public class SolrHBaseProvider implements Provider {
 
             response.setStatus(Status.SUCCESS);
             response.setStatusCode(StatusCode.SUCCESS);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(Status.DEFEAT);
             response.setStatusCode(StatusCode.DEFEAT);
@@ -189,7 +189,7 @@ public class SolrHBaseProvider implements Provider {
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
 
-        logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 
@@ -331,7 +331,7 @@ public class SolrHBaseProvider implements Provider {
         return colMap;
     }
 
-    private HBasePage searchPage(String tableName, SolrQuery query, int pageIndex, int pageSize, Map<Integer, String> colMap, SolrHBaseDatasource datasource) throws IOException {
+    private HBasePage searchPage(String tableName, SolrQuery query, int pageIndex, int pageSize, Map<Integer, String> colMap, SolrHBaseDatasource datasource) throws Exception {
         List<Map<String, String>> records = new ArrayList<Map<String, String>>();
         SolrHBasePage solrHBasePage = searchPage(tableName, query, pageIndex, pageSize, datasource);
         for (String id : solrHBasePage.getRecords()) {
@@ -340,7 +340,7 @@ public class SolrHBaseProvider implements Provider {
         return new HBasePage(records, solrHBasePage.getPageIndex(), solrHBasePage.getPageSize(), solrHBasePage.getTotalCount());
     }
 
-    private List<Map<String, String>> search(String tableName, SolrQuery query, Map<Integer, String> colMap, SolrHBaseDatasource datasource) throws IOException {
+    private List<Map<String, String>> search(String tableName, SolrQuery query, Map<Integer, String> colMap, SolrHBaseDatasource datasource) throws Exception {
         List<String> list = search(tableName, query, datasource);
         List<Map<String, String>> records = new ArrayList<Map<String, String>>();
         for (String id : list) {
@@ -421,7 +421,7 @@ public class SolrHBaseProvider implements Provider {
     }
 
     // ------------------------------HBase----------------------------------
-    private Map<String, String> get(String tableName, String rowkey, Map<Integer, String> colMap, SolrHBaseDatasource datasource) throws IOException {
+    private Map<String, String> get(String tableName, String rowkey, Map<Integer, String> colMap, SolrHBaseDatasource datasource) throws Exception {
         HConnection conn = null;
         HTableInterface table = null;
         Map<String, String> map;
@@ -443,13 +443,13 @@ public class SolrHBaseProvider implements Provider {
         return map;
     }
 
-    private Map<String, String> get(HTableInterface table, String rowkey, Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep) throws IOException {
+    private Map<String, String> get(HTableInterface table, String rowkey, Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep) throws Exception {
         Get get = new Get(Bytes.toBytes(rowkey));
         addColumn(get, family, qualifier);
         return get(table, get, colMap, family, qualifier, fqSep);
     }
 
-    private Map<String, String> get(HTableInterface table, Get get, Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep) throws IOException {
+    private Map<String, String> get(HTableInterface table, Get get, Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep) throws Exception {
         Result r = table.get(get);
         return getMap(r, colMap, family, qualifier, fqSep);
     }

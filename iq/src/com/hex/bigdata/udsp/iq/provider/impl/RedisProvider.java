@@ -142,7 +142,7 @@ public class RedisProvider implements Provider {
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
 
-        logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 

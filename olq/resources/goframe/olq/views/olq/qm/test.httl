@@ -65,7 +65,7 @@ ${extends("/goframe/function_layout.httl")}
                         <input class="nui-button" iconCls="icon-search" text="查询" onclick="search"/>
                         #end
                         <span style="display:inline-block;width:25px;"></span>
-                        <input class="nui-button" iconCls="icon-reset" text="重置" onclick="onFormReset('form1')"/>
+                        <input class="nui-button" iconCls="icon-reset" text="重置" onclick="onFormReset"/>
                         <span style="display:inline-block;width:25px;"></span>
                         #if(hasPermission("OLQ.qm.test.download"))
                         <input class="nui-button" iconCls="icon-download" text="下载" onclick="download"/>
@@ -331,6 +331,11 @@ ${extends("/goframe/function_layout.httl")}
                 grid1.unmask();
             }
         });
+    }
+
+    function onFormReset(){
+        $("#sql").val("");
+        nui.get("dsId").setValue("");
     }
 </script>
 
