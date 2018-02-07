@@ -85,6 +85,8 @@ public class ElasticSearchProvider implements Provider {
         long now = System.currentTimeMillis();
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
+
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 
@@ -146,6 +148,8 @@ public class ElasticSearchProvider implements Provider {
         long now = System.currentTimeMillis();
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
+
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 

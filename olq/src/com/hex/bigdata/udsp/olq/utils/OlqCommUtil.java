@@ -39,22 +39,4 @@ public class OlqCommUtil {
             stmt.close();
         }
     }
-
-    /**
-     * 元数据列信息插入到Map
-     *
-     * @param rsmd
-     * @return
-     */
-    public static LinkedHashMap<String, String> putColumnIntoMap(ResultSetMetaData rsmd) {
-        LinkedHashMap<String, String> columnMap = new LinkedHashMap<>();
-        try {
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                columnMap.put(rsmd.getColumnName(i), rsmd.getColumnTypeName(i));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return columnMap;
-    }
 }

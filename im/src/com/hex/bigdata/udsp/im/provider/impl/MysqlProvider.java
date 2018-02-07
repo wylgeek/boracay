@@ -35,12 +35,12 @@ public class MysqlProvider extends JdbcWrapper implements RealtimeTargetProvider
 
     @Override
     public void createSchema(Metadata metadata) throws Exception {
-        MysqlDatasource mysqlDatasource = new MysqlDatasource( metadata.getDatasource());
+        MysqlDatasource mysqlDatasource = new MysqlDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String tableComment = metadata.getDescribe();
         List<TableColumn> columns = ImUtil.convertToTableColumnList(metadata.getMetadataCols());
         String sql = MysqlSqlUtil.createTable(false, fullTbName, columns, tableComment);
-         JdbcUtil.executeUpdate(mysqlDatasource, sql);
+        JdbcUtil.executeUpdate(mysqlDatasource, sql);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MysqlProvider extends JdbcWrapper implements RealtimeTargetProvider
         MysqlDatasource mysqlDatasource = new MysqlDatasource(metadata.getDatasource());
         String fullTbName = metadata.getTbName();
         String sql = MysqlSqlUtil.dropTable(false, fullTbName);
-         JdbcUtil.executeUpdate(mysqlDatasource, sql);
+        JdbcUtil.executeUpdate(mysqlDatasource, sql);
     }
 
     @Override

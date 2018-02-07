@@ -120,7 +120,7 @@ public class HBaseProvider implements Provider {
             response.setRecords(records);
             response.setStatus(Status.SUCCESS);
             response.setStatusCode(StatusCode.SUCCESS);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(Status.DEFEAT);
             response.setStatusCode(StatusCode.DEFEAT);
@@ -143,7 +143,7 @@ public class HBaseProvider implements Provider {
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
 
-        logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 
@@ -224,7 +224,7 @@ public class HBaseProvider implements Provider {
             page.setTotalCount(hbasePage.getTotalCount());
             response.setStatus(Status.SUCCESS);
             response.setStatusCode(StatusCode.SUCCESS);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(Status.DEFEAT);
             response.setStatusCode(StatusCode.DEFEAT);
@@ -248,7 +248,7 @@ public class HBaseProvider implements Provider {
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
 
-        logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 
@@ -456,13 +456,13 @@ public class HBaseProvider implements Provider {
     }
 
     private int count(HTableInterface table, String startRow,
-                      String stopRow) throws IOException {
+                      String stopRow) throws Exception {
         Scan scan = new Scan();
         setRowScan(scan, startRow, stopRow);
         return count(table, scan);
     }
 
-    private int count(HTableInterface table, Scan scan) throws IOException {
+    private int count(HTableInterface table, Scan scan) throws Exception {
         scan.setCaching(500);
         scan.setCacheBlocks(false);
         scan.setFilter(new FirstKeyOnlyFilter());
@@ -476,13 +476,13 @@ public class HBaseProvider implements Provider {
     }
 
     private List<Map<String, String>> scan(HTableInterface table, Scan scan, Map<Integer, String> colMap,
-                                           byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
+                                           byte[] family, byte[] qualifier, String fqSep, String dataType) throws Exception {
         ResultScanner rs = table.getScanner(scan);
         return getMaps(rs, colMap, family, qualifier, fqSep, dataType);
     }
 
     private List<Map<String, String>> scan(HTableInterface table, String startRow, String stopRow, Map<Integer, String> colMap,
-                                           long maxSize, byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
+                                           long maxSize, byte[] family, byte[] qualifier, String fqSep, String dataType) throws Exception {
         Scan scan = new Scan();
         addColumn(scan, family, qualifier);
         setRowScan(scan, startRow, stopRow);
@@ -491,7 +491,8 @@ public class HBaseProvider implements Provider {
     }
 
     private HBasePage scanPage(HTableInterface table, Scan scan, HBasePage HBasePage,
-                               Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
+                               Map<Integer, String> colMap, byte[] family, byte[] qualifier,
+                               String fqSep, String dataType) throws Exception {
         int totalCount = count(table, HBasePage.getStartRow(), HBasePage.getStopRow());
 
         setRowScan(scan, HBasePage);
@@ -503,7 +504,8 @@ public class HBaseProvider implements Provider {
         return HBasePage;
     }
 
-    private HBasePage scanPage(HTableInterface table, HBasePage HBasePage, Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep, String dataType) throws IOException {
+    private HBasePage scanPage(HTableInterface table, HBasePage HBasePage, Map<Integer, String> colMap,
+                               byte[] family, byte[] qualifier, String fqSep, String dataType) throws Exception {
         Scan scan = new Scan();
         addColumn(scan, family, qualifier);
         return scanPage(table, scan, HBasePage, colMap, family, qualifier, fqSep, dataType);
@@ -548,7 +550,8 @@ public class HBaseProvider implements Provider {
     }
 
     private List<Map<String, String>> getMapsPage(ResultScanner rs, HBasePage HBasePage,
-                                                  Map<Integer, String> colMap, byte[] family, byte[] qualifier, String fqSep, String dataType) {
+                                                  Map<Integer, String> colMap, byte[] family,
+                                                  byte[] qualifier, String fqSep, String dataType) {
         int pageIndex = HBasePage.getPageIndex();
         int pageSize = HBasePage.getPageSize();
         int befNum = pageSize * (pageIndex - 1); // 不需要显示的数据条数

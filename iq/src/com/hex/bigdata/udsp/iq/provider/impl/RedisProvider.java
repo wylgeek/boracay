@@ -7,7 +7,7 @@ import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.iq.provider.Provider;
 import com.hex.bigdata.udsp.iq.provider.impl.factory.RedisConnectionPoolFactory;
-import com.hex.bigdata.udsp.iq.provider.impl.model.RedisDataSource;
+import com.hex.bigdata.udsp.iq.provider.impl.model.RedisDatasource;
 import com.hex.bigdata.udsp.iq.provider.model.*;
 import com.hex.bigdata.udsp.iq.util.IqCommonUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -88,7 +88,7 @@ public class RedisProvider implements Provider {
         Datasource datasource = metadata.getDatasource();
         //获取元数据返回字段
         List<DataColumn> metaReturnColumns = metadata.getReturnColumns();
-        RedisDataSource redisDatasource = new RedisDataSource(datasource.getPropertyMap());
+        RedisDatasource redisDatasource = new RedisDatasource(datasource.getPropertyMap());
         String tableName = metadata.getTbName();
         String query = getRedisQuery(metadata.getQueryColumns(), queryColumns, tableName);
         String fqSep = redisDatasource.getSeprator();
@@ -142,13 +142,13 @@ public class RedisProvider implements Provider {
         long consumeTime = now - bef;
         response.setConsumeTime(consumeTime);
 
-        logger.debug("consumeTime=" + response.getConsumeTime() + " recordsSize=" + response.getRecords().size());
+        logger.debug("consumeTime=" + response.getConsumeTime());
         return response;
     }
 
     //-------------------------------------------分割线---------------------------------------------
 
-    private synchronized RedisConnectionPoolFactory getDataSource(RedisDataSource datasource) {
+    private synchronized RedisConnectionPoolFactory getDataSource(RedisDatasource datasource) {
         String dsId = datasource.getId();
         if (dataSourcePool == null) {
             dataSourcePool = new HashMap<String, RedisConnectionPoolFactory>();
@@ -161,7 +161,7 @@ public class RedisProvider implements Provider {
         return factory;
     }
 
-    private Jedis getConnection(RedisDataSource datasource) {
+    private Jedis getConnection(RedisDatasource datasource) {
         try {
             return getDataSource(datasource).getConnection();
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class RedisProvider implements Provider {
     }
 
 
-    private List<Map<String, String>> search(String fqSep, String queryString, RedisDataSource datasource, List<DataColumn> returnColumns, int startRow, int endRow, int maxNum) {
+    private List<Map<String, String>> search(String fqSep, String queryString, RedisDatasource datasource, List<DataColumn> returnColumns, int startRow, int endRow, int maxNum) {
         RedisConnectionPoolFactory redisConnectionPoolFactory = getDataSource(datasource);
         Jedis jedis = redisConnectionPoolFactory.getConnection();
 
@@ -206,7 +206,7 @@ public class RedisProvider implements Provider {
     }
 
 
-    private int getCountNum(String queryString, RedisDataSource datasource) {
+    private int getCountNum(String queryString, RedisDatasource datasource) {
         RedisConnectionPoolFactory redisConnectionPoolFactory = getDataSource(datasource);
         Jedis jedis = redisConnectionPoolFactory.getConnection();
         //获取模糊匹配的key
@@ -221,7 +221,7 @@ public class RedisProvider implements Provider {
     }
 
 
-    private List<Map<String, String>> search(String fqSep, String queryString, RedisDataSource datasource, List<DataColumn> returnColumns, int maxNum) {
+    private List<Map<String, String>> search(String fqSep, String queryString, RedisDatasource datasource, List<DataColumn> returnColumns, int maxNum) {
         RedisConnectionPoolFactory redisConnectionPoolFactory = getDataSource(datasource);
         Jedis jedis = redisConnectionPoolFactory.getConnection();
 
@@ -261,7 +261,7 @@ public class RedisProvider implements Provider {
     public boolean testDatasource(Datasource datasource) {
         boolean canConnection = false;
         Jedis jedis = null;
-        RedisDataSource redisDatasource = new RedisDataSource(datasource.getPropertyMap());
+        RedisDatasource redisDatasource = new RedisDatasource(datasource.getPropertyMap());
         try {
             jedis = getConnection(redisDatasource);
             canConnection = jedis.isConnected();
