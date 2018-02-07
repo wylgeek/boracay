@@ -1,0 +1,139 @@
+#########################################################################
+#					依赖jar包
+#########################################################################
+httpmime-4.3.1.jar
+netty-3.7.0.Final.jar
+noggit-0.5.jar
+slf4j-api-1.7.5.jar
+slf4j-log4j12-1.7.5.jar
+solr-solrj-4.10.3.jar
+wstx-asl-3.2.7.jar
+
+
+#########################################################################
+#					测试Hive查询Solr中数据（成功）
+#########################################################################
+beeline -u jdbc:hive2://localhost:10000 -n hive -p 111111
+
+--存在表就删除
+drop table if exists solr_handler_test1;
+
+-- 创建一个Solr的外链表（单机Solr）
+create external table solr_handler_test1 ( --定义字段，这里面的字段需要与solr的字段一致
+id string,
+dt string,
+bu_ret_code string,
+ccy string,
+uni_message_type string,
+tran_in_acct_no string,
+paymen_date string,
+teller_no string,
+card_no string,
+medium_type string,
+channel_type string,
+amt decimal(22,2),
+term_seq_no string,
+retr_ref_no string,
+bu_tran_code string,
+bu_settlement_date string,
+system_tracr_no string,
+auth_code string,
+tran_status string,
+message_type string
+)  
+stored by "com.hex.hive.solr.SolrStorageHandler" --定义存储的storehandler
+tblproperties( --配置solr属性
+'solr.url' = 'http://node1:8983/solr/HDS_CUPATRXJNL', -- Solr Rest服务的地址、端口和Collection Name
+'solr.query' = '*:*', -- Solr查询语句
+'solr.cursor.batch.size' = '1000', -- 批量大小
+'solr.primary.key' = 'id', -- Solr Collection 主键字段名
+'is.solrcloud' = '0' -- 0：单机模式，1：集群模式，Default：0
+);
+
+select * from solr_handler_test1 limit 10;
+
+
+-- 创建一个Solr的外链表（集群Solr）
+create external table solr_handler_test2 ( --定义字段，这里面的字段需要与solr的字段一致
+id string,
+dt string,
+bu_ret_code string,
+ccy string,
+uni_message_type string,
+tran_in_acct_no string,
+paymen_date string,
+teller_no string,
+card_no string,
+medium_type string,
+channel_type string,
+amt string,
+term_seq_no string,
+retr_ref_no string,
+bu_tran_code string,
+bu_settlement_date string,
+system_tracr_no string,
+auth_code string,
+tran_status string,
+message_type string
+)  
+stored by "com.hex.hive.solr.SolrStorageHandler" --定义存储的storehandler
+tblproperties( --配置solr属性
+'solr.url' = 'node1:2181,node2:2181,node3:2181/solr', -- zookeeper地址、端口和目录
+'solr.query' = '*:*', -- Solr查询语句
+'solr.cursor.batch.size' = '1000', -- 批量大小
+'solr.primary.key' = 'id', -- Solr Collection 主键字段名
+'is.solrcloud' = '1', -- 0：单机模式，1：集群模式，Default：0
+'collection.name' = 'HDS_CUPATRXJNL' -- Solr Collection Name
+);
+
+select * from solr_handler_test2 limit 10;
+
+#########################################################################
+#					测试Hive插入数据到Solr（成功）
+#########################################################################
+
+create external table solr_handler_test3 (
+id varchar(32),
+card_no char(32),
+channel_type string,
+amt decimal(22,2),
+dt string
+)  
+stored by "com.hex.hive.solr.SolrStorageHandler"
+tblproperties(
+'solr.url' = 'node1:2181,node2:2181,node3:2181/solr',
+'solr.query' = '*:*',
+'solr.cursor.batch.size' = '1000',
+'solr.primary.key' = 'id',
+'is.solrcloud' = '1',
+'collection.name' = 'solr_handler_test1'
+);
+
+INSERT OVERWRITE TABLE solr_handler_test3 
+SELECT id, card_no, channel_type, amt, dt FROM solr_handler_test1 limit 10;
+
+INSERT INTO TABLE solr_handler_test3 
+SELECT id, card_no, channel_type, '11', dt FROM solr_handler_test1 limit 4;
+
+INSERT INTO TABLE solr_handler_test3 
+SELECT id, card_no, channel_type, 11, dt FROM solr_handler_test1 limit 3;
+
+select * from solr_handler_test3 limit 10;
+
+#########################################################################
+#					测试Hive更新数据到DB（不支持）
+#########################################################################
+
+UPDATE solr_handler_test3 SET amt = 110 where id = '000069915bdbd75f';
+
+#########################################################################
+#					测试Hive删除数据到DB（不支持）
+#########################################################################
+
+DELETE FROM jdbc_handler_test3 where s_name = '000069915bdbd75f';
+
+
+注：
+1、Hive建表字段类型只能是String类型；
+2、OVERWRITE和INTO效果相同只是增量添加；
+3、只支持create、select和insert操作；

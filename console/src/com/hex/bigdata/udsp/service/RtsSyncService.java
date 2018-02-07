@@ -4,6 +4,8 @@ import com.hex.bigdata.udsp.common.constant.ErrorCode;
 import com.hex.bigdata.udsp.common.constant.Status;
 import com.hex.bigdata.udsp.common.constant.StatusCode;
 import com.hex.bigdata.udsp.common.provider.model.Result;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
+import com.hex.bigdata.udsp.iq.provider.model.IqResponse;
 import com.hex.bigdata.udsp.model.Response;
 import com.hex.bigdata.udsp.rts.dto.RtsConsumerRequestView;
 import com.hex.bigdata.udsp.rts.dto.RtsProducerRequestView;
@@ -15,6 +17,7 @@ import com.hex.bigdata.udsp.rts.provider.model.ProducerResponse;
 import com.hex.bigdata.udsp.rts.service.RtsMatedataColService;
 import com.hex.bigdata.udsp.rts.service.RtsProducerService;
 import com.hex.bigdata.udsp.rts.service.RtsProviderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +46,10 @@ public class RtsSyncService {
      * @return
      */
     public Response startProducer(String appId, List<Map<String, String>> datas) {
+        Response response = checkParam(appId, datas);
+        if (response != null) return response;
 
-        Response response = new Response();
+        response = new Response();
         try {
             RtsProducer rtsProducer = rtsProducerService.select(appId);
             String mdId = rtsProducer.getMdId();
@@ -75,12 +80,40 @@ public class RtsSyncService {
             response.setStatusCode(producerResponse.getStatusCode().getValue());
         } catch (Exception e) {
             e.printStackTrace();
-            response.setMessage(ErrorCode.ERROR_000007.getName() +"："+e.getMessage());
+            response.setMessage(ErrorCode.ERROR_000007.getName() + "：" + e.getMessage());
             response.setStatus(Status.DEFEAT.getValue());
             response.setStatusCode(StatusCode.DEFEAT.getValue());
             response.setErrorCode(ErrorCode.ERROR_000007.getValue());
         }
 
+        return response;
+    }
+
+
+    /**
+     * 检查输入的参数
+     *
+     * @param appId
+     * @param datas
+     * @return
+     */
+    private Response checkParam(String appId, List<Map<String, String>> datas) {
+        Response response = null;
+        boolean isError = false;
+        StringBuffer colsName = new StringBuffer();
+        for (RtsMatedataCol rtsMatedataCol : rtsMatedataColService.selectByProducerPkid(appId)) {
+            colsName.append(rtsMatedataCol.getName() + ",");
+            if (StringUtils.isBlank(datas.get(0).get(rtsMatedataCol.getName()))) {
+                isError = true;
+            }
+        }
+        if (isError) {
+            response = new Response();
+            response.setStatus(Status.DEFEAT.getValue());
+            response.setStatusCode(StatusCode.DEFEAT.getValue());
+            response.setErrorCode(ErrorCode.ERROR_000009.getValue());
+            response.setMessage("请检查以下参数的值:" + colsName.substring(0, colsName.length() - 1));
+        }
         return response;
     }
 

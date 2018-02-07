@@ -24,7 +24,7 @@
     </Appenders>
 
     <Loggers>
-        <Root level="info">
+        <Root level="debug">
             <AppenderRef ref="udspSdk"/>
             <AppenderRef ref="Console"/>
         </Root>

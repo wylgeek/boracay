@@ -114,6 +114,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="length" headerAlign="center" allowSort="true" width="15">长度
                             <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
                         </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
+                        </div>
                         <div field="defaultVal" headerAlign="center" allowSort="true" width="15">默认值
                             <input property="editor" class="nui-textbox" vtype="maxLength:64"/>
                         </div>
@@ -175,6 +178,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="length" headerAlign="center" allowSort="true" width="15">长度
                             <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
                         </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
+                        </div>
                         <div field="stats" headerAlign="center" allowSort="true" width="20">统计函数
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
                                    dictTypeId="IQ_APP_RETURN_COL_STATS"/>
@@ -227,6 +233,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="type" headerAlign="center" allowSort="true" width="20">类型
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
                                    dictTypeId="IQ_MD_COL_DATA_TYPE" vtype="maxLength:32"/>
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
                         </div>
                         <div field="orderType" headerAlign="center" allowSort="true" width="20">排序
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"

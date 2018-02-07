@@ -92,10 +92,17 @@ ${extends("/goframe/function_layout.httl")}
                     </td>
                 </tr>
                 <tr>
+                    <th class="nui-form-label"><label for="responseContent">错误信息：</label></th>
+                    <td colspan="3">
+                        <input id="message" name="message" class="nui-textarea"
+                               style="height:60px; width:99%;" readonly="true"/>
+                    </td>
+                </tr>
+                <tr>
                     <th class="nui-form-label"><label for="responseContent">响应内容：</label></th>
                     <td colspan="3">
                         <input id="responseContent" name="responseContent" class="nui-textarea"
-                               style="height:120px; width:99%;" readonly="true"/>
+                               style="height:60px; width:99%;" readonly="true"/>
                     </td>
                 </tr>
             </table>

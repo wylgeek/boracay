@@ -151,7 +151,4 @@ public class McServiceChartsService extends BaseService {
     public List<McChartsView> userTimeDay(String timeStart, String timeEnd, String serverName,String userName) {
         return mcServiceChartsMapper.userTimeDay(new McChartsView(timeStart, timeEnd, serverName,userName));
     }
-
-
-
 }

@@ -14,11 +14,13 @@
     <orderEntry type="library" name="spring" level="project" />
     <orderEntry type="library" name="jdbc" level="project" />
     <orderEntry type="library" name="poi" level="project" />
+    <orderEntry type="library" exported="" name="mail" level="project" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="iq" />
     <orderEntry type="module" module-name="mc" />
     <orderEntry type="module" module-name="mm" />
     <orderEntry type="module" module-name="olq" />
     <orderEntry type="module" module-name="rts" />
+    <orderEntry type="module" module-name="im" />
   </component>
 </module>

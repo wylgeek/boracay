@@ -66,7 +66,7 @@ public class FtpFileClient {
      *
      * @return
      */
-    public static FtpFileClient createDefaultFtpClient() {
+    public static FtpFileClient createFtpClient() {
         return new FtpFileClient(new SdkFtpUtil());
     }
 

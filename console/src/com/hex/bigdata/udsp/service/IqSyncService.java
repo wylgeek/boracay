@@ -1,16 +1,21 @@
 package com.hex.bigdata.udsp.service;
 
+import com.hex.bigdata.udsp.common.constant.EnumTrans;
 import com.hex.bigdata.udsp.common.constant.ErrorCode;
 import com.hex.bigdata.udsp.common.constant.Status;
 import com.hex.bigdata.udsp.common.constant.StatusCode;
 import com.hex.bigdata.udsp.common.provider.model.Page;
 import com.hex.bigdata.udsp.common.provider.model.Result;
 import com.hex.bigdata.udsp.common.util.CreateFileUtil;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.FTPClientConfig;
 import com.hex.bigdata.udsp.common.util.FTPHelper;
+import com.hex.bigdata.udsp.iq.model.IqAppQueryCol;
 import com.hex.bigdata.udsp.iq.provider.model.IqResponse;
+import com.hex.bigdata.udsp.iq.service.IqAppQueryColService;
 import com.hex.bigdata.udsp.iq.service.IqProviderService;
 import com.hex.bigdata.udsp.model.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +40,17 @@ public class IqSyncService {
 
     @Autowired
     private IqProviderService iqProviderService;
+    @Autowired
+    private IqAppQueryColService iqAppQueryColService;
 
+    /**
+     * 同步运行
+     *
+     * @param appId
+     * @param paraMap
+     * @param page
+     * @return
+     */
     public Response syncStart(String appId, Map<String, String> paraMap, Page page) {
         Response response = new Response();
         try {
@@ -47,18 +62,21 @@ public class IqSyncService {
             response.setStatusCode(iqResponse.getStatusCode().getValue());
             List<Map<String, String>> records = new ArrayList<>();
             Map<String, String> map = null;
-            for (Result result : iqResponse.getRecords()) {
-                map = new HashMap<>();
-                for (Map.Entry<String, Object> entry : result.entrySet()) {
-                    map.put(entry.getKey(), result.getString(entry.getKey()));
+
+            List<Result> results = iqResponse.getRecords();
+            if (null != results && results.size() > 0) {
+                for (Result result : iqResponse.getRecords()) {
+                    map = new HashMap<>();
+                    for (Map.Entry<String, Object> entry : result.entrySet()) {
+                        map.put(entry.getKey(), result.getString(entry.getKey()));
+                    }
+                    records.add(map);
                 }
-                records.add(map);
+                response.setRecords(records);
+                //返回字段名称及类型
             }
-            response.setRecords(records);
-            //返回字段名称及类型
             response.setReturnColumns(iqResponse.getColumns());
         } catch (Exception e) {
-            logger.error(e.getMessage());
             e.printStackTrace();
             response.setMessage(e.getMessage());
             response.setStatus(Status.DEFEAT.getValue());
@@ -77,11 +95,42 @@ public class IqSyncService {
      * @return
      */
     private IqResponse run(String appId, Map<String, String> paraMap, Page page) {
+        IqResponse response = checkParam(appId, paraMap);
+        if (response != null) return response;
+
         if (page != null && page.getPageIndex() > 0) {
             return iqProviderService.select(appId, paraMap, page.getPageIndex(), page.getPageSize());
         } else {
             return iqProviderService.select(appId, paraMap);
         }
+    }
+
+    /**
+     * 检查输入的参数
+     *
+     * @param appId
+     * @param paraMap
+     * @return
+     */
+    private IqResponse checkParam(String appId, Map<String, String> paraMap) {
+        IqResponse response = null;
+        boolean flg = false;
+        StringBuffer needColsName = new StringBuffer();
+        for (IqAppQueryCol iqAppQueryCol : iqAppQueryColService.selectByAppId(appId)) {
+            if (EnumTrans.transTrue(iqAppQueryCol.getIsNeed())) {
+                needColsName.append(iqAppQueryCol.getLabel() + ",");
+                if (StringUtils.isBlank(paraMap.get(iqAppQueryCol.getLabel()))) {
+                    flg = true;
+                }
+            }
+        }
+        if (flg) {
+            response = new IqResponse();
+            response.setStatus(Status.DEFEAT);
+            response.setStatusCode(StatusCode.DEFEAT);
+            response.setMessage("请检查以下参数的值:" + needColsName.substring(0, needColsName.length() - 1));
+        }
+        return response;
     }
 
     /**
@@ -122,8 +171,13 @@ public class IqSyncService {
                 ftpHelper.connectFTPServer();
                 ftpHelper.uploadFile(localDataFilePath, dataFileName, ftpFileDir);
                 ftpHelper.uploadFile(localFlgFilePath, flgFileName, ftpFileDir);
+                //filePath = "ftp://" + FTPClientConfig.getHostname() + ":" + FTPClientConfig.getPort() + ftpFilePath;
+                filePath = ftpDataFilePath;
+                message = localDataFilePath;
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                status = Status.DEFEAT;
+                statusCode = StatusCode.DEFEAT;
+                message = "FTP上传失败！" + e.getMessage();
                 e.printStackTrace();
             } finally {
                 try {
@@ -132,13 +186,10 @@ public class IqSyncService {
                     e.printStackTrace();
                 }
             }
-            //filePath = "ftp://" + FTPClientConfig.getHostname() + ":" + FTPClientConfig.getPort() + ftpFilePath;
-            filePath = ftpDataFilePath;
-            message = localDataFilePath;
         } else {
             status = Status.DEFEAT;
             statusCode = StatusCode.DEFEAT;
-            message = "失败";
+            message = response.getMessage();
         }
         response.setFilePath(filePath);
         response.setMessage(message);

@@ -286,8 +286,9 @@ public class UserServiceImpl extends BaseService implements ApplicationContextAw
     public void deleteUserSessionByClientIP(String clientIP) {
         try {
             this.userSessionMapper.deleteByClientIP(clientIP);
-        } catch (Exception var3) {
-            logger.error("userSessionMapper deleteByClientIP exception[{}]", var3.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("userSessionMapper deleteByClientIP exception[{}]",  e.getMessage());
         }
 
     }
@@ -313,8 +314,8 @@ public class UserServiceImpl extends BaseService implements ApplicationContextAw
 
         try {
             this.userSessionMapper.insert(userSession);
-        } catch (Exception var5) {
-            logger.error("userSessionMapper insert exception[{}]", var5.getMessage());
+        } catch (Exception e) {
+            logger.error("userSessionMapper insert exception[{}]", e.getMessage());
         }
 
     }

@@ -7,6 +7,7 @@ import com.hex.bigdata.udsp.common.provider.model.Datasource;
 import com.hex.bigdata.udsp.common.service.ComDatasourceService;
 import com.hex.bigdata.udsp.common.service.ComPropertiesService;
 import com.hex.bigdata.udsp.common.util.ObjectUtil;
+import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.iq.model.*;
 import com.hex.bigdata.udsp.iq.provider.Provider;
 import com.hex.bigdata.udsp.iq.provider.model.*;
@@ -52,6 +53,21 @@ public class IqProviderService extends BaseService {
     private static Logger logger = LogManager.getLogger(IqProviderService.class);
 
     /**
+     * 获取字段信息
+     *
+     * @param dsId
+     * @param schemaName
+     * @return
+     */
+    public List<MetadataCol> getColumnInfo(String dsId, String schemaName) {
+        ComDatasource comDatasource = comDatasourceService.select(dsId);
+        List<ComProperties> comPropertiesList = comPropertiesService.selectByFkId(dsId);
+        Datasource datasource = new Datasource(comDatasource, comPropertiesList);
+        Provider provider = getProviderImpl(datasource);
+        return provider.columnInfo(datasource, schemaName);
+    }
+
+    /**
      * 查询
      *
      * @param appId
@@ -62,13 +78,7 @@ public class IqProviderService extends BaseService {
         Application application = getApplication(appId, paraMap);
         IqRequest request = new IqRequest(application);
         Datasource datasource = application.getMetadata().getDatasource();
-        String type = datasource.getType();
-        String implClass = datasource.getImplClass();
-        if (StringUtils.isBlank(implClass)) {
-            GFDict gfDict = gfDictMapper.selectByPrimaryKey("IQ_IMPL_CLASS", type);
-            implClass = gfDict.getDictName();
-        }
-        Provider provider = (Provider) WebApplicationContextUtil.getBean(implClass);
+        Provider provider = getProviderImpl(datasource);
         IqResponse response = provider.query(request);
         //设置返回字段信息
         List<ReturnColumn> returnColumns = application.getReturnColumns();
@@ -99,14 +109,15 @@ public class IqProviderService extends BaseService {
 
     /**
      * 返回字段信息插入到Map
+     *
      * @param returnColumns
      * @return
      */
-    private LinkedHashMap<String,String> putColumnIntoMap(List<ReturnColumn> returnColumns){
-        LinkedHashMap<String,String> columnMap = new LinkedHashMap<>();
-       for (ReturnColumn returnColumn:returnColumns){
-           columnMap.put(returnColumn.getName(),returnColumn.getType().getValue());
-       }
+    private LinkedHashMap<String, String> putColumnIntoMap(List<ReturnColumn> returnColumns) {
+        LinkedHashMap<String, String> columnMap = new LinkedHashMap<>();
+        for (ReturnColumn returnColumn : returnColumns) {
+            columnMap.put(returnColumn.getName(), returnColumn.getType().getValue());
+        }
         return columnMap;
     }
 

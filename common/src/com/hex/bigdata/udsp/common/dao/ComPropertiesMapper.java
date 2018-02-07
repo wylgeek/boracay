@@ -2,6 +2,7 @@ package com.hex.bigdata.udsp.common.dao;
 
 import com.hex.bigdata.udsp.common.dao.base.SyncMapper;
 import com.hex.bigdata.udsp.common.model.ComProperties;
+import com.hex.goframe.util.Util;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -49,5 +50,19 @@ public class ComPropertiesMapper extends SyncMapper<ComProperties> {
 
     public boolean deleteByFkId(String fkId) {
         return this.deleteList(fkId);
+    }
+
+    public boolean insertModelComProperties(String pkId, List<ComProperties> comPropertiesList) {
+
+        String comPropertiesId;
+        for(ComProperties comProperties : comPropertiesList){
+            comProperties.setFkId(pkId);
+            comPropertiesId = Util.uuid();
+            comProperties.setPkId(comPropertiesId);
+            if(!insert(comPropertiesId,comProperties)){
+                return false;
+            }
+        }
+        return true;
     }
 }

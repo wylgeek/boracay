@@ -14,7 +14,7 @@
     <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR" />
     <result column="TB_NAME" property="tbName" jdbcType="VARCHAR" />
   </resultMap>
-  <resultMap id="IqMetadataView" type="com.hex.bigdata.udsp.iq.dto.IqMetadataView" extends="BaseResultMap">
+  <resultMap id="IqMetadataView" type="com.hex.bigdata.udsp.im.dto.ImMetadataView" extends="BaseResultMap">
     <result column="DS_NAME" property="dsName" jdbcType="VARCHAR" />
     <result column="DS_DESC" property="dsDesc" jdbcType="VARCHAR" />
     <result column="DS_TYPE" property="dsType" jdbcType="VARCHAR" />

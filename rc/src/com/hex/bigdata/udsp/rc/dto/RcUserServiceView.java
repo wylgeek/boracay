@@ -33,6 +33,10 @@ public class RcUserServiceView extends RcUserService {
     private String serviceName;
 
     /**
+     * 服务说明
+     */
+    private String serviceDescribe;
+    /**
      *服务类型
      */
     private String serviceType;
@@ -140,5 +144,13 @@ public class RcUserServiceView extends RcUserService {
 
     public void setServiceArray(String[] serviceArray) {
         this.serviceArray = serviceArray;
+    }
+
+    public String getServiceDescribe() {
+        return serviceDescribe;
+    }
+
+    public void setServiceDescribe(String serviceDescribe) {
+        this.serviceDescribe = serviceDescribe;
     }
 }

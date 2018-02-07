@@ -3,6 +3,7 @@ package com.hex.bigdata.udsp.aop;
 import com.hex.bigdata.udsp.common.constant.ErrorCode;
 import com.hex.bigdata.udsp.common.constant.Status;
 import com.hex.bigdata.udsp.common.constant.StatusCode;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.constant.ConsumerConstant;
 import com.hex.bigdata.udsp.dao.ConsumeStatusMapper;
 import com.hex.bigdata.udsp.model.Request;

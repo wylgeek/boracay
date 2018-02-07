@@ -1,0 +1,221 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding: 5px 5px 0px 5px;">
+    <div id="form1" method="post">
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">基础栏</span></legend>
+            <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
+                <tr>
+                    <th class="nui-form-label"><label for="name">名称：</label></th>
+                    <td>
+                        <input id="name" name="name" class="nui-textbox" style="width: 97%" readonly="true"
+                               vtype="maxLength:64" onvalidation="nameValidation"/>
+                    </td>
+                    <th class="nui-form-label"><label for="describe">说明：</label></th>
+                    <td >
+                        <input id="describe" name="describe" class="nui-textbox" style="width:99%" readonly="true"
+                               vtype="maxLength:256"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="dsId">数据源：</label></th>
+                    <td>
+
+                        <div id="dsId" class="nui-combobox" style="width:97%;"  popupWidth="400" textField="name" valueField="pkId" onvaluechanged="typeChanged"
+                             url="${basePath}/com/ds/select?model=IM" dataField="data" name="dsId" multiSelect="false"  readonly="true">
+                            <div property="columns">
+                                <div header="名称" field="name"></div>
+                                <div header="说明" field="describe"></div>
+                                <div header="类型" field="type"></div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <th class="nui-form-label"></th>
+                    <td >
+                        <div id="type" name="type" onvaluechanged="setSaveButton" class="nui-radiobuttonlist" repeatItems="2" repeatLayout="table" repeatDirection="horizontal"
+                             textField="text" valueField="id" data="[{'id':'0','text':'内表'},{'id':'1','text':'外表'}]" value='0' readonly="true">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="tbName">表名：</label></th>
+                    <td >
+                        <input id="tbName" name="tbName" class="nui-textbox" style="width:97%" readonly="true"
+                               vtype="maxLength:64"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="note">备注：</label></th>
+                    <td colspan="3">
+                        <input name="note" id="note" class="nui-textarea" style="height:60px; width:99%;" readonly="true"
+                               vtype="maxLength:4000"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">字段栏</span></legend>
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>字段信息</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add1" enabled="false">添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove1" enabled="false"
+                                   id="remove1">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp1" enabled="false"
+                                   id="moveUp1">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown1" enabled="false"
+                                   id="moveDown1">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:200px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid1" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     url="${basePath}/im/md/col/select/${pkId}"
+                     idField="pkId" multiSelect="true" allowCellEdit="false" allowCellSelect="false" sortMode="client"
+                     showPager="false" editNextOnEnterKey="false" editNextRowCell="false" onselectionchanged="selected1">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="30">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:64"
+                                   onvalidation="colNameValidation1"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="30">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                        <div field="type" headerAlign="center" allowSort="true" width="20">类型
+                            <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   dictTypeId="IQ_MD_COL_DATA_TYPE" value="STRING" vtype="maxLength:32"/>
+                        </div>
+                        <div field="length" headerAlign="center" allowSort="true" width="15">长度
+                            <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textarea" vtype="maxLength:4000"/>
+                        </div>
+                        <div type="checkboxcolumn"  field="primary" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">主键
+                        </div>
+                        <div type="checkboxcolumn"  field="indexed" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">索引
+                        </div>
+                        <div type="checkboxcolumn"  field="stored" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">存储
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">配置栏</span></legend>
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>配置参数</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add2" enabled="false">添加</a>
+                                <a class="nui-button" iconCls="icon-add" onclick="adds" enabled="false">批量添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove2" enabled="false"
+                                   id="remove">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp2" enabled="false"
+                                   id="moveUp">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown2" enabled="false"
+                                   id="moveDown">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:150px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid2" class="nui-datagrid" style="width:100%; height: 100%;"
+                     url="${basePath}/com/props/select/${pkId}"
+                     idField="pkId" multiSelect="true" allowCellEdit="false" allowCellSelect="false" sortMode="client"
+                     showPager="false" editNextOnEnterKey="false" editNextRowCell="false" onselectionchanged="selected">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div name="name" field="name" headerAlign="center" allowSort="true"
+                             width="30">名称<font color="#FF0000">（必填）</font>
+                            <input name="propsName" property="editor" class="nui-combobox"
+                                   textField="dictId" valueField="dictId" allowInput="true"
+                                   onbeforeshowpopup="propsNameBeforeShowPopup" vtype="maxLength:256" required="true"
+                                   onvaluechanged="propsNameChanged" onvalidation="propsNameValidation"/>
+                        </div>
+                        <div name="value" field="value" headerAlign="center" allowSort="true" width="30">数值<font
+                                color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                        </div>
+                        <div name="describe" field="describe" headerAlign="center" allowSort="true" width="40">说明
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
+            <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">返回</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var form1;
+    var grid1;
+    var grid2;
+
+    /**
+     * 按需加载资源文件
+     */
+    require(['jquery', 'nui'], function ($, nui) {
+        nui.parse();
+        form1 = new nui.Form("#form1");
+        grid1 = nui.get("datagrid1");
+        grid2 = nui.get("datagrid2");
+        setData();
+        grid1.load();
+        grid2.load();
+    });
+
+    /**
+     * 读取详情
+     */
+    function setData(){
+        $.ajax({
+            url:"${basePath}/im/md/select/${pkId}",
+            type:'POST',
+            data:null,
+            cache:false,
+            contentType:'application/json',
+            success:function(result){
+                if(result.status == true) {
+                    form1.setData(result.data);
+                }
+            }
+        });
+    }
+
+    /**
+     * 返回
+     */
+    function cancel() {
+        CloseWindow("onCancel");
+    }
+</script>
+<!--#end-->

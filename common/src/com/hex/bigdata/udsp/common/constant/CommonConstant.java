@@ -22,4 +22,20 @@ public class CommonConstant {
      * 请求方式-同步
      */
     public static final String REQUEST_SYNC="SYNC";
+    /**
+     * 服务状态-启用（编码）
+     */
+    public static final String SERVICE_STATUS_ENABLED="0";
+    /**
+     * 服务状态-启用（文字）
+     */
+    public static final String SERVICE_STATUS_ENABLED_TEXT="启用";
+    /**
+     * 服务状态-禁用/停用（编码）
+     */
+    public static final String SERVICE_STATUS_DISABLED="1";
+    /**
+     * 服务状态-禁用/停用（文字）
+     */
+    public static final String SERVICE_STATUS_DISABLED_TEXT="停用";
 }

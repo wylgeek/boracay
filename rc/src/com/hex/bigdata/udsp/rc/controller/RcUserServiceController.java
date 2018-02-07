@@ -4,6 +4,8 @@ import com.hex.bigdata.udsp.common.model.ComDatasource;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.mc.dto.McChartsView;
 import com.hex.bigdata.udsp.mc.service.McChartsService;
+import com.hex.bigdata.udsp.rc.dto.RcUserServiceBatchDto;
+import com.hex.bigdata.udsp.rc.dto.RcUserServiceDto;
 import com.hex.bigdata.udsp.rc.dto.RcUserServiceView;
 import com.hex.bigdata.udsp.rc.model.RcService;
 import com.hex.bigdata.udsp.rc.model.RcUserService;
@@ -69,20 +71,20 @@ public class RcUserServiceController extends BaseController {
     /**
      * 用户服务关系-新增服务记录
      *
-     * @param rcService
+     * @param rcUserServiceDto
      * @return
      */
     @RequestMapping({"/insert"})
     @ResponseBody
-    public MessageResult insert(@RequestBody RcUserService rcService) {
+    public MessageResult insert(@RequestBody RcUserServiceDto rcUserServiceDto) {
         boolean status = true;
         String message = "添加成功";
-        if (rcService == null) {
+        if (rcUserServiceDto == null) {
             status = false;
             message = "请求参数为空";
         } else {
             try {
-                if (StringUtils.isBlank(rcUserServiceService.insert(rcService))) {
+                if (StringUtils.isBlank(rcUserServiceService.insert(rcUserServiceDto))) {
                     status = false;
                     message = "添加失败";
                 }
@@ -102,15 +104,15 @@ public class RcUserServiceController extends BaseController {
 
     @RequestMapping({"/insertBatch"})
     @ResponseBody
-    public MessageResult insertBatch(@RequestBody RcUserServiceView rcUserServiceView) {
+    public MessageResult insertBatch(@RequestBody RcUserServiceBatchDto rcUserServiceBatchDto) {
         boolean status = true;
         String message = "添加成功";
-        if (rcUserServiceView == null) {
+        if (rcUserServiceBatchDto == null) {
             status = false;
             message = "请求参数为空";
         } else {
             try {
-                if (!rcUserServiceService.insertBatch(rcUserServiceView)) {
+                if (!rcUserServiceService.insertBatch(rcUserServiceBatchDto)) {
                     status = false;
                     message = "添加失败";
                 }
@@ -156,15 +158,15 @@ public class RcUserServiceController extends BaseController {
 
     @RequestMapping({"/update"})
     @ResponseBody
-    public MessageResult update(@RequestBody RcUserService rcService) {
+    public MessageResult update(@RequestBody RcUserServiceDto rcUserServiceDto) {
         boolean status = true;
         String message = "更新成功";
-        if (rcService == null) {
+        if (rcUserServiceDto == null) {
             status = false;
             message = "请求参数为空";
         } else {
             try {
-                if (!rcUserServiceService.update(rcService)) {
+                if (!rcUserServiceService.update(rcUserServiceDto)) {
                     status = false;
                     message = "更新失败";
                 }
@@ -458,4 +460,19 @@ public class RcUserServiceController extends BaseController {
         }
         return filePath;
     }
+
+
+    @ResponseBody
+    @RequestMapping("/downStreamInfoDownload")
+    public String downStreamInfoDownload(@RequestBody RcUserService[] rcServices) {
+        // 写入Excel文件
+        String filePath = "";
+        try {
+            filePath = rcUserServiceService.downStreamInfoDownload(rcServices);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return filePath;
+    }
+
 }

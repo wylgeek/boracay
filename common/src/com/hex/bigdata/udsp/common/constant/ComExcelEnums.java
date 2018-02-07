@@ -690,7 +690,8 @@ public class ComExcelEnums {
         Excel_1("name", "1"),
         Excel_2("type", "2"),
         Excel_3("appId", "3"),
-        Excel_4("describe", "4");
+        Excel_4("describe", "4"),
+        Excel_5("status", "5");
 
         private String value;
         private String name;
@@ -710,6 +711,7 @@ public class ComExcelEnums {
                 enums.add(Excel_2);
                 enums.add(Excel_3);
                 enums.add(Excel_4);
+                enums.add(Excel_5);
             }
             return enums;
         }
@@ -722,6 +724,7 @@ public class ComExcelEnums {
                 enums.add(Excel_2);
                 enums.add(Excel_3);
                 enums.add(Excel_4);
+                enums.add(Excel_5);
             }
             return enums;
         }
@@ -750,7 +753,13 @@ public class ComExcelEnums {
         Excel_2("userId", "2"),
         Excel_3("ipSection", "3"),
         Excel_4("maxSyncNum", "4"),
-        Excel_5("maxAsyncNum", "5");
+        Excel_5("maxAsyncNum", "5"),
+        Excel_6("maxSyncWaitNum", "6"),
+        Excel_7("maxAsyncWaitNum", "7"),
+        Excel_8("maxSyncWaitTimeout", "8"),
+        Excel_9("maxAsyncWaitTimeout", "9"),
+        Excel_10("maxSyncExecuteTimeout", "10"),
+        Excel_11("maxAsyncExecuteTimeout", "11");
 
         private String value;
         private String name;
@@ -771,6 +780,12 @@ public class ComExcelEnums {
                 enums.add(Excel_3);
                 enums.add(Excel_4);
                 enums.add(Excel_5);
+                enums.add(Excel_6);
+                enums.add(Excel_7);
+                enums.add(Excel_8);
+                enums.add(Excel_9);
+                enums.add(Excel_10);
+                enums.add(Excel_11);
             }
             return enums;
         }
@@ -805,7 +820,7 @@ public class ComExcelEnums {
         }
     }
 
-    public enum OLQApplicationParamCoumn implements ExcelProperty {
+    public enum OlqApplicationParamCoumn implements ExcelProperty {
         Excel_0("seq", "0"),
         Excel_1("paramName", "1"),
         Excel_2("paramDesc", "2"),
@@ -815,9 +830,9 @@ public class ComExcelEnums {
         private String value;
         private String name;
 
-        private static List<OLQApplicationParamCoumn> enums;
+        private static List<OlqApplicationParamCoumn> enums;
 
-        private OLQApplicationParamCoumn(String na, String va) {
+        private OlqApplicationParamCoumn(String na, String va) {
             value = va;
             name = na;
         }
@@ -842,6 +857,222 @@ public class ComExcelEnums {
                 enums.add(Excel_2);
                 enums.add(Excel_3);
                 enums.add(Excel_4);
+            }
+            return enums;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public enum ImMapping implements ExcelProperty {
+        Excel_0("seq", "0"),
+        Excel_1("name", "1"),
+        Excel_2("colId", "2"),
+        Excel_3("type", "3"),
+        Excel_4("length", "4"),
+        Excel_5("describe", "5"),
+        Excel_6("indexed", "6"),
+        Excel_7("primary", "7"),
+        Excel_8("stored", "8"),
+        Excel_9("note", "9");
+
+        private String value;
+        private String name;
+
+        private static List<ImMapping> enums;
+
+        private ImMapping(String na, String va) {
+            value = va;
+            name = na;
+        }
+
+        public static List getAllNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+                enums.add(Excel_5);
+                enums.add(Excel_6);
+                enums.add(Excel_7);
+                enums.add(Excel_8);
+                enums.add(Excel_9);
+            }
+            return enums;
+        }
+
+        public List getNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+                enums.add(Excel_5);
+                enums.add(Excel_6);
+                enums.add(Excel_7);
+                enums.add(Excel_8);
+                enums.add(Excel_9);
+            }
+            return enums;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+
+
+    public enum ImModelFiterCol implements ExcelProperty {
+        Excel_0("seq", "0"),
+        Excel_1("name", "1"),
+        Excel_2("describe", "2"),
+        Excel_3("type", "3"),
+        Excel_4("length", "4"),
+        Excel_5("isNeed", "5"),
+        Excel_6("operator", "6"),
+        Excel_7("defaultVal", "7"),
+        Excel_8("label", "8");
+
+        private String value;
+        private String name;
+
+        private static List<ImModelFiterCol> enums;
+
+        private ImModelFiterCol(String na, String va) {
+            value = va;
+            name = na;
+        }
+
+        public static List getAllNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+                enums.add(Excel_5);
+                enums.add(Excel_6);
+                enums.add(Excel_7);
+                enums.add(Excel_8);
+            }
+            return enums;
+        }
+
+        public List getNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+                enums.add(Excel_5);
+                enums.add(Excel_6);
+                enums.add(Excel_7);
+                enums.add(Excel_8);
+            }
+            return enums;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+
+    public enum ImMetadataCol implements ExcelProperty {
+        Excel_0("seq", "0"),
+        Excel_1("name", "1"),
+        Excel_2("describe", "2"),
+        Excel_3("type", "3"),
+        Excel_4("length", "4"),
+        Excel_5("note", "5"),
+        Excel_6("indexed", "6"),
+        Excel_7("primary", "7"),
+        Excel_8("stored", "8");
+
+        private String value;
+        private String name;
+
+        private static List<ImMetadataCol> enums;
+
+        private ImMetadataCol(String na, String va) {
+            value = va;
+            name = na;
+        }
+
+        public static List getAllNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+                enums.add(Excel_5);
+                enums.add(Excel_6);
+                enums.add(Excel_7);
+                enums.add(Excel_8);
+            }
+            return enums;
+        }
+
+        public List getNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+                enums.add(Excel_5);
+                enums.add(Excel_6);
+                enums.add(Excel_7);
+                enums.add(Excel_8);
             }
             return enums;
         }

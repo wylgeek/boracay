@@ -6,6 +6,7 @@ import com.hex.bigdata.udsp.common.service.FtpUserManagerService;
 import com.hex.bigdata.udsp.common.util.CreateFileUtil;
 import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
 import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.mm.dao.ContractorMapper;
 import com.hex.bigdata.udsp.mm.dto.ContractorView;
 import com.hex.bigdata.udsp.mm.model.Contractor;
@@ -234,7 +235,7 @@ public class ContractorService extends BaseService {
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("status","false");
-            resultMap.put("message","程序内部异常："+e.getMessage());
+            resultMap.put("message","程序内部异常："+ e.getMessage());
         }finally {
             if(in != null){
                 try {

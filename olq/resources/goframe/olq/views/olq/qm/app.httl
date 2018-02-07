@@ -141,21 +141,8 @@ ${extends("/goframe/function_layout.httl")}
         var data = form1.getData(true, true);
         //console.warn(data);
         data.dsId = dsId;
-        data.sql = getSql(sql, data.defaultNum);
+        data.sql = sql;
         refreshGrid(data);
-    }
-
-    function getSql(sql, defaultNum) {
-        var sqlUpper = sql.trim().toUpperCase();
-        if (sqlUpper.indexOf("SELECT ") == 0 && sqlUpper.indexOf("LIMIT") == -1) {
-            sql = sql.trim();
-            if (sql.indexOf(";") == sql.length - 1) {
-                sql = sql.substring(0, sql.length - 1) + " limit " + defaultNum + ";";
-            } else {
-                sql = sql + " limit " + defaultNum;
-            }
-        }
-        return sql;
     }
 
     /**
@@ -209,6 +196,7 @@ ${extends("/goframe/function_layout.httl")}
                 intGridColumns(columns);
                 grid1.setData(records);
                 grid1.unmask();
+                nui.alert("加载成功!");
             }
         });
     }

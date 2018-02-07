@@ -1,9 +1,11 @@
 package com.hex.bigdata.udsp.controller;
 
 import com.hex.bigdata.udsp.common.constant.ErrorCode;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.common.util.ObjectUtil;
 import com.hex.bigdata.udsp.constant.ConsumerConstant;
+import com.hex.bigdata.udsp.dto.ConsumeRequest;
 import com.hex.bigdata.udsp.model.ExternalRequest;
 import com.hex.bigdata.udsp.model.Response;
 import com.hex.bigdata.udsp.model.WSRequest;
@@ -80,7 +82,8 @@ public class WebServiceController implements WebServiceInterface {
         } catch (Exception e) {
             //处理异常，返回respone
             response = new Response();
-            this.consumerService.setErrorResponse(response, new ExternalRequest(), bef, ErrorCode.ERROR_000005.getValue(), e.getMessage());
+            this.consumerService.setErrorResponse(response, new ConsumeRequest(), bef,
+                    ErrorCode.ERROR_000005.getValue(), e.getMessage(), null);
             return JSONUtil.parseObj2JSON(response);
         }
         //获取并设置客户端请求的IP

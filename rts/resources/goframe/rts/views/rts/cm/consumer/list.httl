@@ -193,7 +193,24 @@ ${extends("/goframe/function_layout.httl")}
             nui.get("edit").disable();
             nui.get("remove").enable();
         }
-
+        if(rows.length != 0){
+            var json = nui.encode(getRows(rows));
+            $.ajax({
+                url: "${basePath}/rc/service/checkAppUsed/RTS_CONSUMER",
+                type: 'POST',
+                data: json,
+                async:false,
+                cache: false,
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.status == true) {
+                        //nui.alert(result.message, "提示");
+                        nui.get("edit").disable();
+                        nui.get("remove").disable();
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -265,40 +282,22 @@ ${extends("/goframe/function_layout.httl")}
             if (action == "ok") {
                 var json = nui.encode(getRows(rows));
                 grid1.loading("正在删除中,请稍等...");
-                var canDelete = true;
                 $.ajax({
-                    url: "${basePath}/rc/service/checkApplicationsUsed/RTS_CONSUMER",
+                    url: "${basePath}/rts/consumer/delete",
                     type: 'POST',
                     data: json,
-                    async:false,
                     cache: false,
                     contentType: 'application/json',
                     success: function (result) {
                         if (result.status == true) {
+                            nui.alert(result.message);
+                            grid1.reload();
+                        } else {
                             nui.alert(result.message, "错误提示");
                             grid1.unmask();
-                            canDelete = false;
                         }
                     }
                 });
-                if(canDelete){
-                    $.ajax({
-                        url: "${basePath}/rts/consumer/delete",
-                        type: 'POST',
-                        data: json,
-                        cache: false,
-                        contentType: 'application/json',
-                        success: function (result) {
-                            if (result.status == true) {
-                                nui.alert(result.message);
-                                grid1.reload();
-                            } else {
-                                nui.alert(result.message, "错误提示");
-                                grid1.unmask();
-                            }
-                        }
-                    });
-                }
             }
         });
     }

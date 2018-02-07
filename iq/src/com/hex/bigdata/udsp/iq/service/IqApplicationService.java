@@ -7,14 +7,20 @@ import com.hex.bigdata.udsp.common.model.ComUploadExcelContent;
 import com.hex.bigdata.udsp.common.util.CreateFileUtil;
 import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
 import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.iq.dao.IqApplicationMapper;
 import com.hex.bigdata.udsp.iq.dao.IqMetadataMapper;
 import com.hex.bigdata.udsp.iq.dto.IqApplicationPropsView;
 import com.hex.bigdata.udsp.iq.dto.IqApplicationView;
+import com.hex.bigdata.udsp.iq.dto.IqIndexDto;
 import com.hex.bigdata.udsp.iq.model.IqAppOrderCol;
 import com.hex.bigdata.udsp.iq.model.IqAppQueryCol;
 import com.hex.bigdata.udsp.iq.model.IqAppReturnCol;
 import com.hex.bigdata.udsp.iq.model.IqApplication;
+import com.hex.bigdata.udsp.rc.dto.RcUserServiceView;
+import com.hex.bigdata.udsp.rc.dto.ServiceBaseInfo;
+import com.hex.bigdata.udsp.rc.model.RcService;
+import com.hex.bigdata.udsp.rc.service.RcServiceService;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.service.BaseService;
 import com.hex.goframe.util.DateUtil;
@@ -53,6 +59,8 @@ public class IqApplicationService extends BaseService {
     private IqAppOrderColService iqAppOrderColService;
     @Autowired
     private IqMetadataMapper iqMetadataMapper;
+    @Autowired
+    private RcServiceService rcServiceService;
 
     @Transactional
     public String insert(IqApplication iqApplication) {
@@ -212,7 +220,7 @@ public class IqApplicationService extends BaseService {
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("status", "false");
-            resultMap.put("message","程序内部异常：" + e.getMessage());
+            resultMap.put("message", "程序内部异常：" + e.getMessage());
         } finally {
             if (in != null) {
                 try {
@@ -259,110 +267,7 @@ public class IqApplicationService extends BaseService {
         comExcelParams.add(new ComExcelParam(3, 1, "describe"));
         comExcelParams.add(new ComExcelParam(3, 3, "maxNum"));
         for (IqApplication iqApplication : iqApplications) {
-            sheet = workbook.createSheet();
-
-
-            //将前面样式内容复制到下载表中
-            int i = 0;
-            for (; i < 11; i++) {
-                try {
-                    ExcelCopyUtils.copyRow(sheet.createRow(i), sourceSheet.getRow(i), sheet.createDrawingPatriarch(), workbook);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            //设置内容
-            IqApplication iqApp = iqApplicationMapper.select(iqApplication.getPkId());
-            //设置元数据名
-            iqApp.setMdId(iqMetadataMapper.select(iqApp.getMdId()).getName());
-            for (ComExcelParam comExcelParam : comExcelParams) {
-                try {
-                    Field field = iqApp.getClass().getDeclaredField(comExcelParam.getName());
-                    field.setAccessible(true);
-                    ExcelCopyUtils.setCellValue(sheet, comExcelParam.getRowNum(), comExcelParam.getCellNum(), field.get(iqApp) == null ? "" : field.get(iqApp).toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            List<IqAppQueryCol> iqAppQueryCols = iqAppQueryColService.selectByAppId(iqApplication.getPkId());
-            if (iqAppQueryCols.size() > 0) {
-                for (IqAppQueryCol iqAppQueryCol : iqAppQueryCols) {
-                    row = sheet.createRow(i);
-                    cell = row.createCell(0);
-                    cell.setCellValue(iqAppQueryCol.getSeq());
-                    cell = row.createCell(1);
-                    cell.setCellValue(iqAppQueryCol.getName());
-                    cell = row.createCell(2);
-                    cell.setCellValue(iqAppQueryCol.getDescribe());
-                    cell = row.createCell(3);
-                    cell.setCellValue(iqAppQueryCol.getOperator());
-                    cell = row.createCell(4);
-                    cell.setCellValue(iqAppQueryCol.getType());
-                    cell = row.createCell(5);
-                    cell.setCellValue(iqAppQueryCol.getLength());
-                    cell = row.createCell(6);
-                    cell.setCellValue(iqAppQueryCol.getDefaultVal());
-                    cell = row.createCell(7);
-                    cell.setCellValue(iqAppQueryCol.getLabel());
-                    cell = row.createCell(8);
-                    cell.setCellValue(iqAppQueryCol.getIsNeed().equals("1")?"否":"是");
-                    cell = row.createCell(9);
-                    cell.setCellValue(iqAppQueryCol.getIsOfferOut().equals("1")?"否":"是");
-                    i++;
-                }
-            }
-            try {
-                ExcelCopyUtils.copyRow(sheet.createRow(i++), sourceSheet.getRow(16), sheet.createDrawingPatriarch(), workbook);
-                ExcelCopyUtils.copyRow(sheet.createRow(i++), sourceSheet.getRow(17), sheet.createDrawingPatriarch(), workbook);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            List<IqAppReturnCol> iqAppReturnCols = iqAppReturnColService.selectByAppId(iqApplication.getPkId());
-            if (iqAppReturnCols.size() > 0) {
-                for (IqAppReturnCol iqAppReturnCol : iqAppReturnCols) {
-                    row = sheet.createRow(i);
-                    cell = row.createCell(0);
-                    cell.setCellValue(iqAppReturnCol.getSeq());
-                    cell = row.createCell(1);
-                    cell.setCellValue(iqAppReturnCol.getName());
-                    cell = row.createCell(2);
-                    cell.setCellValue(iqAppReturnCol.getDescribe());
-                    cell = row.createCell(3);
-                    cell.setCellValue(iqAppReturnCol.getType());
-                    cell = row.createCell(4);
-                    cell.setCellValue(iqAppReturnCol.getLength());
-                    cell = row.createCell(5);
-                    cell.setCellValue(iqAppReturnCol.getStats());
-                    cell = row.createCell(6);
-                    cell.setCellValue(iqAppReturnCol.getLabel());
-                    i++;
-                }
-            }
-
-            try {
-                ExcelCopyUtils.copyRow(sheet.createRow(i++), sourceSheet.getRow(24), sheet.createDrawingPatriarch(), workbook);
-                ExcelCopyUtils.copyRow(sheet.createRow(i++), sourceSheet.getRow(25), sheet.createDrawingPatriarch(), workbook);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            List<IqAppOrderCol> iqAppOrderCols = iqAppOrderColService.selectByAppId(iqApplication.getPkId());
-            if (iqAppOrderCols.size() > 0) {
-                for (IqAppOrderCol iqAppOrderCol : iqAppOrderCols) {
-                    row = sheet.createRow(i);
-                    cell = row.createCell(0);
-                    cell.setCellValue(iqAppOrderCol.getSeq());
-                    cell = row.createCell(1);
-                    cell.setCellValue(iqAppOrderCol.getName());
-                    cell = row.createCell(2);
-                    cell.setCellValue(iqAppOrderCol.getDescribe());
-                    cell = row.createCell(3);
-                    cell.setCellValue(iqAppOrderCol.getType());
-                    cell = row.createCell(4);
-                    cell.setCellValue(iqAppOrderCol.getOrderType());
-                    i++;
-                }
-            }
+            this.setWorkbookSheet(workbook, sourceSheet, comExcelParams, iqApplication);
         }
         if (workbook != null) {
             try {
@@ -376,4 +281,204 @@ public class IqApplicationService extends BaseService {
         }
         return null;
     }
+
+    /**
+     * 设置信息到workbook
+     *
+     * @param workbook
+     */
+    public void setWorkbooksheet(HSSFWorkbook workbook, RcUserServiceView rcUserService) {
+        HSSFWorkbook sourceWork;
+        HSSFSheet sourceSheet = null;
+        String seprator = FileUtil.getFileSeparator();
+        String templateFile = ExcelCopyUtils.templatePath + seprator + "downLoadTemplate_allServiceInfo.xls";
+        // 获取模板文件第一个Sheet对象
+        POIFSFileSystem sourceFile = null;
+
+        try {
+            sourceFile = new POIFSFileSystem(new FileInputStream(templateFile));
+            sourceWork = new HSSFWorkbook(sourceFile);
+            sourceSheet = sourceWork.getSheetAt(0);
+            //创建表格
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        RcService rcService = null;
+        if (StringUtils.isNotBlank(rcUserService.getServiceId())) {
+            rcService = rcServiceService.select(rcUserService.getServiceId());
+        }
+        IqApplication iqApplication = null;
+        if (null != rcService) {
+            iqApplication = this.select(rcService.getAppId());
+        }
+
+        List<ComExcelParam> comExcelParams = new ArrayList<ComExcelParam>();
+        comExcelParams.add(new ComExcelParam(2, 1, "serviceName"));
+        comExcelParams.add(new ComExcelParam(2, 3, "serviceDescribe"));
+        comExcelParams.add(new ComExcelParam(2, 5, "maxNum"));
+        comExcelParams.add(new ComExcelParam(3, 1, "maxSyncNum"));
+        comExcelParams.add(new ComExcelParam(3, 3, "maxAsyncNum"));
+        comExcelParams.add(new ComExcelParam(3, 5, "maxSyncWaitNum"));
+        comExcelParams.add(new ComExcelParam(3, 7, "maxAsyncWaitNum"));
+        comExcelParams.add(new ComExcelParam(4, 1, "userId"));
+        comExcelParams.add(new ComExcelParam(4, 5, "userName"));
+        comExcelParams.add(new ComExcelParam(5, 1, "udspRequestUrl"));
+        long maxSize = 65535;
+        if (iqApplication != null) {
+            long maxNum = iqApplication.getMaxNum() == null ? 0 : iqApplication.getMaxNum();
+            if (maxNum != 0) {
+                maxSize = maxNum;
+            }
+        }
+
+        ServiceBaseInfo serviceBaseInfo = new ServiceBaseInfo(rcUserService, maxSize, "");
+
+        HSSFSheet sheet;
+        sheet = workbook.createSheet();
+        //将前面样式内容复制到下载表中
+        int i = 0;
+        for (; i < 11; i++) {
+            try {
+                ExcelCopyUtils.copyRow(sheet.createRow(i), sourceSheet.getRow(i), sheet.createDrawingPatriarch(), workbook);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (ComExcelParam comExcelParam : comExcelParams) {
+            try {
+                Field field = serviceBaseInfo.getClass().getDeclaredField(comExcelParam.getName());
+                field.setAccessible(true);
+                ExcelCopyUtils.setCellValue(sheet, comExcelParam.getRowNum(), comExcelParam.getCellNum(), field.get(serviceBaseInfo) == null ? "" : field.get(serviceBaseInfo).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        IqIndexDto iqIndexDto = new IqIndexDto(i, 20, 32);
+        this.setWorkbookSheetPart(sheet, iqApplication, sourceSheet, workbook, iqIndexDto);
+    }
+
+    /**
+     * 设置信息到workbook
+     *
+     * @param workbook
+     * @param sourceSheet
+     * @param comExcelParams
+     * @param iqApplication
+     */
+    public void setWorkbookSheet(HSSFWorkbook workbook, HSSFSheet sourceSheet, List<ComExcelParam> comExcelParams, IqApplication iqApplication) {
+        HSSFSheet sheet;
+        sheet = workbook.createSheet();
+        //将前面样式内容复制到下载表中
+        int i = 0;
+        for (; i < 11; i++) {
+            try {
+                ExcelCopyUtils.copyRow(sheet.createRow(i), sourceSheet.getRow(i), sheet.createDrawingPatriarch(), workbook);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //设置内容
+        IqApplication iqApp = iqApplicationMapper.select(iqApplication.getPkId());
+        //设置元数据名
+        iqApp.setMdId(iqMetadataMapper.select(iqApp.getMdId()).getName());
+        for (ComExcelParam comExcelParam : comExcelParams) {
+            try {
+                Field field = iqApp.getClass().getDeclaredField(comExcelParam.getName());
+                field.setAccessible(true);
+                ExcelCopyUtils.setCellValue(sheet, comExcelParam.getRowNum(), comExcelParam.getCellNum(), field.get(iqApp) == null ? "" : field.get(iqApp).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        IqIndexDto iqIndexDto = new IqIndexDto(i, 16, 24);
+        this.setWorkbookSheetPart(sheet, iqApplication, sourceSheet, workbook, iqIndexDto);
+    }
+
+    public void setWorkbookSheetPart(HSSFSheet sheet, IqApplication iqApplication, HSSFSheet sourceSheet, HSSFWorkbook workbook, IqIndexDto iqIndexDto) {
+        HSSFRow row;
+        HSSFCell cell;
+        int rowIndex = iqIndexDto.getRowIndex();
+        List<IqAppQueryCol> iqAppQueryCols = iqAppQueryColService.selectByAppId(iqApplication.getPkId());
+        if (iqAppQueryCols.size() > 0) {
+            for (IqAppQueryCol iqAppQueryCol : iqAppQueryCols) {
+                row = sheet.createRow(rowIndex);
+                cell = row.createCell(0);
+                cell.setCellValue(iqAppQueryCol.getSeq());
+                cell = row.createCell(1);
+                cell.setCellValue(iqAppQueryCol.getName());
+                cell = row.createCell(2);
+                cell.setCellValue(iqAppQueryCol.getDescribe());
+                cell = row.createCell(3);
+                cell.setCellValue(iqAppQueryCol.getOperator());
+                cell = row.createCell(4);
+                cell.setCellValue(iqAppQueryCol.getType());
+                cell = row.createCell(5);
+                cell.setCellValue(iqAppQueryCol.getLength());
+                cell = row.createCell(6);
+                cell.setCellValue(iqAppQueryCol.getDefaultVal());
+                cell = row.createCell(7);
+                cell.setCellValue(iqAppQueryCol.getLabel());
+                cell = row.createCell(8);
+                cell.setCellValue(iqAppQueryCol.getIsNeed().equals("1") ? "否" : "是");
+                cell = row.createCell(9);
+                cell.setCellValue(iqAppQueryCol.getIsOfferOut().equals("1") ? "否" : "是");
+                rowIndex++;
+            }
+        }
+        try {
+            ExcelCopyUtils.copyRow(sheet.createRow(rowIndex++), sourceSheet.getRow(iqIndexDto.getReturnTitleIndex()), sheet.createDrawingPatriarch(), workbook);
+            ExcelCopyUtils.copyRow(sheet.createRow(rowIndex++), sourceSheet.getRow(iqIndexDto.getReturnTitleIndex() + 1), sheet.createDrawingPatriarch(), workbook);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<IqAppReturnCol> iqAppReturnCols = iqAppReturnColService.selectByAppId(iqApplication.getPkId());
+        if (iqAppReturnCols.size() > 0) {
+            for (IqAppReturnCol iqAppReturnCol : iqAppReturnCols) {
+                row = sheet.createRow(rowIndex);
+                cell = row.createCell(0);
+                cell.setCellValue(iqAppReturnCol.getSeq());
+                cell = row.createCell(1);
+                cell.setCellValue(iqAppReturnCol.getName());
+                cell = row.createCell(2);
+                cell.setCellValue(iqAppReturnCol.getDescribe());
+                cell = row.createCell(3);
+                cell.setCellValue(iqAppReturnCol.getType());
+                cell = row.createCell(4);
+                cell.setCellValue(iqAppReturnCol.getLength());
+                cell = row.createCell(5);
+                cell.setCellValue(iqAppReturnCol.getStats());
+                cell = row.createCell(6);
+                cell.setCellValue(iqAppReturnCol.getLabel());
+                rowIndex++;
+            }
+        }
+
+        try {
+            ExcelCopyUtils.copyRow(sheet.createRow(rowIndex++), sourceSheet.getRow(iqIndexDto.getOrderTitleIndex()), sheet.createDrawingPatriarch(), workbook);
+            ExcelCopyUtils.copyRow(sheet.createRow(rowIndex++), sourceSheet.getRow(iqIndexDto.getOrderTitleIndex() + 1), sheet.createDrawingPatriarch(), workbook);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<IqAppOrderCol> iqAppOrderCols = iqAppOrderColService.selectByAppId(iqApplication.getPkId());
+        if (iqAppOrderCols.size() > 0) {
+            for (IqAppOrderCol iqAppOrderCol : iqAppOrderCols) {
+                row = sheet.createRow(rowIndex);
+                cell = row.createCell(0);
+                cell.setCellValue(iqAppOrderCol.getSeq());
+                cell = row.createCell(1);
+                cell.setCellValue(iqAppOrderCol.getName());
+                cell = row.createCell(2);
+                cell.setCellValue(iqAppOrderCol.getDescribe());
+                cell = row.createCell(3);
+                cell.setCellValue(iqAppOrderCol.getType());
+                cell = row.createCell(4);
+                cell.setCellValue(iqAppOrderCol.getOrderType());
+                rowIndex++;
+            }
+        }
+    }
+
+
 }

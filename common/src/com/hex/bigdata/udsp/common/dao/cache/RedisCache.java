@@ -1,6 +1,7 @@
 package com.hex.bigdata.udsp.common.dao.cache;
 
 import com.hex.bigdata.udsp.common.lock.RedisDistributedLock;
+import com.hex.bigdata.udsp.common.service.InitParamService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
@@ -29,17 +30,22 @@ public class RedisCache<T> implements Cache<T> {
     @Autowired
     private RedisDistributedLock redisLock;
 
+    @Autowired
+    private InitParamService initParamService;
+
     @Override
     public boolean insertCache(String key, T t) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key) && t != null) {
                     redisTemplate.opsForValue().set(key, t);
                 }
                 return true;
             } finally {
-                redisLock.unlock(key); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(key); // 分布式解锁
             }
         }
     }
@@ -51,8 +57,9 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public boolean deleteCache(String key) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key)) {
                     ValueOperations<String, T> valueOperation = redisTemplate.opsForValue();
@@ -61,30 +68,34 @@ public class RedisCache<T> implements Cache<T> {
                 }
                 return true;
             } finally {
-                redisLock.unlock(key); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(key); // 分布式解锁
             }
         }
     }
 
     @Override
     public T selectCache(String key) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key)) {
                     return (T) redisTemplate.opsForValue().get(key);
                 }
                 return null;
             } finally {
-                redisLock.unlock(key); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(key); // 分布式解锁
             }
         }
     }
 
     @Override
     public boolean insertListCache(String key, List<T> list) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key) && list != null && list.size() != 0) {
                     this.deleteCache(key);
@@ -94,7 +105,8 @@ public class RedisCache<T> implements Cache<T> {
                 }
                 return true;
             } finally {
-                redisLock.unlock(key); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(key); // 分布式解锁
             }
         }
     }
@@ -111,8 +123,9 @@ public class RedisCache<T> implements Cache<T> {
 
     @Override
     public <T> List<T> selectListCache(String key) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 if (StringUtils.isNotBlank(key)) {
                     ListOperations<String, T> listOperations = (ListOperations<String, T>) redisTemplate.opsForList();
@@ -123,15 +136,17 @@ public class RedisCache<T> implements Cache<T> {
                 }
                 return null;
             } finally {
-                redisLock.unlock(key); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(key); // 分布式解锁
             }
         }
     }
 
     @Override
     public <T> List<T> selectCacheLike(String likeKey) {
-        synchronized (likeKey) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(likeKey); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (likeKey.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(likeKey); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 Set<String> keys = redisTemplate.keys(likeKey + "*");
                 List<T> list = new ArrayList<>();
@@ -151,15 +166,17 @@ public class RedisCache<T> implements Cache<T> {
                 }
                 return list;
             } finally {
-                redisLock.unlock(likeKey); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(likeKey); // 分布式解锁
             }
         }
     }
 
     @Override
     public boolean removeCacheLike(String likeKey) {
-        synchronized (likeKey) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(likeKey); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (likeKey.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(likeKey); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 Set<String> keys = redisTemplate.keys(likeKey + "*");
                 for (String key : keys) {
@@ -171,21 +188,24 @@ public class RedisCache<T> implements Cache<T> {
                 }
                 return true;
             } finally {
-                redisLock.unlock(likeKey); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(likeKey); // 分布式解锁
             }
         }
     }
 
     @Override
     public boolean insertTimeoutCache(String key, T t, long timeout) {
-        synchronized (key) { // 单节点上锁（主要防止多线程并发资源不同步问题）
-            redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
+        synchronized (key.intern()) { // 单节点上锁（主要防止多线程并发资源不同步问题）
+            if (initParamService.isUseClusterRedisLock())
+                redisLock.lock(key); // 分布式上锁 （主要防止多节点并发资源不同步问题）
             try {
                 redisTemplate.opsForValue().set(key, t);
                 redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
                 return true;
             } finally {
-                redisLock.unlock(key); // 分布式解锁
+                if (initParamService.isUseClusterRedisLock())
+                    redisLock.unlock(key); // 分布式解锁
             }
         }
     }

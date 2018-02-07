@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.ed.dao.EdAppRequestParamMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.ed.model.EdAppRequestParam" >
+    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+    <result column="SEQ" property="seq" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIBE" property="describe" jdbcType="VARCHAR" />
+    <result column="IS_NEED" property="isNeed" jdbcType="CHAR" />
+    <result column="DEFAULT_VAL" property="defaultVal" jdbcType="VARCHAR" />
+    <result column="APP_ID" property="appId" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from ED_APPLICATION_REQUEST_PARAM
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </delete>
+  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.ed.model.EdAppRequestParam" >
+    update ED_APPLICATION_REQUEST_PARAM
+    set SEQ = #{seq,jdbcType=DECIMAL},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESCRIBE = #{describe,jdbcType=VARCHAR},
+      IS_NEED = #{isNeed,jdbcType=CHAR},
+      DEFAULT_VAL = #{defaultVal,jdbcType=VARCHAR},
+      APP_ID = #{appId,jdbcType=VARCHAR}
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, SEQ, NAME, DESCRIBE, IS_NEED, DEFAULT_VAL, APP_ID
+    from ED_APPLICATION_REQUEST_PARAM
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select PK_ID, SEQ, NAME, DESCRIBE, IS_NEED, DEFAULT_VAL, APP_ID
+    from ED_APPLICATION_REQUEST_PARAM
+  </select>
+
+  <insert id="addEdAppRequestParam" parameterType="com.hex.bigdata.udsp.ed.model.EdAppRequestParam" >
+    insert into ED_APPLICATION_REQUEST_PARAM (PK_ID, SEQ, NAME,
+    DESCRIBE, IS_NEED, DEFAULT_VAL,
+    APP_ID)
+    values (#{pkId,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR},
+    #{describe,jdbcType=VARCHAR}, #{isNeed,jdbcType=CHAR}, #{defaultVal,jdbcType=VARCHAR},
+    #{appId,jdbcType=VARCHAR})
+  </insert>
+  <select id="getEdAppRequestParamByAppId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, SEQ, NAME, DESCRIBE, IS_NEED, DEFAULT_VAL, APP_ID
+    from ED_APPLICATION_REQUEST_PARAM
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteEdAppRequestParamByAppId" parameterType="java.lang.String" >
+    delete from ED_APPLICATION_REQUEST_PARAM
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </delete>
+</mapper>

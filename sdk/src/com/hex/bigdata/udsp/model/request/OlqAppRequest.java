@@ -5,6 +5,7 @@ import com.hex.bigdata.udsp.model.Page;
 import java.util.Map;
 
 /**
+ * 联机查询应用
  * Created with IntelliJ IDEA
  * Author: tomnic.wang
  * DATE:2017/5/17

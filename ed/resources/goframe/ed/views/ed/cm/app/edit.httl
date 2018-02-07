@@ -1,0 +1,695 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding: 5px 5px 0px 5px;">
+    <div id="form1" method="post">
+        <fieldset style="border:dotted 1px #227EA0;">
+            <input name="pkId" class="nui-hidden"/>
+            <legend><span style="font-weight: bold">基础栏</span></legend>
+            <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
+                <tr>
+                    <th class="nui-form-label"><label for="name">名称：</label></th>
+                    <td>
+                        <input id="name" name="name" class="nui-textbox" style="width: 97%" required="true"
+                               vtype="maxLength:64" onvalidation="nameValidation"/>
+
+                    </td>
+                    <th class="nui-form-label"><label for="interfaceId">接口编码：</label></th>
+                    <td>
+                        <div id="interfaceId" class="nui-combobox" style="width:97%;"  popupWidth="400" textField="interfaceCode"
+                             valueField="pkId"
+                             url="${basePath}/interfaceInfo/selectInterfaceInfoList" dataField="data" name="interfaceId" multiSelect="false"
+                             allowInput="true" required="true" onvaluechanged="interfaceIdChanged" >
+                            <div property="columns">
+                                <div header="接口编码" field="interfaceCode"></div>
+                                <div header="接口名称" field="interfaceName"></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="describe">说明：</label></th>
+                    <td >
+                        <input id="describe" name="describe" class="nui-textbox" style="width:97%" required="true"
+                               vtype="maxLength:256"/>
+                    </td>
+                    <th class="nui-form-label"><label for="maxNum">最大返回数：</label></th>
+                    <td >
+                        <input id="maxNum" name="maxNum" class="nui-textbox" style="width:97%"
+                               vtype="maxLength:10;int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="isCheck">是否校验查询字段：</label></th>
+                    <td >
+                        <label><input id="noCheck" name="isCheck" type="radio" value="0" />否 </label>
+                        <label><input id="isCheck" name="isCheck" type="radio" value="1" />是 </label>
+                    </td>
+                    <th class="nui-form-label"></th>
+                    <td >
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="note">备注：</label></th>
+                    <td colspan="3">
+                        <input name="note" id="note" class="nui-textarea" style="height:60px; width:99%;"
+                               vtype="maxLength:4000"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">字段栏</span></legend>
+
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>查询字段</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add1">添加</a>
+                                <a class="nui-button" iconCls="icon-add" onclick="adds1">批量添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove1" enabled="false"
+                                   id="remove1">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp1" enabled="false"
+                                   id="moveUp1">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown1" enabled="false"
+                                   id="moveDown1">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:150px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid1" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellEdit="true" allowCellSelect="true" sortMode="client"
+                     showPager="false" editNextOnEnterKey="true" editNextRowCell="true" onselectionchanged="selected1"
+                     url="${basePath}/edApp/getEdAppRequestParamByAppId/${pkId}">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="20">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input name="colName" property="editor" class="nui-combobox"
+                                   textField="name" valueField="name" allowInput="true" dataField="data"
+                                   onbeforeshowpopup="colNameBeforeShowPopup1" vtype="maxLength:64" required="true"
+                                   onvaluechanged="colNameChanged1"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="20">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                        <div field="defaultVal" headerAlign="center" allowSort="true" width="15">默认值
+                            <input property="editor" class="nui-textbox" vtype="maxLength:64"/>
+                        </div>
+                        <div type="checkboxcolumn"  field="isNeed" trueValue="0" falseValue="1"
+                             headerAlign="center" allowSort="true" width="8">必填
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>返回字段</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add2">添加</a>
+                                <a class="nui-button" iconCls="icon-add" onclick="adds2">批量添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove2" enabled="false"
+                                   id="remove2">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp2" enabled="false"
+                                   id="moveUp2">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown2" enabled="false"
+                                   id="moveDown2">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:200px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid2" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellEdit="true" allowCellSelect="true" sortMode="client"
+                     showPager="false" editNextOnEnterKey="true" editNextRowCell="true" onselectionchanged="selected2"
+                     url="${basePath}/edApp/getEdAppResponseParamByAppId/${pkId}">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="20">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input name="name" property="editor" class="nui-combobox"
+                                   textField="name" valueField="name" allowInput="true" dataField="data"
+                                   onbeforeshowpopup="colNameBeforeShowPopup2" vtype="maxLength:64" required="true"
+                                   onvaluechanged="colNameChanged2"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="20">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
+            <a class="nui-button" style="" iconCls="icon-save" onclick="save" id="saveButton">保存</a>
+            <span style="display:inline-block;width:25px;"></span>
+            <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">返回</a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var form1;
+    var grid1;
+    var grid2;
+    var interfaceIdObj;
+    var originName;
+
+    /**
+     * 按需加载资源文件
+     */
+    require(['jquery', 'nui'], function ($, nui) {
+        nui.parse();
+        form1 = new nui.Form("#form1");
+        grid1 = nui.get("datagrid1");
+        grid2 = nui.get("datagrid2");
+        interfaceIdObj = nui.get("interfaceId");
+        setData();
+        grid1.load();
+        grid2.load();
+    });
+
+    /**
+     * 读取详情
+     */
+    function setData(){
+        $.ajax({
+            url:"${basePath}/edApp/selectByPrimaryKey/${pkId}",
+            type:'POST',
+            data:null,
+            cache:false,
+            contentType:'application/json',
+            success:function(result){
+                //console.warn(result);
+                if(result.status == true) {
+                    form1.setData(result.data);
+                    if(result.data.isCheck == 0){
+                        document.getElementById("noCheck").checked = true;
+                    } else {
+                        document.getElementById("isCheck").checked = true;
+                    }
+                    form1.setChanged(false);
+                    originName = result.data.name;
+                }
+            }
+        });
+    }
+
+    /**
+     * 选中
+     */
+    function selected1() {
+        var rows = grid1.getSelecteds();
+        if (rows.length == 1) {
+            nui.get("remove1").enable();
+            nui.get("moveUp1").enable();
+            nui.get("moveDown1").enable();
+        } else if (rows.length == 0) {
+            nui.get("remove1").disable();
+            nui.get("moveUp1").disable();
+            nui.get("moveDown1").disable();
+        } else {
+            nui.get("remove1").enable();
+            nui.get("moveUp1").enable();
+            nui.get("moveDown1").enable();
+        }
+    }
+    function selected2() {
+        var rows = grid2.getSelecteds();
+        if (rows.length == 1) {
+            nui.get("remove2").enable();
+            nui.get("moveUp2").enable();
+            nui.get("moveDown2").enable();
+        } else if (rows.length == 0) {
+            nui.get("remove2").disable();
+            nui.get("moveUp2").disable();
+            nui.get("moveDown2").disable();
+        } else {
+            nui.get("remove2").enable();
+            nui.get("moveUp2").enable();
+            nui.get("moveDown2").enable();
+        }
+    }
+
+    /**
+     * 字段名称变化时触发检查
+     */
+    function colNameValidation1(e) {
+        if (e.isValid) {
+            var count = 0;
+            var rows = grid1.getData(true, true);
+            for (var i = 0, len = rows.length; i < len; i++) {
+                if (e.value == rows[i].name) {
+                    count++;
+                }
+                if(count == 1){
+                    e.errorText = "名称已存在";
+                    e.isValid = false;
+                    return false;
+                }
+            }
+            //当字段名称改变时，对应"必填项"默认更改为“勾选”状态
+            var row = grid1.getSelected();
+            row.isNeed = "0";
+        }
+    }
+    function colNameValidation2(e) {
+        if (e.isValid) {
+            var count = 0;
+            var rows = grid2.getData(true, true);
+            for (var i = 0, len = rows.length; i < len; i++) {
+                if (e.value == rows[i].name) {
+                    count++;
+                }
+                if(count == 1){
+                    e.errorText = "名称已存在";
+                    e.isValid = false;
+                    return false;
+                }
+            }
+        }
+    }
+
+    /**
+     * 添加
+     */
+    function add1() {
+        var rows = grid1.getData(true, true);
+        var length = rows.length;
+        var newRow = {colType: "STRING"};
+        grid1.addRow(newRow, length);
+    }
+    function add2() {
+        var rows = grid2.getData(true, true);
+        var length = rows.length;
+        var newRow = {colType: "STRING"};
+        grid2.addRow(newRow, length);
+    }
+
+    /**
+     * 删除
+     */
+    function remove1() {
+        var rows = grid1.getSelecteds();
+        if (rows.length > 0) {
+            grid1.removeRows(rows, true);
+        } else {
+            nui.alert("请至少选中一条记录!");
+        }
+    }
+    function remove2() {
+        var rows = grid2.getSelecteds();
+        if (rows.length > 0) {
+            grid2.removeRows(rows, true);
+        } else {
+            nui.alert("请至少选中一条记录!");
+        }
+    }
+
+    /**
+     * 保存
+     */
+    function save() {
+        var saveData = getSaveData();
+        if (!saveData) {
+            return;
+        }
+        var json = nui.encode(saveData);
+        // --发送信息--
+        form1.loading("正在保存中,请稍等...");
+        //禁用保存按钮
+        nui.get("saveButton").disable();
+        $.ajax({
+            url: "${basePath}/edApp/updateEdApplicationAndParam",
+            type: 'POST',
+            data: json,
+            cache: false,
+            contentType: 'application/json',
+            success: function (result) {
+                if (result.status == true) {
+                    nui.alert(result.message);
+                    CloseWindow("success");
+                } else {
+                    nui.alert(result.message, "系统提示");
+                }
+                form1.unmask();
+                //解除保存按钮禁用
+                nui.get("saveButton").enable();
+            }
+        });
+    }
+
+    /**
+     * 获取需要保存的数据
+     */
+    function getSaveData() {
+        debugger;
+        var baseData = getBaseData();
+        if (!baseData) {
+            return;
+        }
+        var queryColsData = getQueryColsData();
+        if (!queryColsData) {
+            return;
+        }
+        var returnColsData = getReturnColsData();
+        if (!returnColsData) {
+            return;
+        }
+        var saveData = {
+            "edApplication": baseData,
+            "edAppRequestParam": queryColsData,
+            "edAppResponseParam": returnColsData
+        };
+        return saveData;
+    }
+
+    /**
+     * 获取基础数据
+     */
+    function getBaseData() {
+        form1.validate();
+        if (form1.isValid() == false) {
+            return;
+        }
+        var baseData = form1.getData(true, true);
+        var isCheck = getRadioBoxValue();
+        baseData.isCheck = isCheck;
+        return baseData;
+    }
+
+    /**
+     * 获取查询字段数据
+     */
+    function getQueryColsData() {
+        var status = true;
+        var queryColsData = grid1.getData(true, true);
+        if (queryColsData == null || queryColsData.length == 0) {
+            nui.alert("【查询字段】的信息不能为空!");
+            return;
+        }
+        $.each(queryColsData, function (_index, record) {
+            record.seq = grid1.indexOf(record) + 1;
+            if (record.name == null || record.name == "") {
+                nui.alert("【查询字段】的位置" + record.seq + "：【名称】不能为空!");
+                status = false;
+                return false;
+            }
+            if (checkPattern(record.name) == false) {
+                nui.alert("【查询字段】的位置" + record.seq + "：【名称】只能包含字母、数字、下划线，且以字母开头!");
+                status = false;
+                return false;
+            }
+            if (record.describe == null || record.describe == "") {
+                nui.alert("【查询字段】的位置" + record.seq + "：【说明】不能为空!");
+                status = false;
+                return false;
+            }
+        });
+        if (!status) {
+            return;
+        }
+        // 检查参数重复
+        if (checkRepetition(queryColsData)) {
+            nui.alert("【查询字段】中存在重复【名称】，请检查后再提交！");
+            return;
+        }
+        return queryColsData;
+    }
+
+    /**
+     * 获取返回字段数据
+     */
+    function getReturnColsData() {
+        var status = true;
+        var returnColsData = grid2.getData(true, true);
+        if (returnColsData == null || returnColsData.length == 0) {
+            nui.alert("【返回字段】的信息不能为空!");
+            return;
+        }
+        $.each(returnColsData, function (_index, record) {
+            record.seq = grid2.indexOf(record) + 1;
+            if (record.name == null || record.name == "") {
+                nui.alert("【返回字段】的位置" + record.seq + "：【名称】不能为空!");
+                status = false;
+                return false;
+            }
+            if (checkPattern(record.name) == false) {
+                nui.alert("【返回字段】的位置" + record.seq + "：【名称】只能包含字母、数字、下划线，且以字母开头!");
+                status = false;
+                return false;
+            }
+            if (record.describe == null || record.describe == "") {
+                nui.alert("【返回字段】的位置" + record.seq + "：【说明】不能为空!");
+                status = false;
+                return false;
+            }
+        });
+        if (!status) {
+            return;
+        }
+        // 检查参数重复
+        if (checkRepetition(returnColsData)) {
+            nui.alert("【返回字段】中存在重复【名称】，请检查后再提交！");
+            return;
+        }
+        return returnColsData;
+    }
+
+    /**
+     * 检查参数列表是否重复
+     */
+    function checkRepetition(propsData) {
+        //算法1、遍历
+        var repetFlg = false;
+        $.each(propsData, function (_index, record) {
+            var repetCount = 0;
+            $.each(propsData, function (i, item) {
+                if (record.name == item.name) {
+                    repetCount++;
+                }
+            });
+            if (repetCount > 1) {
+                repetFlg = true;
+            }
+        });
+        //算法2、构造Map类型集合，以record.name为key，插入到map集合中，
+        //集合中长度小于原来的长度,则存在重复
+        return repetFlg;
+    }
+
+    /**
+     * 名称变化时触发检查
+     */
+    function nameValidation(e) {
+        if (e.isValid) {
+            if (checkPattern(e.value) == false) {
+                e.errorText = "只能包含字母、数字、下划线，且以字母开头";
+                e.isValid = false;
+            }
+            if(e.value == originName){
+                return;
+            }
+            if (isExist(e.value)) {
+                nui.alert("名称已存在");
+                e.errorText = "名称已存在";
+                e.isValid = false;
+            }
+        }
+    }
+
+    /**
+     * 检查是否满足字母、数字、下划线，且以字母开头
+     */
+    function checkPattern(v) {
+        var re = new RegExp("^[A-Za-z][A-Za-z0-9_]{0,63}$");
+        if (re.test(v)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 检查是否存    在
+     */
+    function isExist(value) {
+        var result=false;
+        $.ajax({
+            url: "${basePath}/edApp/getEdApplicationByName?name=" + value,
+            type: 'GET',
+            cache: false,
+            async: false,
+            contentType: 'application/json',
+            success: function (text) {
+                result = text.status;
+            }
+        });
+        return result;
+    }
+
+    /**
+     * 返回
+     */
+    function cancel() {
+        CloseWindow("onCancel");
+    }
+
+    /**
+     * 选中项上移
+     */
+    function moveUp1() {
+        var rows = grid1.getSelecteds();
+        grid1.moveUp(rows);
+    }
+    function moveUp2() {
+        var rows = grid2.getSelecteds();
+        grid2.moveUp(rows);
+    }
+
+    /**
+     * 选中项下移
+     */
+    function moveDown1() {
+        var rows = grid1.getSelecteds();
+        grid1.moveDown(rows);
+    }
+    function moveDown2() {
+        var rows = grid2.getSelecteds();
+        grid2.moveDown(rows);
+    }
+
+    /**
+     * 查询字段下拉框弹出前发生
+     */
+    var count1 = 0;
+    function colNameBeforeShowPopup1(e){
+        // --下拉选项变化--
+        if(count1 == 0) {
+            e.source.load("${basePath}/interfaceParam/selectListRequest/" + interfaceIdObj.value);
+            count1++;
+        }
+    }
+
+    /**
+     * 返回字段下拉框弹出前发生
+     */
+    var count2 = 0;
+    function colNameBeforeShowPopup2(e){
+        // --下拉选项变化--
+        if(count2 == 0) {
+            e.source.load("${basePath}/interfaceParam/selectListResponse/" + interfaceIdObj.value);
+            count2++;
+        }
+    }
+
+    /**
+     * 字段名称变化时触发
+     */
+    function colNameChanged1(e) {
+        // --同一行的说明、长度和别名变化--
+        var selected = e.selected;
+        var row = grid1.getSelected();
+        row.describe = selected.describe;
+        row.defaultVal = "";
+        row.isNeed = "0";
+    }
+    function colNameChanged2(e) {
+        // --同一行的说明、长度和别名变化--
+        var selected = e.selected;
+        var row = grid2.getSelected();
+        row.describe = selected.describe;
+    }
+
+    /**
+     * 批量添加查询字段
+     */
+    function adds1() {
+        nui.open({
+            url: "${basePath}/goframe/p/mm.cm.app.multi?modelId=" + interfaceIdObj.value + "&type=1",
+            title: "批量添加",
+            width: 650,
+            height: 380,
+            onload: function () {
+                var data = grid1.getData(true, true);
+                var iframe = this.getIFrameEl();
+                var props = [];
+                if (data.length > 0) {
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        props.push({"name": data[i].name});
+                    }
+                }
+                iframe.contentWindow.SetData(props);
+            },
+            ondestroy: function (action) {
+                if (action == "success") {
+                    var iframe = this.getIFrameEl();
+                    var result = iframe.contentWindow.GetData();
+                    result = nui.clone(result);
+                    grid1.addRows(result);
+                }
+            }
+        });
+    }
+
+    /**
+     * 批量添加返回字段
+     */
+    function adds2() {
+        nui.open({
+            url: "${basePath}/goframe/p/mm.cm.app.multi?modelId=" + interfaceIdObj.value + "&type=2",
+            title: "批量添加",
+            width: 650,
+            height: 380,
+            onload: function () {
+                var data = grid2.getData(true, true);
+                var iframe = this.getIFrameEl();
+                var props = [];
+                if (data.length > 0) {
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        props.push({
+                            "name": data[i].name,
+                            "describe": data[i].describe
+                        });
+                    }
+                }
+                iframe.contentWindow.SetData(props);
+            },
+            ondestroy: function (action) {
+                if (action == "success") {
+                    var iframe = this.getIFrameEl();
+                    var result = iframe.contentWindow.GetData();
+                    result = nui.clone(result);
+                    grid2.addRows(result);
+                }
+            }
+        });
+    }
+
+    function getRadioBoxValue(){
+        var isCheck = '1';
+        var isCheckDom = document.getElementById('isCheck');
+        if(isCheckDom && isCheckDom.checked){
+            isCheck = '1';
+        } else {
+            isCheck = '0';
+        }
+        return isCheck;
+    }
+</script>
+<!--#end-->

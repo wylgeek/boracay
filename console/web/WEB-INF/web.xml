@@ -15,23 +15,6 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
-    <!-- TZB ESB -->
-    <!--
-    <servlet>
-        <servlet-name>ESBServer</servlet-name>
-        <servlet-class>com.dcfs.esb.server.ESBServer</servlet-class>
-        <init-param>
-            <param-name>EAI_HOME</param-name>
-            <param-value>D:\\BDP\\01工程\\03编码\\UDSP\\out\\production\\console</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ESBServer</servlet-name>
-        <url-pattern>/ESBServer</url-pattern>
-    </servlet-mapping>
-    -->
-
     <!-- CXF -->
     <servlet>
         <servlet-name>CXFServer</servlet-name>

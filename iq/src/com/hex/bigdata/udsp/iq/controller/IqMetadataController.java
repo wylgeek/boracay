@@ -1,10 +1,12 @@
 package com.hex.bigdata.udsp.iq.controller;
 
 import com.hex.bigdata.udsp.common.util.JSONUtil;
+import com.hex.bigdata.udsp.im.provider.model.MetadataCol;
 import com.hex.bigdata.udsp.iq.dto.IqMetadataPropsView;
 import com.hex.bigdata.udsp.iq.dto.IqMetadataView;
 import com.hex.bigdata.udsp.iq.model.IqMetadata;
 import com.hex.bigdata.udsp.iq.service.IqMetadataService;
+import com.hex.bigdata.udsp.iq.service.IqProviderService;
 import com.hex.goframe.controller.BaseController;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
@@ -35,6 +37,8 @@ public class IqMetadataController extends BaseController {
 
     @Autowired
     private IqMetadataService iqMetadataService;
+    @Autowired
+    private IqProviderService iqProviderService;
 
     @RequestMapping({"/page"})
     @ResponseBody
@@ -154,10 +158,10 @@ public class IqMetadataController extends BaseController {
             message = "请求参数为空";
         }
         try {
-            for(IqMetadata iqMetadata:iqMetadatas){
+            for (IqMetadata iqMetadata : iqMetadatas) {
                 if (iqMetadataService.hasUsed(iqMetadata)) {
                     status = false;
-                    message = "名称为"+iqMetadataService.select(iqMetadata.getPkId()).getName()+"元数据已经被引用！";
+                    message = "名称为" + iqMetadataService.select(iqMetadata.getPkId()).getName() + "元数据已经被引用！";
                     break;
                 }
             }
@@ -211,34 +215,66 @@ public class IqMetadataController extends BaseController {
         return new MessageResult(status, message);
     }
 
+    /**
+     * 获取字段信息
+     *
+     * @param dsId
+     * @param tbName
+     * @return
+     */
+    @RequestMapping({"/getColumnInfo/{dsId}"})
+    @ResponseBody
+    public MessageResult getColumnInfo(@PathVariable("dsId") String dsId, String tbName) {
+        boolean status = true;
+        String message = "获取字段信息成功！";
+        List<MetadataCol> metadataCols = null;
+        if (StringUtils.isBlank(dsId) || StringUtils.isBlank(tbName)) {
+            status = false;
+            message = "请求参数为空";
+        } else {
+            try {
+                metadataCols = iqProviderService.getColumnInfo(dsId, tbName);
+            } catch (Exception e) {
+                e.printStackTrace();
+                status = false;
+                message = "系统异常：" + e.getMessage();
+            }
+        }
+        if (status) {
+            logger.debug(message);
+        } else {
+            logger.error(message);
+        }
+        return new MessageResult(status, message, metadataCols);
+    }
 
     @RequestMapping("upload")
     @ResponseBody
-    public MessageResult upload(MultipartFile excelFile){
+    public MessageResult upload(MultipartFile excelFile) {
         boolean status = true;
         String message = "上传成功";
 
         //判断结尾是否为xl或者xlsx
-        if (((CommonsMultipartFile)excelFile).getFileItem().getName().endsWith(".xls")
-                || ((CommonsMultipartFile)excelFile).getFileItem().getName().endsWith(".xlsx")) {
+        if (((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xls")
+                || ((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xlsx")) {
             //将文件放到项目上传文件目录中
             String uploadFilePath = FileUtil.uploadFile(FileUtil
                     .getRealUploadPath("EXCEL_UPLOAD"), excelFile);
-            Map<String,String> result = iqMetadataService.uploadExcel(uploadFilePath);
-            if("false".equals(result.get("status"))){
+            Map<String, String> result = iqMetadataService.uploadExcel(uploadFilePath);
+            if ("false".equals(result.get("status"))) {
                 status = false;
                 message = result.get("message");
             }
-        }else{
+        } else {
             status = false;
             message = "请上传正确格式的文件！";
         }
-        return new MessageResult(status,message);
+        return new MessageResult(status, message);
     }
 
     @ResponseBody
     @RequestMapping("/download")
-    public String createExcel(@RequestBody IqMetadata[] iqMetadatas){
+    public String createExcel(@RequestBody IqMetadata[] iqMetadatas) {
         // 写入Excel文件
         String filePath = "";
         try {

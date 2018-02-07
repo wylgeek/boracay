@@ -1,0 +1,306 @@
+${extends("/goframe/function_layout.httl")}
+<script src="${basePath}/s/js/jquery/jquery-1.8.1.min.js" type="text/javascript"></script>
+<script src="${basePath}/s/js/nui/swfupload/swfupload.js" type="text/javascript"></script>
+<!--#macro(head)-->
+<title>接口管理</title>
+<link rel="stylesheet" href="${basePath}/s/css/udsp.css"/>
+<link rel="stylesheet" href="${basePath}/s/css/font-awesome.css"/>
+<!--#end-->
+
+<!--#macro(content)-->
+<div class="nui-toolbar">
+
+    <div class="panel-toolbar">
+        <table style="width:100%">
+            <tr>
+                <td style="white-space:nowrap;">
+                    <a class="nui-button" id="pull" iconCls="icon-search" onclick="moreOption">搜索︽</a>
+                    <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
+                </td>
+                <td style="text-align: right;">
+
+                    <a class="nui-button" iconCls="icon-add" plain="true" onclick="add">添加</a>
+
+                    <a class="nui-button" iconCls="icon-edit" plain="true" onclick="edit" enabled="false" id="edit">编辑</a>
+
+                    <a class="nui-button" iconCls="icon-remove" plain="true" onclick="remove" enabled="false" id="remove">删除</a>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="panel-query search-condition" style="display:none;" id="query">
+        <div class="list">
+            <div id="form1">
+                <table class="table">
+                    <tr>
+                        <td class="tit" style="width: 100px;" align="right">接口编码：</td>
+                        <td style="width: 25%">
+                            <input class="nui-textbox" style="width: 98%;" name="interfaceCode" />
+                        </td>
+                        <td class="tit" style="width: 100px;" align="right">接口类别：</td>
+                        <td style="width: 1%">
+                            <input class="nui-dictcombobox" style="width: 98%;" valueField="dictId" textField="dictName"
+                                   dictTypeId="ED_INTERFACE_TYPE" name="interfaceType" showNullItem="true" emptyText="全部"
+                                   nullItemText="全部"/>
+                        </td>
+                        <td class="tit" style="width: 100px;" align="right">创建时间：</td>
+                        <td style="width: 25%">
+                            <input id="startTime" name="startTime" class="nui-datepicker"  shoutodayButton="false"
+                                   onvaluechanged="onStartTimeChanged"/> -
+                            <input id="endTime" name="endTime" class="nui-datepicker"  shoutodayButton="false"
+                                   onvaluechanged="onEndTimeChanged"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tit" style="width: 100px;" align="right">接口名称：</td>
+                        <td style="width: 25%">
+                            <input class="nui-textbox" style="width: 98%;" name="interfaceName" />
+                        </td>
+                        <td class="tit" style="width: 100px;" align="right">接口厂商：</td>
+                        <td style="width: 25%">
+                            <input name="interfaceCompany" class="nui-dictcombobox" style="width: 98%;" valueField="dictId"
+                                   textField="dictName" dictTypeId="ED_INTERFACE_COMPANY" showNullItem="true" emptyText="全部"
+                                   nullItemText="全部"/>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align="center">
+                            <input class="nui-button" iconCls="icon-search" text="查询" onclick="search"/>
+                            <span style="display:inline-block;width:25px;"></span>
+                            <input class="nui-button" iconCls="icon-reset" text="重置" onclick="reset"/>
+                            <span style="display:inline-block;width:25px;"></span>
+                            <input class="nui-button" iconCls="icon-download" text="下载" onclick="downLoad()"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="updateForm" style="width:100%;height:auto;overflow:hidden;">
+        <table style="width:100%;table-layout:fixed;" class="nui-form-table">
+            <tr>
+                <th class="nui-form-label"  width="15%" align="right"><label>EXCEL配置文件：</label></th>
+                <td><input id="fileUpload" class="nui-fileupload" style="width:100%"
+                           name="excelFile" limitType="*.xls;*.xlsx"
+                           flashUrl="${basePath}/s/js/nui/swfupload/swfupload.swf"
+                           uploadUrl="${basePath}/mm/contractor/upload"
+                           onuploadsuccess="uploadSuccess"
+                />
+                </td>
+                <td width="15%"  align="center">
+                    <a type="submit" id="impimp" class="nui-button"   iconCls="icon-upload" onclick="startUpload">上传</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="display:none">
+        <table>
+            <form id="downForm" action="${basePath}/com/file/download" method="get">
+                <input id="filePath" name="filePath" type="hidden" />
+            </form>
+        </table>
+    </div>
+</div>
+
+<div class="nui-fit">
+    <div id="datagrid1" class="nui-datagrid" style="width:100%;height:100%;" idField="pkId"
+         url="${basePath}/interfaceInfo/getInterfaceInfoList" onrowdblclick="detail"
+         sizeList=[5,10,20,50,100] multiSelect="true" pageSize="20" onselectionchanged="selectionChanged">
+        <div property="columns">
+            <div type="checkcolumn"></div>
+            <div field="interfaceCode" width="120px" headerAlign="center">接口编码</div>
+            <div field="interfaceName" width="170px" headerAlign="center">接口名称</div>
+            <div field="validTime" width="100px" headerAlign="center" align="right">缓存时间（分钟）</div>
+            <div field="reqUrl" width="200px" headerAlign="center">接口路径</div>
+            <div field="interfaceType" width="90px" headerAlign="center" renderer="onInterfaceTypeRenderer">接口类别</div>
+            <div field="interfaceCompany" width="90px" headerAlign="center" renderer="onInterfaceCompanyRenderer">接口厂商</div>
+            <div field="crtUser" width="90px" headerAlign="center">创建人</div>
+            <div field="crtTime" width="130px" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+            <div field="updateUser" width="90px" headerAlign="center">修改人</div>
+            <div field="updateTime" width="130px" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">修改时间</div>
+            <div field="interfaceDesc" width="100px" headerAlign="center">接口描述</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var grid;
+    require(['jquery','nui'],function($, nui) {
+        nui.parse();
+        grid = nui.get("datagrid1");
+        search();
+        $("#pull").hide();
+    });
+
+    /**
+     * 搜索按钮转换
+     */
+    function moreOption() {
+        $("#push").toggle();
+        $("#pull").toggle();
+        $("#query").toggle();
+        nui.layout(document.body);
+    }
+
+    function search() {
+        var form = new nui.Form("#form1");
+        var data = form.getData(true,true);
+        grid.load(data);
+    }
+
+    function reset() {
+        var form = new nui.Form("#form1");
+        form.reset();
+        onStartTimeChanged();
+        onEndTimeChanged();
+    }
+
+    /*增加接口信息*/
+    function add() {
+        nui.open({
+            url:"${basePath}/goframe/p/ed.cm.interfaceInfo.add",
+            title:"新增接口",
+            width:800,
+            height:600,
+            onload:function () {
+
+            },
+            ondestroy:function (action) {
+                if(action=="saveSuccess"){
+                    grid.reload();
+                }
+            }
+        });
+    }
+
+    /*修改接口信息*/
+    function edit() {
+        var row = grid.getSelected();
+        if(row != null || row != ''){
+            nui.open({
+                url:"${basePath}/goframe/p/ed.cm.interfaceInfo.update?pkId=" + row.pkId,
+                title:"编辑接口",
+                width:800,
+                height:600,
+                onload:function () {
+                    var iframe = this.getIFrameEl();
+                    iframe.contentWindow.setData(row);
+                },
+                ondestroy:function (action) {
+                    if(action=="saveSuccess"){
+                        grid.reload();
+                    }
+                }
+            });
+        } else {
+            nui.alert("请选中一条记录！");
+        }
+    }
+
+    /*详情页面*/
+    function detail() {
+        var row = grid.getSelected();
+        if(row!=null){
+            nui.open({
+                url:"${basePath}/goframe/p/ed.cm.interfaceInfo.detail?pkId=" + row.pkId,
+                title:"接口详情",
+                width:800,
+                height:600,
+                onload:function () {
+                    var iframe = this.getIFrameEl();
+                    iframe.contentWindow.setData(row);
+                },
+                ondestroy:function (action) {
+                }
+            });
+        }
+    }
+
+    /*删除接口*/
+    function remove() {
+        var rows = grid.getSelecteds();
+        if(rows.length > 0) {
+            nui.confirm("确定删除选中记录？","系统提示",function (action) {
+                if(action != "ok") return;
+                var json = nui.encode(rows);
+                var messageBox = nui.loading("正在删除中，请稍后...","提示");
+                $.ajax({
+                    url:"${basePath}/interfaceInfo/deleteInterfaceInfo",
+                    type:'POST',
+                    data:json,
+                    cache:false,
+                    async:true,
+                    contentType:'application/json',
+                    success:function (text) {
+                        nui.hideMessageBox(messageBox);
+                        if(text.status) {
+                            nui.alert(text.message);
+                            search();
+                        } else {
+                            nui.alert(text.message);
+                        }
+                    },
+                    error:function (text) {
+                        nui.alert("请求错误");
+                        nui.hideMessageBox(messageBox);
+                    }
+                });
+            });
+        } else {
+            nui.alert("请选择要删除的对象！");
+        }
+    }
+
+    /*接口类别替换*/
+    function onInterfaceTypeRenderer(e) {
+        return nui.getDictText("ED_INTERFACE_TYPE",e.row.interfaceType);
+    }
+
+    /*接口厂商替换*/
+    function onInterfaceCompanyRenderer(e) {
+        return nui.getDictText("ED_INTERFACE_COMPANY",e.row.interfaceCompany);
+    }
+
+    /*按钮控制*/
+    function selectionChanged() {
+        var rows = grid.getSelecteds();
+        if(rows.length > 1) {
+            nui.get("edit").disable();
+            nui.get("remove").enable();
+        } else if(rows.length < 1) {
+            nui.get("edit").disable();
+            nui.get("remove").disable();
+        } else {
+            nui.get("edit").enable();
+            nui.get("remove").enable();
+        }
+    }
+
+    function onStartTimeChanged() {
+        var start_time = nui.get("startTime");
+        var end_time = nui.get("endTime");
+        var startTime = start_time.getValue();
+        if(startTime == "" || startTime == null) {
+            end_time.setMinDate();
+        } else {
+            end_time.setMinDate(startTime);
+        }
+    }
+
+    function onEndTimeChanged() {
+        var start_time = nui.get("startTime");
+        var end_time = nui.get("endTime");
+        var endTime = end_time.getValue();
+        if(endTime == "" || endTime == null) {
+            start_time.setMaxDate();
+        } else {
+            start_time.setMaxDate(endTime);
+        }
+    }
+</script>
+<!--#end-->

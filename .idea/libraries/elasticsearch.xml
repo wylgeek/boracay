@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="elasticsearch">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/elasticsearch" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/elasticsearch" recursive="false" />
+  </library>
+</component>

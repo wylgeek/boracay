@@ -54,7 +54,7 @@ public class McChartsService extends BaseService {
     }
 
     public List<McChartsView> chart3(String timeStart, String timeEnd) {
-        return mcChartsMapper.statsServiceGroupByUserName(new McChartsView(timeStart, timeEnd));
+        return mcChartsMapper.chart3(new McChartsView(timeStart, timeEnd));
     }
 
     public List<McChartsView> chart4(String timeStart, String timeEnd) {
@@ -67,6 +67,14 @@ public class McChartsService extends BaseService {
 
     public List<McChartsView> chart6(String timeStart, String timeEnd) {
         return mcChartsMapper.chart6(timeStart, timeEnd);
+    }
+
+    public List<McChartsView> chart7(String timeStart, String timeEnd) {
+        return mcChartsMapper.chart7(timeStart, timeEnd);
+    }
+
+    public List<McChartsView> chart8(String timeStart, String timeEnd) {
+        return mcChartsMapper.chart8(timeStart, timeEnd);
     }
 
     public List<McChartsView> chart1Second(String timeStart, String timeEnd, String serverName) {

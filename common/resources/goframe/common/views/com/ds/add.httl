@@ -142,9 +142,9 @@ ${extends("/goframe/function_layout.httl")}
      * 下拉框弹出前发生
      */
     var count = 0;
-    function propsNameBeforeShowPopup(e){
+    function propsNameBeforeShowPopup(e) {
         // --下拉选项变化--
-        if(count == 0) {
+        if (count == 0) {
             e.source.load("${basePath}/goframe/dict/getDictData?dictTypeId=${model}_DS_PROPS_" + typeObj.value);
             count++;
         }
@@ -194,7 +194,7 @@ ${extends("/goframe/function_layout.httl")}
                 if (e.value == rows[i].name) {
                     count++;
                 }
-                if(count == 1){
+                if (count == 1) {
                     e.errorText = "名称已存在";
                     e.isValid = false;
                     return false;
@@ -469,26 +469,28 @@ ${extends("/goframe/function_layout.httl")}
         grid1.moveDown(rows);
     }
 
-     /**
-    *连接测试
-    */
-    function test(){
-            var saveData = getSaveData();
-            if (!saveData) {
-                return;
-            }
-            var json = nui.encode(saveData);
-            // --发送信息--
-            $.ajax({
-                url: "${basePath}/http/ds/test",
-                type: 'POST',
-                data: json,
-                cache: false,
-                contentType: 'application/json',
-                success: function (result) {
-                    nui.alert(result.message);
-                }
-            });
+    /**
+     *连接测试
+     */
+    function test() {
+        var saveData = getSaveData();
+        if (!saveData) {
+            return;
         }
+        var json = nui.encode(saveData);
+        // --发送信息--
+        form1.loading("正在测试中,请稍等...");
+        $.ajax({
+            url: "${basePath}/http/ds/test",
+            type: 'POST',
+            data: json,
+            cache: false,
+            contentType: 'application/json',
+            success: function (result) {
+                form1.unmask();
+                nui.alert(result.message);
+            }
+        });
+    }
 </script>
 <!--#end-->

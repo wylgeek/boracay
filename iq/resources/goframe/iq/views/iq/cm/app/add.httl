@@ -14,15 +14,13 @@ ${extends("/goframe/function_layout.httl")}
                     <th class="nui-form-label"><label for="mdId">元数据：</label></th>
                     <td>
                         <div id="mdId" class="nui-combobox" style="width:97%;"  popupWidth="400" textField="name" valueField="pkId"
-                             url="${basePath}/iq/md/select" dataField="data" name="mdId" multiSelect="false"   required="true" onvaluechanged="mdIdChanged">
+                             url="${basePath}/iq/md/select" dataField="data" name="mdId" multiSelect="false" allowInput="true"
+                             required="true" onvaluechanged="mdIdChanged">
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>
                             </div>
                         </div>
-                        <!--<input id="mdId" name="mdId" class="nui-combobox" valueField="pkId" textField="name"
-                               dataField="data" url="${basePath}/iq/md/select" allowInput="true"
-                               style="width:97%" onvaluechanged="mdIdChanged" required="true"/>-->
                     </td>
                 </tr>
                 <tr>
@@ -100,6 +98,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="length" headerAlign="center" allowSort="true" width="15">长度
                             <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
                         </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
+                        </div>
                         <div field="defaultVal" headerAlign="center" allowSort="true" width="15">默认值
                             <input property="editor" class="nui-textbox" vtype="maxLength:64"/>
                         </div>
@@ -161,6 +162,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="length" headerAlign="center" allowSort="true" width="15">长度
                             <input property="editor" class="nui-textbox" vtype="maxLength:32"/>
                         </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
+                        </div>
                         <div field="stats" headerAlign="center" allowSort="true" width="20">统计函数
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
                                    dictTypeId="IQ_APP_RETURN_COL_STATS"/>
@@ -213,6 +217,9 @@ ${extends("/goframe/function_layout.httl")}
                         <div field="type" headerAlign="center" allowSort="true" width="20">类型
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
                                    dictTypeId="IQ_MD_COL_DATA_TYPE" vtype="maxLength:32"/>
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox"/>
                         </div>
                         <div field="orderType" headerAlign="center" allowSort="true" width="20">排序
                             <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
@@ -348,6 +355,7 @@ ${extends("/goframe/function_layout.httl")}
                         "name": data[i].name,
                         "describe": data[i].describe,
                         "length": data[i].length,
+                        "note":data[i].note,
                         "label": data[i].name,
                         "type": data[i].colType,
                         "operator": "==",
@@ -372,6 +380,7 @@ ${extends("/goframe/function_layout.httl")}
                         "name": data[i].name,
                         "describe": data[i].describe,
                         "length": data[i].length,
+                        "note":data[i].note,
                         "label": data[i].name,
                         "type": data[i].colType,
                         "stats": "none"
@@ -394,6 +403,7 @@ ${extends("/goframe/function_layout.httl")}
         var row = grid1.getSelected();
         row.describe = selected.describe;
         row.length = selected.length;
+        row.note = selected.note;
         row.label = selected.name;
         row.type = selected.colType;
         row.operator = "==";
@@ -407,6 +417,7 @@ ${extends("/goframe/function_layout.httl")}
         row.describe = selected.describe;
         row.label = selected.name;
         row.length = selected.length;
+        row.note = selected.note;
         row.type = selected.colType;
         row.stats = "none";
     }
@@ -416,6 +427,7 @@ ${extends("/goframe/function_layout.httl")}
         var row = grid3.getSelected();
         row.describe = selected.describe;
         row.type = selected.colType;
+        row.note = selected.note;
         row.orderType = "ASC";
     }
 

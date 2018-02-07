@@ -6,15 +6,15 @@ ${extends("/goframe/function_layout.httl")}
 	<!-- 查询区 -->
 	<div style="text-align:center;line-height:23px;padding:5px;">
 		<div>
-			<span>应用类型:</span>
-			<input id="serviceType" name="serviceType"class="nui-dictcombobox nui-form-input" style="width:160px;"  emptyText="请选择服务类型"
-				   valueField="dictId" textField="dictName" dictTypeId="UDSP_SERVICE_TYPE" required="true"/>
-			<a class="nui-button" style="width:50px;height:20px;" onclick="onClearClick">清除</a>
-		</div>
-		<div>
 			<span>服务名称:</span>
 			<input id="name" name="name" class="nui-textbox" style="width:160px;" />
 			<a class="nui-button" style="width:50px;height:20px;" onclick="onSearchClick">查找</a>
+		</div>
+		<div>
+			<span>应用类型:</span>
+			<input id="serviceType" name="serviceType"class="nui-dictcombobox nui-form-input" style="width:160px;"  emptyText="请选择服务类型"
+				   valueField="dictId" textField="dictName" dictTypeId="UDSP_SERVICE_TYPE" />
+			<a class="nui-button" style="width:50px;height:20px;" onclick="onClearClick">清除</a>
 		</div>
 	</div>
 	
@@ -31,8 +31,8 @@ ${extends("/goframe/function_layout.httl")}
 					showPageSize="true" showPageIndex="true" sizeList="[10,20,40,80,160]" pageSize="20" >
 						<div property="columns">
 							<div type="checkcolumn"></div>
-							<div field="type" headerAlign="center" allowSort="true" renderer="renderServiceType">应用类型</div>
 							<div field="name" with="180" headerAlign="center" allowSort="true">服务名称</div>
+							<div field="type" headerAlign="center" allowSort="true" renderer="renderServiceType">应用类型</div>
 						</div>
 					</div>
 				</td>
@@ -45,7 +45,6 @@ ${extends("/goframe/function_layout.httl")}
 				<td style="padding:5px;">
 				</td>
 				<!-- 右边列表 -->
-				
 				<td>
 				    <h4 style="margin:0;line-height:22px;font-size:12px;">已选服务：</h4>
 					<div id="selectedList" class="nui-listbox" style="width:250px;height:220px;" multiSelect="true" showCheckBox="true" showPager="false" idField="id" sortMode="client" >

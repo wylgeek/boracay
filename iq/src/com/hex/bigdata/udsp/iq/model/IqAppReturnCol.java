@@ -21,6 +21,8 @@ public class IqAppReturnCol implements Serializable {
 
     private String length;
 
+    private String note;
+
     public String getLength() {
         return length;
     }
@@ -91,5 +93,13 @@ public class IqAppReturnCol implements Serializable {
 
     public void setSeq(Short seq) {
         this.seq = seq;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

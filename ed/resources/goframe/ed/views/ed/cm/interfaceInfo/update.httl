@@ -1,0 +1,596 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding: 5px 5px 0px 5px;">
+    <div id="form1" method="post">
+        <input name="pkId" class="nui-hidden"/>
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">接口信息栏</span></legend>
+            <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
+                <tr>
+                    <th class="nui-form-label" style="width: 120px;" align="right">
+                        <label for="interfaceType">接口类别:</label>
+                    </th>
+                    <td>
+                        <input id="interfaceType" name="interfaceType" class="nui-dictcombobox nui-form-input" style="width: 90%;"
+                               value="1" valueField="dictId" textField="dictName" dictTypeId="ED_INTERFACE_TYPE" required="true"/>
+                    </td>
+                    <th class="nui-form-label" style="width: 120px;" align="right">
+                        <label for="interfaceCompany">接口厂商:</label>
+                    </th>
+                    <td>
+                        <input id="interfaceCompany" name="interfaceCompany" class="nui-dictcombobox nui-form-input" style="width: 90%;"
+                               value="1" valueField="dictId" textField="dictName" dictTypeId="ED_INTERFACE_COMPANY" required="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label" style="width: 120px;" align="right">
+                        <label for="interfaceCode">接口编码:</label>
+                    </th>
+                    <td>
+                        <input id="interfaceCode" name="interfaceCode" class="nui-textbox nui-form-input" style="width: 90%;"
+                               onvalidation="onInterfaceCodeChanged" maxlength="60" required="true"/>
+                    </td>
+                    <th class="nui-form-label" style="width: 120px;" align="right">
+                        <label for="interfaceName">接口名称:</label>
+                    </th>
+                    <td>
+                        <input id="interfaceName" name="interfaceName" class="nui-textbox nui-form-input" style="width: 90%;"
+                               maxlength="40" required="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label" style="width: 120px;" align="right">
+                        <label for="validTime">缓存时间（分钟）:</label>
+                    </th>
+                    <td>
+                        <input id="validTime" name="validTime" class="nui-buttonedit nui-form-input" style="width: 90%;"
+                               text="1440" value="1440" onbuttonclick="onButtonEdit" onvaluechange="onValidTimeChanged" required="true"/>
+                    </td>
+                    <th class="nui-form-label" style="width: 120px;" align="right">
+                        <label for="reqUrl">接口路径:</label>
+                    </th>
+                    <td>
+                        <input id="reqUrl" name="reqUrl" class="nui-textbox nui-form-input" style="width: 90%;"
+                               maxlength="128" required="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label" style="width: 120px;" align="right">
+                        <label for="interfaceDesc">接口描述:</label>
+                    </th>
+                    <td colspan="3">
+                        <input id="interfaceDesc" name="interfaceDesc" class="nui-textarea nui-form-input" style="width: 96%;height: 40px"
+                               maxlength="1000" required="false"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">参数信息栏</span></legend>
+
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>查询字段</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add1">添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove1" enabled="false"
+                                   id="remove1">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp1" enabled="false"
+                                   id="moveUp1">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown1" enabled="false"
+                                   id="moveDown1">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:150px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid1" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellEdit="true" allowCellSelect="true" sortMode="client"
+                     showPager="false" editNextOnEnterKey="true" editNextRowCell="true" onselectionchanged="selected1"
+                     url="${basePath}/interfaceParam/selectListRequest/${pkId}">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="30">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:64"
+                                   onvalidation="colNameValidation1"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="30">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                        <div field="colType" headerAlign="center" allowSort="true" width="20">类型
+                            <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   dictTypeId="IQ_MD_COL_DATA_TYPE" value="STRING" vtype="maxLength:32"/>
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>返回字段</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add2">添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove2" enabled="false"
+                                   id="remove2">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp2" enabled="false"
+                                   id="moveUp2">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown2" enabled="false"
+                                   id="moveDown2">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:200px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid2" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellEdit="true" allowCellSelect="true" sortMode="client"
+                     showPager="false" editNextOnEnterKey="true" editNextRowCell="true" onselectionchanged="selected2"
+                     url="${basePath}/interfaceParam/selectListResponse/${pkId}">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div field="name" headerAlign="center" allowSort="true" width="30">名称<font
+                                color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:64"
+                                   onvalidation="colNameValidation2"/>
+                        </div>
+                        <div field="describe" headerAlign="center" allowSort="true" width="30">说明<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:256"/>
+                        </div>
+                        <div field="colType" headerAlign="center" allowSort="true" width="20">类型
+                            <input property="editor" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   dictTypeId="IQ_MD_COL_DATA_TYPE" value="STRING" vtype="maxLength:32"/>
+                        </div>
+                        <div field="note" headerAlign="center" allowSort="true" width="30">备注
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
+            <a class="nui-button" style="" iconCls="icon-save" onclick="onSave" id="saveButton">保存</a>
+            <span style="display:inline-block;width:25px;"></span>
+            <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">返回</a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var form1;
+    var returnData;
+    var formData;
+    var grid1;
+    var grid2;
+    require(['jquery','nui'],function($, nui) {
+        nui.parse();
+        form1 = new nui.Form("#form1");
+        grid1 = nui.get("datagrid1");
+        grid2 = nui.get("datagrid2");
+        grid1.load();
+        grid2.load();
+        form1.setChanged(false);
+    });
+
+    function setData(temp) {
+        formData = temp;
+        require(['jquery','nui'],function($, nui) {
+            form1 = new nui.Form("#form1");
+            form1.setData(temp);
+            nui.get("validTime").setText(temp.validTime);
+            form1.setChanged(false);
+        });
+    }
+    /*保存*/
+    function onSave() {
+
+        if(form1.isValid() == false) {
+            return;
+        }
+        var data = getSaveData();
+        if (!data) {
+            return;
+        }
+        var json = nui.encode(data);
+        var messageBox = nui.loading("更新中...","提示");
+        $.ajax({
+            url:"${basePath}/interfaceInfo/updateInterfaceInfoByPkId",
+            type:'POST',
+            data:json,
+            cache:false,
+            contentType:'application/json',
+            success:function (text) {
+                nui.hideMessageBox(messageBox);
+                if(text.status) {
+                    CloseWindow("saveSuccess");
+                } else {
+                    nui.alert(text.message,"系统提示");
+                }
+            },
+            error:function (text) {
+                nui.alert("请求错误");
+                nui.hideMessageBox(messageBox);
+            }
+        });
+    }
+
+    /*验证服务编码是否存在*/
+    function onInterfaceCodeChanged(e) {
+        $.ajax({
+            url:"${basePath}/interfaceInfo/getInterfaceInfoByInterfaceCode?interfaceCode="+e.value,
+            type:'GET',
+            cache:false,
+            contentType:'application/json',
+            success:function (text) {
+                if(text.status) {
+                    nui.alert("项目编码已存在，请重新输入");
+                }
+            },
+            error:function (text) {
+
+            }
+        });
+    }
+
+    function onButtonEdit() {
+        nui.open({
+            url:"${basePath}/goframe/p/ed.cm.interfaceInfo.validTime",
+            title:"缓存时间选择",
+            width:450,
+            height:400,
+            onload:function () {
+            },
+            ondestroy:function (action) {
+                if(action=="success") {
+                    var iframe = this.getIFrameEl();
+                    returnData = iframe.contentWindow.getData();
+                    nui.get("validTime").setText(returnData);
+                    form1.setChanged(true);
+                }
+            }
+        });
+    }
+
+    function onValidTimeChanged(e) {
+        var valid = e.value;
+        valid = nui.get("validTime").getValue();
+        if(valid == "" || valid == null) {
+            nui.alert("缓存时间不能为空！");
+            return false;
+        }
+        var re = new RegExp("^[0-9]{0,11}$");
+        if(re.test(valid)) {
+            return true;
+        }
+        nui.alert("请输入数字！");
+        return false;
+    }
+
+    /**
+     * 选中
+     */
+    function selected1() {
+        var rows = grid1.getSelecteds();
+        if (rows.length == 1) {
+            nui.get("remove1").enable();
+            nui.get("moveUp1").enable();
+            nui.get("moveDown1").enable();
+        } else if (rows.length == 0) {
+            nui.get("remove1").disable();
+            nui.get("moveUp1").disable();
+            nui.get("moveDown1").disable();
+        } else {
+            nui.get("remove1").enable();
+            nui.get("moveUp1").enable();
+            nui.get("moveDown1").enable();
+        }
+    }
+
+    /**
+     * 选中
+     */
+    function selected2() {
+        var rows = grid2.getSelecteds();
+        if (rows.length == 1) {
+            nui.get("remove2").enable();
+            nui.get("moveUp2").enable();
+            nui.get("moveDown2").enable();
+        } else if (rows.length == 0) {
+            nui.get("remove2").disable();
+            nui.get("moveUp2").disable();
+            nui.get("moveDown2").disable();
+        } else {
+            nui.get("remove2").enable();
+            nui.get("moveUp2").enable();
+            nui.get("moveDown2").enable();
+        }
+    }
+
+    function selected3(e) {
+        var rows = e.selecteds;
+        if (rows.length == 1) {
+            nui.get("remove3").enable();
+            nui.get("moveUp3").enable();
+            nui.get("moveDown3").enable();
+        } else if (rows.length == 0) {
+            nui.get("remove3").disable();
+            nui.get("moveUp3").disable();
+            nui.get("moveDown3").disable();
+        } else {
+            nui.get("remove3").enable();
+            nui.get("moveUp3").enable();
+            nui.get("moveDown3").enable();
+        }
+    }
+
+    /**
+     * 添加
+     */
+    function add1() {
+        var rows = grid1.getData(true, true);
+        var length = rows.length;
+        var newRow = {colType: "STRING"};
+        grid1.addRow(newRow, length);
+    }
+    function add2() {
+        var rows = grid2.getData(true, true);
+        var length = rows.length;
+        var newRow = {colType: "STRING"};
+        grid2.addRow(newRow, length);
+    }
+
+    /**
+     * 删除
+     */
+    function remove1() {
+        var rows = grid1.getSelecteds();
+        if (rows.length > 0) {
+            grid1.removeRows(rows, true);
+        } else {
+            nui.alert("请至少选中一条记录!");
+        }
+    }
+    function remove2() {
+        var rows = grid2.getSelecteds();
+        if (rows.length > 0) {
+            grid2.removeRows(rows, true);
+        } else {
+            nui.alert("请至少选中一条记录!");
+        }
+    }
+
+    /**
+     * 选中项上移
+     */
+    function moveUp1() {
+        var rows = grid1.getSelecteds();
+        grid1.moveUp(rows);
+    }
+    function moveUp2() {
+        var rows = grid2.getSelecteds();
+        grid2.moveUp(rows);
+    }
+
+    /**
+     * 选中项下移
+     */
+    function moveDown1() {
+        var rows = grid1.getSelecteds();
+        grid1.moveDown(rows);
+    }
+    function moveDown2() {
+        var rows = grid2.getSelecteds();
+        grid2.moveDown(rows);
+    }
+
+    /**
+     * grid1字段名称变化时触发检查
+     */
+    function colNameValidation1(e) {
+        paramNameValidation(e,grid1);
+    }
+
+    /**
+     * grid2字段名称变化时触发检查
+     */
+    function colNameValidation2(e) {
+        paramNameValidation(e,grid2);
+    }
+
+    /**
+     * 字段名称变化时触发检查
+     */
+    function paramNameValidation(e,grid) {
+        if (e.isValid) {
+            var count = 0;
+            var rows = grid.getData(true, true);
+            for (var i = 0, len = rows.length; i < len; i++) {
+                if (e.value == rows[i].name) {
+                    count++;
+                }
+                if(count == 1){
+                    e.errorText = "名称已存在";
+                    e.isValid = false;
+                    return false;
+                }
+            }
+        }
+    }
+
+    /**
+     * 返回
+     */
+    function cancel() {
+        CloseWindow("onCancel");
+    }
+
+    /**
+     * 获取需要保存的数据
+     */
+    function getSaveData() {
+        var interfaceInfo = getInterfaceData();
+
+
+        var interfaceRequestParam = getRequestColsData();
+        if(!interfaceRequestParam){
+            return ;
+        }
+
+        var interfaceResponseParam = getResponseColsData();
+        if(!interfaceResponseParam){
+            return ;
+        }
+        var saveData = {
+            "interfaceInfo":interfaceInfo,
+            "edInterfaceParamsRequest":interfaceRequestParam,
+            "edInterfaceParamsResponse":interfaceResponseParam
+        };
+        return saveData;
+    }
+
+    /**
+     * 获取基础数据
+     */
+    function getInterfaceData() {
+        if(form1.isChanged()) {
+            if (form1.isValid() == false) {
+                nui.alert("接口数据不符合规范");
+                return;
+            }
+        };
+        var data = form1.getData(true, true);
+        data.validTime = nui.get("validTime").getText();
+        return data;
+    }
+
+    /**
+     * 获取查询字段数据
+     */
+    function getRequestColsData() {
+        var status = true;
+        var queryColsData = grid1.getData(true, true);
+        if (queryColsData == null || queryColsData.length == 0) {
+            nui.alert("【查询字段】的信息不能为空!");
+            return;
+        }
+        $.each(queryColsData, function (_index, record) {
+            record.seq = grid1.indexOf(record) + 1;
+            if (record.name == null || record.name == "") {
+                nui.alert("【查询字段】的位置" + record.seq + "：【名称】不能为空!");
+                status = false;
+                return false;
+            }
+            if (checkPattern(record.name) == false) {
+                nui.alert("【查询字段】的位置" + record.seq + "：【名称】只能包含字母、数字、下划线，且以字母开头!");
+                status = false;
+                return false;
+            }
+            if (record.describe == null || record.describe == "") {
+                nui.alert("【查询字段】的位置" + record.seq + "：【说明】不能为空!");
+                status = false;
+                return false;
+            }
+            if (record.colType == null || record.colType == "") {
+                nui.alert("【查询字段】的位置" + record.seq + "：【类型】不能为空!");
+                status = false;
+                return false;
+            }
+        });
+        if (!status) {
+            return;
+        }
+        return queryColsData;
+    }
+
+    /**
+     * 获取返回字段数据
+     */
+    function getResponseColsData() {
+        var status = true;
+        var returnColsData = grid2.getData(true, true);
+        if (returnColsData == null || returnColsData.length == 0) {
+            nui.alert("【返回字段】的信息不能为空!");
+            return;
+        }
+        $.each(returnColsData, function (_index, record) {
+            record.seq = grid2.indexOf(record) + 1;
+            if (record.name == null || record.name == "") {
+                nui.alert("【返回字段】的位置" + record.seq + "：【名称】不能为空!");
+                status = false;
+                return false;
+            }
+            if (checkPattern(record.name) == false) {
+                nui.alert("【返回字段】的位置" + record.seq + "：【名称】只能包含字母、数字、下划线，且以字母开头!");
+                status = false;
+                return false;
+            }
+            if (record.describe == null || record.describe == "") {
+                nui.alert("【返回字段】的位置" + record.seq + "：【说明】不能为空!");
+                status = false;
+                return false;
+            }
+            if (record.colType == null || record.colType == "") {
+                nui.alert("【返回字段】的位置" + record.seq + "：【类型】不能为空!");
+                status = false;
+                return false;
+            }
+        });
+        if (!status) {
+            return;
+        }
+        if (checkRepetitionName(returnColsData)) {
+            nui.alert("【返回字段】中存在重复【名称】，请检查后再提交！");
+            return;
+        }
+        return returnColsData;
+    }
+
+    /**
+     * 检查参数列表名称是否重复
+     */
+    function checkRepetitionName(propsData) {
+        //算法1、遍历
+        var repetFlg = false;
+        $.each(propsData, function (_index, record) {
+            var repetCount = 0;
+            $.each(propsData, function (i, item) {
+                if (record.name == item.name) {
+                    repetCount++;
+                }
+            });
+            if (repetCount > 1) {
+                repetFlg = true;
+            }
+        });
+        return repetFlg;
+    }
+
+    /**
+     * 检查是否满足字母、数字、下划线，且以字母开头
+     */
+    function checkPattern(v) {
+        var re = new RegExp("^[A-Za-z][A-Za-z0-9_]{0,63}$");
+        if (re.test(v)) {
+            return true;
+        }
+        return false;
+    }
+
+</script>
+<!--#end-->

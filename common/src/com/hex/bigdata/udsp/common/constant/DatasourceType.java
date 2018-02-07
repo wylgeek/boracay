@@ -7,9 +7,18 @@ package com.hex.bigdata.udsp.common.constant;
  * TIME:14:09
  */
 public enum DatasourceType {
-    IQ("交互查询", "IQ"),
-    OLQ("联机查询", "OLQ"),
-    RTS("实时流", "RTS");
+    HIVE("HIVE", "HIVE"),
+    IMPALA("IMPALA", "IMPALA"),
+    ORACLE("ORACLE", "ORACLE"),
+    MYSQL("MYSQL", "MYSQL"),
+    REDIS("REDIS", "REDIS"),
+    PGSQL("PGSQL", "PGSQL"),
+    DB2("DB2", "DB2"),
+    KYLIN("KYLIN", "KYLIN"),
+    SOLR("SOLR", "SOLR"),
+    KAFKA("KAFKA", "KAFKA"),
+    HBASE("HBASE", "HBASE"),
+    SOLR_HBASE("SOLR_HBASE", "SOLR_HBASE");
 
     private String value;
     private String name;

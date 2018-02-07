@@ -1,0 +1,96 @@
+#########################################################################
+#					依赖jar包
+#########################################################################
+
+
+
+#########################################################################
+#					测试Hive查询DB中数据（成功）
+#########################################################################
+beeline -u jdbc:hive2://localhost:10000 -n hive -p 111111
+
+
+drop table if exists jdbc_handler_test1;
+
+-- 创建外表（显示的指定字段映射）
+CREATE EXTERNAL TABLE jdbc_handler_test1 (
+s_name      string, 
+s_longitude float, 
+s_latitude  float, 
+t_name      string, 
+t_longitude float, 
+t_latitude  float
+)
+stored by "com.hex.hive.jdbc.JdbcStorageHandler"
+tblproperties(
+"mapred.jdbc.driver.class" = "com.mysql.jdbc.Driver",
+"mapred.jdbc.url" = "jdbc:mysql://goupwith.mysql.rds.aliyuncs.com:3306/dcp",
+"mapred.jdbc.username" = "edh",
+"mapred.jdbc.password" = "edh159357",
+"mapred.jdbc.input.table.name" = "marklinemap_test",
+"mapred.jdbc.output.table.name" = "marklinemap_test",
+"mapred.jdbc.hive.lazy.split" = "false"
+);
+
+select * from jdbc_handler_test1 limit 10;
+
+-- 创建外表（非显示的指定字段映射）
+CREATE EXTERNAL TABLE jdbc_handler_test2
+row format serde 'com.hex.hive.jdbc.serde.JdbcSerDe'
+STORED BY 'com.hex.hive.jdbc.JdbcStorageHandler'
+TBLPROPERTIES (
+"mapred.jdbc.driver.class" = "com.mysql.jdbc.Driver",
+"mapred.jdbc.url" = "jdbc:mysql://goupwith.mysql.rds.aliyuncs.com:3306/dcp",
+"mapred.jdbc.username" = "edh",
+"mapred.jdbc.password" = "edh159357",
+"mapred.jdbc.input.table.name" = "marklinemap_test",
+"mapred.jdbc.output.table.name" = "marklinemap_test",
+"mapred.jdbc.hive.lazy.split" = "false"
+);
+
+select * from jdbc_handler_test2 limit 10;
+
+#########################################################################
+#					测试Hive插入数据到DB（成功）
+#########################################################################
+
+CREATE EXTERNAL TABLE jdbc_handler_test3 (
+s_name      string, 
+s_longitude float, 
+s_latitude  float, 
+t_name      string, 
+t_longitude float, 
+t_latitude  float
+)
+stored by "com.hex.hive.jdbc.JdbcStorageHandler"
+tblproperties(
+"mapred.jdbc.driver.class" = "com.mysql.jdbc.Driver",
+"mapred.jdbc.url" = "jdbc:mysql://goupwith.mysql.rds.aliyuncs.com:3306/dcp",
+"mapred.jdbc.username" = "edh",
+"mapred.jdbc.password" = "edh159357",
+"mapred.jdbc.input.table.name" = "marklinemap_test",
+"mapred.jdbc.output.table.name" = "marklinemap_test",
+"mapred.jdbc.hive.lazy.split" = "false"
+);
+
+INSERT OVERWRITE TABLE jdbc_handler_test3 
+SELECT * FROM jdbc_handler_test1;
+
+select * from jdbc_handler_test3 limit 10;
+
+#########################################################################
+#					测试Hive更新数据到DB（不支持）
+#########################################################################
+
+UPDATE jdbc_handler_test3 SET s_name = '上海' where s_name = '上海市';
+
+#########################################################################
+#					测试Hive删除数据到DB（不支持）
+#########################################################################
+
+DELETE FROM jdbc_handler_test3 where s_name = '上海市';
+
+注：
+1、只支持create、select和insert操作；
+2、
+3、

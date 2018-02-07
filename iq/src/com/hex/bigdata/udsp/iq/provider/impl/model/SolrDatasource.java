@@ -11,9 +11,6 @@ import java.util.Map;
  * Solr的数据源配置
  */
 public class SolrDatasource extends Datasource {
-    private String solrServers;
-    private int maxNum = 65535;
-
     public SolrDatasource(List<Property> properties) {
         super(properties);
     }
@@ -31,13 +28,9 @@ public class SolrDatasource extends Datasource {
 
     public int getMaxNum() {
         String value = getProperty("solr.max.data.size").getValue();
-        if (StringUtils.isNotBlank(value)) {
-            try {
-                maxNum = Integer.valueOf(value);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("solr.max.data.size为一整数");
-            }
+        if (StringUtils.isBlank(value)) {
+            value = "65536";
         }
-        return maxNum;
+        return Integer.valueOf(value);
     }
 }

@@ -1,0 +1,45 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div class="nui-fit" title="字典类型" style="padding: 0px 5px 5px 5px;">
+    <div id="dictG" class="nui-datagrid" style="width:100%;height:100%;" idField="dictTypeId"
+         url="${basePath}/goframe/dict/queryDict"
+         sizeList=[15,20,30] pageSize="20" onselectionchanged="selectionChanged">
+        <div property="columns">
+            <div width="30px" type="checkcolumn"></div>
+            <div field="dictName" width="200px" headerAlign="center" align="left">缓存时间</div>
+            <div field="dictId" width="200px" headerAlign="center" align="center">缓存时间（分钟）</div>
+        </div>
+    </div>
+</div>
+<div class="nui-toolbar" style="text-align:center;border-bottom:5px;padding-top:15px;" borderStyle="border:0;">
+    <a class="nui-button" style="margin-top: -16px;" iconCls="icon-ok" onclick="selectRow">选择</a>
+    <span style="display: inline-block;width: 25px;"></span>
+    <a class="nui-button" style="margin-top: -16px;" iconCls="icon-close" onclick="CloseWindow('cancel')">取消</a>
+</div>
+<script type="text/javascript">
+    var grid;
+    var dictId;
+    require(['jquery','nui'],function($, nui) {
+        nui.parse();
+        grid = nui.get("dictG");
+        var GFDict = new Object();
+        GFDict.dictTypeId = 'ED_CACHE_TIME';
+        grid.load(GFDict);
+    });
+
+    function selectionChanged() {
+        var row = grid.getSelected();
+        dictId = row.dictId;
+    }
+
+    function selectRow(e) {
+        if(!(dictId == null || dictId == "")) {
+            CloseWindow("success");
+        }
+    }
+
+    function getData() {
+        return dictId;
+    }
+</script>
+<!--#end-->

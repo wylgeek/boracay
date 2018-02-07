@@ -8,6 +8,10 @@
     <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
     <result column="COUNT_NUM" property="countNum" jdbcType="DECIMAL" />
     <result column="STATUS" property="status" jdbcType="CHAR" />
+    <result column="SYNC_TYPE" property="syncType" jdbcType="CHAR" />
+    <result  column="MAX_TIME" property="maxTime" jdbcType="DECIMAL" />
+    <result  column="MIN_TIME" property="minTime" jdbcType="DECIMAL" />
+    <result  column="AVG_TIME" property="avgTime" jdbcType="DECIMAL" />
   </resultMap>
   <select id="chart1Second" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.mc.dto.McChartsView" >
     select substr(REQUEST_END_TIME,0,19) as DATETIME, STATUS, COUNT(1) as COUNT_NUM
@@ -119,5 +123,45 @@
     and #{timeEnd} >= REQUEST_END_TIME
     group by APP_TYPE, STATUS
     order by APP_TYPE asc, STATUS asc
+  </select>
+
+  <select id="chart7" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.mc.dto.McChartsView" >
+    SELECT T.SERVICE_NAME,
+          MAX(T.S_TIME) AS MAX_TIME,
+          MIN(T.S_TIME) AS MIN_TIME,
+          ROUND(AVG(T.S_TIME), 3) AS AVG_TIME
+     FROM (SELECT SERVICE_NAME,
+                  (((TO_DATE(SUBSTR(REQUEST_END_TIME, 1, 19),
+                                  'yyyy-mm-dd hh24:mi:ss') -
+                        TO_DATE(SUBSTR(REQUEST_START_TIME, 1, 19),
+                                  'yyyy-mm-dd hh24:mi:ss')) * 24 * 60 * 60 * 1000) +
+                        (TO_NUMBER(SUBSTR(REQUEST_END_TIME, 21, 3)) -
+                        TO_NUMBER(SUBSTR(REQUEST_START_TIME, 21, 3)))) / 1000 S_TIME
+             FROM MC_CONSUME_LOG
+            WHERE REQUEST_END_TIME >= #{timeStart}
+              AND #{timeEnd} >= REQUEST_END_TIME
+              AND SYNC_TYPE = 'SYNC') T
+    GROUP BY T.SERVICE_NAME
+    ORDER BY T.SERVICE_NAME ASC
+  </select>
+
+  <select id="chart8" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.mc.dto.McChartsView" >
+    SELECT T.SERVICE_NAME,
+          MAX(T.S_TIME) AS MAX_TIME,
+          MIN(T.S_TIME) AS MIN_TIME,
+          ROUND(AVG(T.S_TIME), 3) AS AVG_TIME
+     FROM (SELECT SERVICE_NAME,
+                  (((TO_DATE(SUBSTR(REQUEST_END_TIME, 1, 19),
+                                  'yyyy-mm-dd hh24:mi:ss') -
+                        TO_DATE(SUBSTR(REQUEST_START_TIME, 1, 19),
+                                  'yyyy-mm-dd hh24:mi:ss')) * 24 * 60 * 60 * 1000) +
+                        (TO_NUMBER(SUBSTR(REQUEST_END_TIME, 21, 3)) -
+                        TO_NUMBER(SUBSTR(REQUEST_START_TIME, 21, 3)))) / 1000 S_TIME
+             FROM MC_CONSUME_LOG
+            WHERE REQUEST_END_TIME >= #{timeStart}
+              AND #{timeEnd} >= REQUEST_END_TIME
+              AND SYNC_TYPE = 'ASYNC') T
+    GROUP BY T.SERVICE_NAME
+    ORDER BY T.SERVICE_NAME ASC
   </select>
 </mapper>

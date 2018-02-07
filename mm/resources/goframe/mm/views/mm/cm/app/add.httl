@@ -14,7 +14,8 @@ ${extends("/goframe/function_layout.httl")}
                     <th class="nui-form-label"><label for="modelId">模型名称：</label></th>
                     <td>
                         <div id="modelId" class="nui-combobox" style="width:97%;"  popupWidth="400" textField="name" valueField="pkId"
-                             url="${basePath}/mm/modelInfo/select" dataField="data" name="modelId" multiSelect="false"   required="true" onvaluechanged="modelIdChanged" >
+                             url="${basePath}/mm/modelInfo/select" dataField="data" name="modelId" multiSelect="false"
+                             allowInput="true" required="true" onvaluechanged="modelIdChanged" >
                             <div property="columns">
                                 <div header="名称" field="name"></div>
                                 <div header="说明" field="describe"></div>

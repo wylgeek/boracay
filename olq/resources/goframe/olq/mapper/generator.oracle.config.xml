@@ -24,7 +24,7 @@
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
-        <table tableName="OLQ_APPLICATION" domainObjectName="OLQApplication"/>
-        <table tableName="OLQ_APPLICATION_PARAM" domainObjectName="OLQApplicationParam"/>
+        <table tableName="OLQ_APPLICATION" domainObjectName="OlqApplication"/>
+        <table tableName="OLQ_APPLICATION_PARAM" domainObjectName="OlqApplicationParam"/>
   </context>
 </generatorConfiguration>

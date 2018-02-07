@@ -14,6 +14,7 @@
     <result column="OPERATOR" property="operator" jdbcType="VARCHAR" />
     <result column="LABEL" property="label" jdbcType="VARCHAR" />
     <result column="IS_OFFER_OUT" property="isOfferOut" jdbcType="CHAR" />
+    <result column="NOTE" property="note" jdbcType="VARCHAR"/>
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from IQ_APPLICATION_QUERY_COLUMN
@@ -23,12 +24,13 @@
     insert into IQ_APPLICATION_QUERY_COLUMN (PK_ID, APP_ID, SEQ, 
       NAME, DESCRIBE, TYPE, 
       LENGTH, IS_NEED, DEFAULT_VAL, 
-      OPERATOR, LABEL, IS_OFFER_OUT
+      OPERATOR, LABEL, IS_OFFER_OUT,NOTE
       )
     values (#{pkId,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR}, #{seq,jdbcType=DECIMAL}, 
       #{name,jdbcType=VARCHAR}, #{describe,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
       #{length,jdbcType=VARCHAR}, #{isNeed,jdbcType=CHAR}, #{defaultVal,jdbcType=VARCHAR}, 
-      #{operator,jdbcType=VARCHAR}, #{label,jdbcType=VARCHAR}, #{isOfferOut,jdbcType=CHAR}
+      #{operator,jdbcType=VARCHAR}, #{label,jdbcType=VARCHAR}, #{isOfferOut,jdbcType=CHAR},
+      #{note,jdbcType=VARCHAR}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.iq.model.IqAppQueryCol" >
@@ -43,23 +45,24 @@
       DEFAULT_VAL = #{defaultVal,jdbcType=VARCHAR},
       OPERATOR = #{operator,jdbcType=VARCHAR},
       LABEL = #{label,jdbcType=VARCHAR},
-      IS_OFFER_OUT = #{isOfferOut,jdbcType=CHAR}
+      IS_OFFER_OUT = #{isOfferOut,jdbcType=CHAR},
+      NOTE=#{note,jdbcType=VARCHAR}
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </update>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select PK_ID, APP_ID, SEQ, NAME, DESCRIBE, TYPE, LENGTH, IS_NEED, DEFAULT_VAL, OPERATOR, 
-    LABEL, IS_OFFER_OUT
+    LABEL, IS_OFFER_OUT,NOTE
     from IQ_APPLICATION_QUERY_COLUMN
     where PK_ID = #{pkId,jdbcType=VARCHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap" >
     select PK_ID, APP_ID, SEQ, NAME, DESCRIBE, TYPE, LENGTH, IS_NEED, DEFAULT_VAL, OPERATOR, 
-    LABEL, IS_OFFER_OUT
+    LABEL, IS_OFFER_OUT,NOTE
     from IQ_APPLICATION_QUERY_COLUMN
   </select>
   <select id="select" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.iq.model.IqAppQueryCol">
     select PK_ID, APP_ID, SEQ, NAME, DESCRIBE, TYPE, LENGTH, IS_NEED, DEFAULT_VAL, OPERATOR,
-    LABEL, IS_OFFER_OUT
+    LABEL, IS_OFFER_OUT,NOTE
     from IQ_APPLICATION_QUERY_COLUMN
     <trim prefix="WHERE" prefixOverrides="AND |OR ">
       <if test="pkId!='' and pkId!=null ">and PK_ID = #{pkId}</if>

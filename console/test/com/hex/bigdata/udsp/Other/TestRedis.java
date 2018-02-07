@@ -7,7 +7,7 @@ import redis.clients.jedis.Jedis;
  */
 public class TestRedis {
     public static void  main(String args[]){
-        Jedis jedis = new Jedis("10.1.97.1",6379);
+        Jedis jedis = new Jedis("192.168.1.61",6379);
         jedis.set("redisTest:name1|age1|","name1\\007age1");
         jedis.set("redisTest:name1|age2|","name1\\007age2");
         jedis.set("redisTest:name1|age3|","name2\\007age2");

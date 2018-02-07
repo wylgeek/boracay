@@ -1,15 +1,28 @@
 package com.hex.bigdata.udsp.rc.service;
 
 import com.hex.bigdata.udsp.common.constant.ComExcelEnums;
+import com.hex.bigdata.udsp.common.model.ComProperties;
 import com.hex.bigdata.udsp.common.model.ComUploadExcelContent;
+import com.hex.bigdata.udsp.common.service.ComPropertiesService;
+import com.hex.bigdata.udsp.common.util.CreateFileUtil;
 import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
 import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
+import com.hex.bigdata.udsp.iq.service.IqApplicationService;
+import com.hex.bigdata.udsp.mm.service.MmApplicationService;
+import com.hex.bigdata.udsp.olq.service.OlqApplicationService;
+import com.hex.bigdata.udsp.olq.service.OlqService;
 import com.hex.bigdata.udsp.rc.dao.RcUserServiceForUserIdAndServiceIdMapper;
 import com.hex.bigdata.udsp.rc.dao.RcUserServiceMapper;
 import com.hex.bigdata.udsp.rc.dto.IpSectionHelper;
+import com.hex.bigdata.udsp.rc.dto.RcUserServiceBatchDto;
+import com.hex.bigdata.udsp.rc.dto.RcUserServiceDto;
 import com.hex.bigdata.udsp.rc.dto.RcUserServiceView;
 import com.hex.bigdata.udsp.rc.model.RcService;
 import com.hex.bigdata.udsp.rc.model.RcUserService;
+import com.hex.bigdata.udsp.rc.util.RcConstant;
+import com.hex.bigdata.udsp.rts.service.RtsConsumerService;
+import com.hex.bigdata.udsp.rts.service.RtsProducerService;
 import com.hex.goframe.model.GFUser;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.service.BaseService;
@@ -52,22 +65,58 @@ public class RcUserServiceService extends BaseService {
     @Autowired
     private RcUserServiceForUserIdAndServiceIdMapper rcUserServiceForUserIdAndServiceIdMapper;
 
+    @Autowired
+    private RtsProducerService rtsProducerService;
+    @Autowired
+    private RtsConsumerService rtsConsumerService;
+    @Autowired
+    private IqApplicationService iqApplicationService;
+    @Autowired
+    private OlqService olqService;
+    @Autowired
+    private MmApplicationService mmApplicationService;
+    @Autowired
+    private OlqApplicationService olqApplicationService;
+    @Autowired
+    private ComPropertiesService comPropertiesService;
+
+    @Transactional
+    public String insert(RcUserServiceDto rcUserServiceDto) {
+        RcUserService rcUserService = rcUserServiceDto.getRcUserService();
+        String pkId = this.insert(rcUserService);
+        if (org.apache.commons.lang.StringUtils.isBlank(pkId)) {
+            return "";
+        }
+        comPropertiesService.insertList(pkId, rcUserServiceDto.getComPropertiesList());
+        return pkId;
+    }
 
     @Transactional
     public String insert(RcUserService rcUserService) {
         String pkId = Util.uuid();
         rcUserService.setPkId(pkId);
-
         if (checkBeforeInsetOrUpdate(rcUserService) && rcUserServiceMapper.insert(pkId, rcUserService)) {
             /*
             同时按照不同ID保存到内存中
              */
             String id = rcUserService.getUserId() + "|" + rcUserService.getServiceId();
             rcUserServiceForUserIdAndServiceIdMapper.insert(id, rcUserService);
-
             return pkId;
         }
         return "";
+    }
+
+    public boolean update(RcUserServiceDto rcUserServiceDto) {
+        RcUserService rcUserService = rcUserServiceDto.getRcUserService();
+        String pkId = rcUserService.getPkId();
+        if (!update(rcUserService)) {
+            return false;
+        }
+        if (!comPropertiesService.deleteByFkId(pkId)) {
+            return false;
+        }
+        comPropertiesService.insertList(pkId, rcUserServiceDto.getComPropertiesList());
+        return true;
     }
 
     /**
@@ -154,34 +203,43 @@ public class RcUserServiceService extends BaseService {
     /**
      * 批量新增
      *
-     * @param view
+     * @param rcUserServiceBatchDto
      * @return
      */
-    public boolean insertBatch(RcUserServiceView view) {
-        String userIds = view.getUserIds();
-        String serviceIds = view.getServiceIds();
+    @Transactional
+    public boolean insertBatch(RcUserServiceBatchDto rcUserServiceBatchDto) {
+        RcUserServiceView rcUserServiceView = rcUserServiceBatchDto.getRcUserServiceView();
+        List<ComProperties> comPropertiesList = rcUserServiceBatchDto.getComPropertiesList();
+        String userIds = rcUserServiceView.getUserIds();
+        String serviceIds = rcUserServiceView.getServiceIds();
         String[] serviceIdArray = serviceIds.split(",");
         String[] userIdArray = userIds.split(",");
-
         //插入前检查
-        if(!checkBeforeBatchInset(view)){
+        if (!checkBeforeBatchInset(rcUserServiceView)) {
             return false;
         }
         //批量循环插入
         for (String serviceId : serviceIdArray) {
             for (String userId : userIdArray) {
-                RcUserService temp = new RcUserService();
-                temp.setServiceId(serviceId);
-                temp.setIpSection(view.getIpSection());
-                temp.setMaxSyncNum(view.getMaxSyncNum());
-                temp.setMaxAsyncNum(view.getMaxSyncNum());
-                temp.setUserId(userId);
-                this.insert(temp);
+                RcUserService service = new RcUserService();
+                service.setServiceId(serviceId);
+                service.setIpSection(rcUserServiceView.getIpSection());
+                service.setMaxSyncNum(rcUserServiceView.getMaxSyncNum());
+                service.setMaxAsyncNum(rcUserServiceView.getMaxSyncNum());
+                service.setMaxSyncExecuteTimeout(rcUserServiceView.getMaxSyncExecuteTimeout());
+                service.setMaxAsyncExecuteTimeout(rcUserServiceView.getMaxAsyncExecuteTimeout());
+                service.setMaxSyncWaitNum(rcUserServiceView.getMaxSyncWaitNum());
+                service.setMaxSyncWaitTimeout(rcUserServiceView.getMaxSyncWaitTimeout());
+                service.setMaxAsyncWaitNum(rcUserServiceView.getMaxAsyncWaitNum());
+                service.setMaxAsyncWaitTimeout(rcUserServiceView.getMaxAsyncWaitTimeout());
+                service.setAlarmType(rcUserServiceView.getAlarmType());
+                service.setUserId(userId);
+                String pkId = this.insert(service);
+                comPropertiesService.insertList(pkId, comPropertiesList);
             }
         }
         return true;
     }
-
 
     /**
      * 批量检查用户和服务关系是否存在
@@ -328,18 +386,18 @@ public class RcUserServiceService extends BaseService {
      */
     public boolean checkModels(String ipSections) {
         //逗号分隔
-        String [] ipSectionArray=ipSections.split(",");
-        boolean flg=true;
-        for (String item:ipSectionArray){
-            if (!this.checkModel(item)){
-                flg=false;
+        String[] ipSectionArray = ipSections.split(",");
+        boolean flg = true;
+        for (String item : ipSectionArray) {
+            if (!this.checkModel(item)) {
+                flg = false;
                 break;
             }
         }
-        return  flg;
+        return flg;
     }
 
-    private boolean checkModel(String ipSection){
+    private boolean checkModel(String ipSection) {
         String[] patternArray = ipSection.split("\\.");
         if (patternArray.length != 4) {
             return false;
@@ -383,19 +441,19 @@ public class RcUserServiceService extends BaseService {
             String[] subArray = subStr.split("-");
             if (subArray.length > 2 || subArray.length < 1) {
                 return false;
-            } else if (subArray.length == 1&& this.isIpInt(subArray[0])){
+            } else if (subArray.length == 1 && this.isIpInt(subArray[0])) {
                 continue;
-            }else if (subArray.length == 2 ){
+            } else if (subArray.length == 2) {
                 for (String ipIntStr : subArray) {
                     if (!this.isIpInt(ipIntStr)) {
                         return false;
                     }
                 }
                 //如果[7-5]，则不合法
-                if (Integer.valueOf(subArray[0])>Integer.valueOf(subArray[1])){
-                    return  false;
+                if (Integer.valueOf(subArray[0]) > Integer.valueOf(subArray[1])) {
+                    return false;
                 }
-            }else{
+            } else {
                 return false;
             }
         }
@@ -448,17 +506,18 @@ public class RcUserServiceService extends BaseService {
 
     /**
      * 检查ip地址与多个ip区间表达式是否匹配
+     *
      * @param ip
      * @param ipSections
      * @return
      */
     public boolean checkIpSuitForSections(String ip, String ipSections) {
-        if (StringUtils.isBlank(ip)||StringUtils.isBlank(ipSections)){
+        if (StringUtils.isBlank(ip) || StringUtils.isBlank(ipSections)) {
             return false;
         }
-        String[] ipSectionArray=ipSections.split(",");
-        for (String item: ipSectionArray ){
-            if (checkIpSuitForSection(ip,item)){
+        String[] ipSectionArray = ipSections.split(",");
+        for (String item : ipSectionArray) {
+            if (checkIpSuitForSection(ip, item)) {
                 return true;
             }
         }
@@ -466,9 +525,9 @@ public class RcUserServiceService extends BaseService {
     }
 
 
-
     /**
      * 检查ip地址与单个ip区间表达式是否匹配
+     *
      * @param ip
      * @param ipSection
      * @return
@@ -501,6 +560,7 @@ public class RcUserServiceService extends BaseService {
 
     /**
      * 检查区间表达式与ip对应的数字是否匹配
+     *
      * @param ipPart
      * @param sectionPart
      * @return
@@ -528,6 +588,7 @@ public class RcUserServiceService extends BaseService {
 
     /**
      * 获取区间表达式对象
+     *
      * @param sectionPart
      * @return
      */
@@ -574,11 +635,12 @@ public class RcUserServiceService extends BaseService {
 
     /**
      * 数据源excel文件导入
+     *
      * @param uploadFilePath
      * @return
      */
     public Map<String, String> uploadExcel(String uploadFilePath) {
-        Map resultMap = new HashMap<String,String>(2);
+        Map resultMap = new HashMap<String, String>(2);
         File uploadFile = new File(uploadFilePath);
         FileInputStream in = null;
         try {
@@ -594,33 +656,33 @@ public class RcUserServiceService extends BaseService {
             HSSFSheet sheet;
             sheet = hfb.getSheetAt(0);
 
-            Map<String,List> uploadExcelModel = ExcelUploadhelper.getUploadExcelModel(sheet, dataSourceContent);
-            List<RcUserService> rcServices = (List<RcUserService>)uploadExcelModel.get("com.hex.bigdata.udsp.rc.model.RcUserService");
+            Map<String, List> uploadExcelModel = ExcelUploadhelper.getUploadExcelModel(sheet, dataSourceContent);
+            List<RcUserService> rcServices = (List<RcUserService>) uploadExcelModel.get("com.hex.bigdata.udsp.rc.model.RcUserService");
             String inseResult;
             int i = 0;
-            for (RcUserService rcService : rcServices){
+            for (RcUserService rcService : rcServices) {
                 i++;
-                if(rcServiceService.selectByName(rcService.getServiceId()) == null){
-                    resultMap.put("status","false");
-                    resultMap.put("message","第"+i+"个对应服务不存在！");
+                if (rcServiceService.selectByName(rcService.getServiceId()) == null) {
+                    resultMap.put("status", "false");
+                    resultMap.put("message", "第" + i + "个对应服务不存在！");
                     break;
                 }
                 rcService.setServiceId(rcServiceService.selectByName(rcService.getServiceId()).getPkId());
                 inseResult = insert(rcService);
-                if(inseResult != null){
-                    resultMap.put("status","true");
-                }else{
-                    resultMap.put("status","false");
-                    resultMap.put("message","上传失败！");
+                if (inseResult != null) {
+                    resultMap.put("status", "true");
+                } else {
+                    resultMap.put("status", "false");
+                    resultMap.put("message", "上传失败！");
                     break;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            resultMap.put("status","false");
-            resultMap.put("message","程序内部异常：" + e.getMessage());
-        }finally {
-            if(in != null){
+            resultMap.put("status", "false");
+            resultMap.put("message", "程序内部异常：" + e.getMessage());
+        } finally {
+            if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
@@ -649,14 +711,13 @@ public class RcUserServiceService extends BaseService {
         if (!file.exists()) {
             FileUtil.mkdir(dirPath);
         }
-        dirPath += seprator+ "download_rcAuther_excel_"+ DateUtil.format(new Date(), "yyyyMMddHHmmss")+".xls";
+        dirPath += seprator + "download_rcAuther_excel_" + DateUtil.format(new Date(), "yyyyMMddHHmmss") + ".xls";
         // 获取模板文件第一个Sheet对象
         POIFSFileSystem sourceFile = null;
 
         try {
             sourceFile = new POIFSFileSystem(new FileInputStream(
                     templateFile));
-
             sourceWork = new HSSFWorkbook(sourceFile);
             sourceSheet = sourceWork.getSheetAt(0);
             //创建表格
@@ -668,7 +729,7 @@ public class RcUserServiceService extends BaseService {
         }
 
         int i = 1;
-        for(RcUserService rcService : rcServices){
+        for (RcUserService rcService : rcServices) {
             //设置内容
             RcUserService rcService1 = rcUserServiceMapper.select(rcService.getPkId());
             //将pkid替换成name
@@ -686,6 +747,18 @@ public class RcUserServiceService extends BaseService {
             cell.setCellValue(rcService1.getMaxSyncNum());
             cell = row.createCell(5);
             cell.setCellValue(rcService1.getMaxAsyncNum());
+            cell = row.createCell(6);
+            cell.setCellValue(rcService1.getMaxSyncWaitNum());
+            cell = row.createCell(7);
+            cell.setCellValue(rcService1.getMaxAsyncWaitNum());
+            cell = row.createCell(8);
+            cell.setCellValue(rcService1.getMaxSyncWaitTimeout());
+            cell = row.createCell(9);
+            cell.setCellValue(rcService1.getMaxAsyncWaitTimeout());
+            cell = row.createCell(10);
+            cell.setCellValue(rcService1.getMaxSyncExecuteTimeout());
+            cell = row.createCell(11);
+            cell.setCellValue(rcService1.getMaxAsyncExecuteTimeout());
             i++;
         }
         if (workbook != null) {
@@ -703,16 +776,17 @@ public class RcUserServiceService extends BaseService {
 
     /**
      * 根据服务名称获取对应的用户
+     *
      * @param rcUserServiceView
      * @return
      */
     public List<GFUser> selectUsersByServiceName(RcUserServiceView rcUserServiceView) {
         String serviceName = rcUserServiceView.getServiceName();
-        if (StringUtils.isBlank(serviceName)){
+        if (StringUtils.isBlank(serviceName)) {
             return null;
         }
         RcService rcService = rcServiceService.selectByName(serviceName);
-        if (rcService == null ){
+        if (rcService == null) {
             return null;
         }
         rcUserServiceView.setServiceIds(rcService.getPkId());
@@ -721,14 +795,68 @@ public class RcUserServiceService extends BaseService {
 
     /**
      * 根据用户登录名获取对应的服务
+     *
      * @param rcUserServiceView
      * @return
      */
     public List<RcUserServiceView> selectServicesByUserId(RcUserServiceView rcUserServiceView) {
         String userName = rcUserServiceView.getUserId();
-        if (StringUtils.isBlank(userName)){
+        if (StringUtils.isBlank(userName)) {
             return null;
         }
         return this.rcUserServiceMapper.selectServicesByUserId(rcUserServiceView.getUserId());
+    }
+
+    public String downStreamInfoDownload(RcUserService[] rcServices) {
+
+        HSSFWorkbook workbook = null;
+        // 下载地址生成
+        String seprator = FileUtil.getFileSeparator();
+        String dirPath = CreateFileUtil.getLocalDirPath();
+        dirPath += seprator + "downStreamService_excel_" + DateUtil.format(new Date(), "yyyyMMddHHmmss") + ".xls";
+        workbook = new HSSFWorkbook();
+
+        for (RcUserService item : rcServices) {
+            RcUserServiceView rcUserServiceView = new RcUserServiceView();
+            rcUserServiceView = this.selectFullResultMap(item.getPkId());
+            String type = rcUserServiceView.getServiceType();
+
+            if (RcConstant.UDSP_SERVICE_TYPE_IQ.equals(type)) {
+                //交互查询
+                iqApplicationService.setWorkbooksheet(workbook, rcUserServiceView);
+            } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ.equals(type)) {
+                //联机查询
+                olqService.setWorkbooksheet(workbook, rcUserServiceView);
+            } else if (RcConstant.UDSP_SERVICE_TYPE_MM.equals(type)) {
+                //模型调用
+                mmApplicationService.setWorkbooksheet(workbook, rcUserServiceView);
+            } else if (RcConstant.UDSP_SERVICE_TYPE_RTS_PRODUCER.equals(type)) {
+                //实时流-生产者
+                rtsProducerService.setWorkbooksheet(workbook, rcUserServiceView);
+            } else if (RcConstant.UDSP_SERVICE_TYPE_RTS_CONSUMER.equals(type)) {
+                //实时流-消费者
+                rtsConsumerService.setWorkbooksheet(workbook, rcUserServiceView);
+            } else if (RcConstant.UDSP_SERVICE_TYPE_OLQ_APP.equals(type)) {
+                //联机查询应用
+                olqApplicationService.setWorkbooksheet(workbook, rcUserServiceView);
+            } else if (RcConstant.UDSP_SERVICE_TYPE_IM.equals(type)) {
+                //暂不支持
+            } else {
+
+            }
+        }
+
+        if (workbook != null) {
+            try {
+                FileOutputStream stream = new FileOutputStream(dirPath);
+                workbook.write(new FileOutputStream(dirPath));
+                stream.close();
+                return dirPath;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return dirPath;
     }
 }

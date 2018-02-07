@@ -10,6 +10,7 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:task="http://www.springframework.org/schema/task"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:hdp="http://www.springframework.org/schema/hadoop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/mvc
@@ -27,7 +28,9 @@
        http://www.springframework.org/schema/task
        http://www.springframework.org/schema/task/spring-task.xsd
        http://cxf.apache.org/jaxws
-       http://cxf.apache.org/schemas/jaxws.xsd">
+       http://cxf.apache.org/schemas/jaxws.xsd
+       http://www.springframework.org/schema/hadoop
+       http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
     <context:component-scan base-package="com.hex.bigdata.udsp"/>
 
@@ -107,4 +110,33 @@
     <!-- ==================================== AOP =====================================-->
     <aop:aspectj-autoproxy/>
 
+    <!-- ==================================== Quartz =====================================-->
+    <!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序  -->
+    <bean id="scheduler" lazy-init="true" autowire="no" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"></bean>
+
+
+
+    <bean id="paramService" class="com.hex.bigdata.udsp.ed.connect.service.ParamService">
+        <property name="udspStorePrefix" value="${udsp.store.prefix}"></property>
+
+        <property name="hbaseDataFamily" value="${hbase.data.family}"></property>
+        <property name="hbaseDataColumn" value="${hbase.data.column}"></property>
+        <property name="hbaseCrtTimeColumn" value="${hbase.crtTime.column}"></property>
+    </bean>
+
+    <!--hadoop配置-->
+    <!--配置hadoop基本信息-->
+    <hdp:configuration id="hadoopConfiguration">
+        fs.default.name="${hd.fs}"
+    </hdp:configuration>
+
+    <!--配置zookeeper地址和端口-->
+    <hdp:hbase-configuration id="hbaseConfiguration" configuration-ref="hadoopConfiguration"
+                             zk-quorum="${hbase.zk.quorum}" zk-port="${hbase.zk.port}"/>
+
+    <!--配置HbaseTemplate-->
+    <bean id="hbaseTemplate" class="org.springframework.data.hadoop.hbase.HbaseTemplate">
+        <property name="configuration" ref="hbaseConfiguration"/>
+        <property name="encoding" value="UTF-8"/>
+    </bean>
 </beans>

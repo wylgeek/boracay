@@ -49,6 +49,14 @@ ${extends("/goframe/function_layout.httl")}
                         <td class="roleText" style="width: 25%">
                             <input name="userName" class="nui-textbox" style="width:98%;"/>
                         </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">告警方式：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="alarmType" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   emptyText="全部" showNullItem="true" nullItemText="全部" dictTypeId="RC_ALARM_TYPE"
+                                   style="width:98%;"/>
+                        </td>
+                    </tr>
+                    <tr>
                         <td style="width: 100px;text-align: right">创建时间：</td>
                         <td style="width: 25%">
                             <input name="crtTimeStart" class="nui-datepicker" allowInput="true"
@@ -57,8 +65,6 @@ ${extends("/goframe/function_layout.httl")}
                             <input name="crtTimeEnd" class="nui-datepicker" allowInput="true"
                                    showTime="true" format="yyyy-MM-dd HH:mm:ss" timeFormat="HH:mm:ss" style="width: 46%"/>
                         </td>
-                    </tr>
-                    <tr>
                         <td style="width: 100px;text-align: right">更新时间：</td>
                         <td style="width: 25%">
                             <input name="uptTimeStart" class="nui-datepicker" allowInput="true"
@@ -92,10 +98,13 @@ ${extends("/goframe/function_layout.httl")}
             <div field="serviceType" headerAlign="center" allowSort="true" renderer="renderServiceType">服务类型</div>-->
             <div field="userName" headerAlign="center"  width="70px" allowSort="true">用户名</div>
             <div field="ipSection" headerAlign="center" width="80px" allowSort="true">IP段</div>
-            <div field="maxSyncNum" headerAlign="center" allowSort="true">最大同步并发数</div>
-            <div field="maxAsyncNum" headerAlign="center" allowSort="true">最大异步并发数</div>
-            <div field="crtTime" headerAlign="center" width="85px"  allowSort="true" renderer="timeFormat">创建时间</div>
-            <div field="crtUser" headerAlign="center" width="70px"  allowSort="true">创建者</div>
+            <div field="maxSyncNum" headerAlign="center" allowSort="true">运行队列大小（同步）</div>
+            <div field="maxAsyncNum" headerAlign="center" allowSort="true">运行队列大小（异步）</div>
+            <div field="maxSyncWaitNum" headerAlign="center" allowSort="true">等待队列大小（同步）</div>
+            <div field="maxAsyncWaitNum" headerAlign="center" allowSort="true">等待队列大小（异步）</div>
+            <div field="alarmType" headerAlign="center" allowSort="true" renderer="renderAlarmType">告警方式</div>
+            <!--<div field="crtTime" headerAlign="center" width="85px"  allowSort="true" renderer="timeFormat">创建时间</div>-->
+            <!--<div field="crtUser" headerAlign="center" width="70px"  allowSort="true">创建者</div>-->
             <!--<div name="operation" headerAlign="center" align="center" allowSort="true" renderer="operation">操作</div>-->
         </div>
     </div>
@@ -156,7 +165,6 @@ ${extends("/goframe/function_layout.httl")}
             nui.get("edit").disable();
             nui.get("remove").enable();
         }
-
     }
 
     /**
@@ -345,6 +353,15 @@ ${extends("/goframe/function_layout.httl")}
      */
     function renderServiceType(e) {
         return nui.getDictText("UDSP_SERVICE_TYPE", e.row.serviceType);
+    }
+
+    /**
+     * 转换告警方式
+     * @param e
+     * @returns {*}
+     */
+    function renderAlarmType(e) {
+        return nui.getDictText("RC_ALARM_TYPE", e.row.alarmType);
     }
 </script>
 

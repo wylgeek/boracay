@@ -1,0 +1,166 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(content)-->
+<div style="padding-left:5px;padding-right:5px;">
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <!-- 左边列表 -->
+            <td>
+                <h4 style="margin:0;line-height:22px;font-size:12px;">待选列表：</h4>
+                <div id="datagrid1" class="nui-datagrid" style="width:250px;height:265px;"
+                     pageStyle="padding:2px;" multiSelect="true" idField="" showPager="false">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="name" with="40%" headerAlign="center">名称</div>
+                    </div>
+                </div>
+            </td>
+            <!-- 选择 -->
+            <td style="padding:5px;">
+                <input type="button" value="选择" style="width:50px;" onclick="addSelected()"/>
+                <br/>
+            </td>
+            <!-- 右边列表 -->
+            <td>
+                <h4 style="margin:0;line-height:22px;font-size:12px;">选中列表：</h4>
+                <div id="datagrid2" class="nui-datagrid" style="width:250px;height:265px;"
+                     multiSelect="true" idField="" showPager="false">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div type="indexcolumn">位置</div>
+                        <div field="name" with="40%" headerAlign="center">名称</div>
+                    </div>
+                </div>
+            </td>
+            <!-- 操作 -->
+            <td style="padding:5px;">
+                <input type="button" value="删除" style="width:50px;margin-bottom:2px;" onclick="removeSelecteds()"/>
+                <br/>
+                <input type="button" value="清空" style="width:50px;" onclick="removeAllSelecteds()"/>
+                <br/>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- 按钮区 -->
+<div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
+    <a class="nui-button" style="" iconCls="icon-save" onclick="save">保存</a>
+    <span style="display:inline-block;width:25px;"></span>
+    <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">返回</a>
+</div>
+
+<script type="text/javascript">
+    var grid1;
+    var grid2;
+
+    /**
+     * 父页面调用：设置数据
+     */
+    function SetData(param) {
+        require(['jquery', 'nui'], function ($, nui) {
+            nui.parse();
+            grid1 = nui.get("datagrid1");
+            grid2 = nui.get("datagrid2");
+            var datas = nui.clone(param);
+            //console.warn(datas);
+            // 查询字段集合
+            var modelId = '${modelId}';//如果没有得到对应modelId则不需要加载
+            if(!modelId){
+                return ;
+            }
+            grid1.loading("正在加载，请稍等");
+            $.post("${basePath}/mm/params/select/${modelId}/${type}", function (result) {
+                var data = result.data;
+                // 去重并判断字段是否存在
+                var items = [];
+                for (var i = 0, len = data.length; i < len; i++) {
+                    var name = data[i].name;
+                    var describe = data[i].describe;
+                    var length = data[i].length;
+                    var type = data[i].colType;
+                    var isSame = false;
+                    if (datas.length > 0) {
+                        $.each(datas, function (_index, record) {
+                            if (name == record.name) {
+                                isSame = true;
+                                return false;
+                            }
+                        });
+                    }
+                    if (isSame === false) {
+                        items.push({
+                            "name": name,
+                            "describe": describe,
+                            "length": length,
+                            "type": type,
+                            "label": name,
+                            "stats": "none",
+                            "operator": "==",
+                            "isNeed": "0",
+                            "isOfferOut": "0",
+                            "orderType": "ASC"
+                        });
+                    }
+                }
+                grid1.addRows(items);
+                grid1.unmask();
+            });
+        });
+    }
+
+    /**
+     * 父页面调用：获取数据
+     */
+    function GetData() {
+        return grid2.getData();
+    }
+
+    /**
+     * 添加选择项
+     */
+    function addSelected() {
+        var items = grid1.getSelecteds();
+        if (items.length == 0) {
+            nui.alert("请至少选中一条记录!");
+        }
+        var data = nui.clone(items);
+        grid1.removeRows(items);
+        grid2.addRows(data);
+    }
+
+    /**
+     * 删除已选项
+     */
+    function removeSelecteds() {
+        var items = grid2.getSelecteds();
+        grid2.removeRows(items);
+        var data = nui.clone(items);
+        grid1.addRows(items);
+    }
+
+    /**
+     * 清空已选项
+     */
+    function removeAllSelecteds() {
+        var rows = grid2.getData();
+        var data = nui.clone(rows);
+        grid2.removeRows(rows);
+        grid1.addRows(data);
+    }
+
+    /**
+     * 保存
+     */
+    function save(e) {
+        CloseWindow("success");
+    }
+
+    /**
+     * 返回
+     */
+    function cancel() {
+        CloseWindow("onCancel");
+    }
+
+</script>
+<!--#end-->

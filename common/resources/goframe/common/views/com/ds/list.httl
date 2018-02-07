@@ -207,7 +207,27 @@ ${extends("/goframe/function_layout.httl")}
             nui.get("edit").disable();
             nui.get("remove").enable();
         }
-
+        var model = "${model}";
+        if(model == "OLQ" && rows.length != 0){
+            var json = nui.encode(getRows(rows));
+            //grid1.loading("正在检查,请稍等...");
+            $.ajax({
+                url: "${basePath}/rc/service/checkAppUsed/OLQ",
+                type: 'POST',
+                data: json,
+                async:false,
+                cache: false,
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.status == true) {
+                        //nui.alert(result.message, "提示");
+                        //grid1.unmask();
+                        nui.get("edit").disable();
+                        nui.get("remove").disable();
+                    }
+                }
+            });
+        }
     }
 
 //    /**
@@ -299,50 +319,22 @@ ${extends("/goframe/function_layout.httl")}
                 var json = nui.encode(getRows(rows));
                 var resultStatus = true;
                 grid1.loading("正在删除中,请稍等...");
-                //删除前校验
-                var model= "${model}";
-                var url = "";
-                if(model == "IQ"){
-                    url = "${basePath}/iq/dataResource/checkDatasourcesUsed";
-                }else if(model == "OLQ"){
-                    url = "${basePath}/rc/service/checkApplicationsUsed/OLQ";
-                }else if(model == "RTS"){
-                    url = "${basePath}/rts/dataResource/checkDatasourcesUsed";
-                }
-
                 $.ajax({
-                    url: url,
+                    url: "${basePath}/com/ds/delete",
                     type: 'POST',
                     data: json,
                     cache: false,
-                    async:false,
                     contentType: 'application/json',
                     success: function (result) {
                         if (result.status == true) {
+                            nui.alert(result.message);
+                            grid1.reload();
+                        } else {
                             nui.alert(result.message, "错误提示");
-                            resultStatus = false;
                             grid1.unmask();
                         }
                     }
                 });
-                if(resultStatus){
-                    $.ajax({
-                        url: "${basePath}/com/ds/delete",
-                        type: 'POST',
-                        data: json,
-                        cache: false,
-                        contentType: 'application/json',
-                        success: function (result) {
-                            if (result.status == true) {
-                                nui.alert(result.message);
-                                grid1.reload();
-                            } else {
-                                nui.alert(result.message, "错误提示");
-                                grid1.unmask();
-                            }
-                        }
-                    });
-                }
             }
         });
     }

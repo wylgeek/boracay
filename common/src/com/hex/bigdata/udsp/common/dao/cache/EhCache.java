@@ -26,7 +26,7 @@ public class EhCache<T> implements Cache<T> {
     private CacheManager cacheManager;
 
     private boolean insert(String key, Object obj) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key) && obj != null) {
                 cacheManager.getCache(UDSP_EHCACHE_NAME).put(new Element(key, obj));
             }
@@ -35,7 +35,7 @@ public class EhCache<T> implements Cache<T> {
     }
 
     private boolean update(String key, Object obj) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key) && obj != null) {
                 net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
                 cache.remove(key);
@@ -46,7 +46,7 @@ public class EhCache<T> implements Cache<T> {
     }
 
     private boolean delete(String key) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key)) {
                 cacheManager.getCache(UDSP_EHCACHE_NAME).remove(key);
             }
@@ -55,7 +55,7 @@ public class EhCache<T> implements Cache<T> {
     }
 
     private Object select(String key) {
-        synchronized (key) {
+        synchronized (key.intern()) {
             if (StringUtils.isNotBlank(key)) {
                 net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
                 Element element = cache.get(key);
@@ -69,11 +69,11 @@ public class EhCache<T> implements Cache<T> {
     }
 
     public boolean insertCache(String key, T t) {
-        return insert(key, t);
+        return insert(key, cloneObj(t));
     }
 
     public boolean updateCache(String key, T t) {
-        return update(key, t);
+        return update(key, cloneObj((T) t));
     }
 
     public boolean deleteCache(String key) {
@@ -88,12 +88,12 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public boolean insertListCache(String key, List<T> list) {
-        return insert(key, list);
+        return insert(key, cloneList(list));
     }
 
     @Override
     public boolean updateListCache(String key, List<T> list) {
-        return update(key, list);
+        return update(key, cloneList((List<T>) list));
     }
 
     @Override
@@ -109,7 +109,7 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public List<T> selectCacheLike(String likeKey) {
-        synchronized (likeKey) {
+        synchronized (likeKey.intern()) {
             net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
             Attribute<String> keyObject = cache.getSearchAttribute("key");
             Query query = cache.createQuery();
@@ -128,7 +128,7 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public boolean removeCacheLike(String likeKey) {
-        synchronized (likeKey) {
+        synchronized (likeKey.intern()) {
             net.sf.ehcache.Cache cache = cacheManager.getCache(UDSP_EHCACHE_NAME);
             Attribute<String> keyObject = cache.getSearchAttribute("key");
             Query query = cache.createQuery();
@@ -147,8 +147,8 @@ public class EhCache<T> implements Cache<T> {
 
     @Override
     public boolean insertTimeoutCache(String key, T t, long timeout) {
-        synchronized (key) {
-            Element element = new Element(key, t);
+        synchronized (key.intern()) {
+            Element element = new Element(key, cloneObj(t));
             element.setTimeToIdle((int) timeout / 1000);
             if (StringUtils.isNotBlank(key) && t != null) {
                 cacheManager.getCache(UDSP_EHCACHE_NAME).put(element);
@@ -167,8 +167,20 @@ public class EhCache<T> implements Cache<T> {
         T t = null;
         if (obj != null) {
             try {
-                t = (T) obj.getClass().newInstance();
-                ObjectUtil.copyObject(obj, t);
+                if (obj instanceof Integer) {
+                    t = (T) new Integer((Integer) obj);
+                } else if (obj instanceof Long) {
+                    t = (T) new Long((Long) obj);
+                } else if (obj instanceof Short) {
+                    t = (T) new Short((Short) obj);
+                } else if (obj instanceof Double) {
+                    t = (T) new Double((Double) obj);
+                } else if (obj instanceof Float) {
+                    t = (T) new Float((Float) obj);
+                } else {
+                    t = (T) obj.getClass().newInstance();
+                    ObjectUtil.copyObject(obj, t);
+                }
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {

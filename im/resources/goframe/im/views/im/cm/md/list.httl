@@ -1,0 +1,598 @@
+${extends("/goframe/function_layout.httl")}
+<script src="${basePath}/s/js/jquery/jquery-1.8.1.min.js" type="text/javascript"></script>
+<script src="${basePath}/s/js/nui/swfupload/swfupload.js" type="text/javascript"></script>
+<!--#macro(head)-->
+<link rel="stylesheet" href="${basePath}/s/css/udsp.css"/>
+<link rel="stylesheet" href="${basePath}/s/css/font-awesome.css"/>
+<!--#end-->
+
+<!--#macro(content)-->
+<style type="text/css">
+    #btnQuery > span {
+        width: 100px;
+    }
+</style>
+
+<div class="nui-toolbar">
+
+    <div class="panel-toolbar">
+        <table style="width:100%">
+            <tr>
+                <td style="white-space:nowrap;">
+                    <a class="nui-button" id="pull" iconCls="icon-search" onclick="moreOption">搜索︽</a>
+                    <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
+                </td>
+                <td style="text-align: right;">
+                    #if(hasPermission("IM.cm.md.list.add"))
+                    <a class="nui-button" iconCls="icon-add" plain="true" onclick="add">添加</a>
+                    #end
+                    #if(hasPermission("IM.cm.md.list.edit"))
+                    <a class="nui-button" iconCls="icon-edit" plain="true" onclick="edit" enabled="false"
+                       id="edit">编辑</a>
+                    #end
+                    #if(hasPermission("IM.cm.md.list.remove"))
+                    <a class="nui-button" iconCls="icon-remove" plain="true" onclick="remove" enabled="false"
+                       id="remove">删除</a>
+                    #end
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="panel-query search-condition" style="display:none;" id="query">
+        <div class="list">
+            <div id="form1">
+                <table style="width:100%">
+                    <tr>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">名称：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="name" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">说明：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="describe" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">数据源：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input id="dsId" name="dsId" class="nui-combobox" textField="name" valueField="pkId"
+                                   dataField="data" url="${basePath}/com/ds/select?model=IM" allowInput="true"
+                                   showNullItem="true" emptyText="全部" nullItemText="全部" style="width:98%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">备注：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="note" class="nui-textbox" style="width:98%;"/>
+                        </td>
+                        <td style="width: 100px;text-align: right">创建时间：</td>
+                        <td style="width: 25%">
+                            <input name="crtTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd H:mm:ss" timeFormat="H:mm:ss" style="width: 46%"/>
+                            -
+                            <input name="crtTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd H:mm:ss" timeFormat="H:mm:ss" style="width: 46%"/>
+                        </td>
+                        <td style="width: 100px;text-align: right">更新时间：</td>
+                        <td style="width: 25%">
+                            <input name="uptTimeStart" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd H:mm:ss" timeFormat="H:mm:ss" style="width: 46%"/>
+                            -
+                            <input name="uptTimeEnd" class="nui-datepicker" allowInput="true"
+                                   showTime="true" format="yyyy-MM-dd H:mm:ss" timeFormat="H:mm:ss" style="width: 46%"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">类型：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="type" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   emptyText="全部" dictTypeId="IM_MD_TYPE" showNullItem="true" nullItemText="全部"
+                                   style="width:98%;"/>
+                        </td>
+                        <td class="tit roleLabel" style="width: 100px;text-align: right">状态：</td>
+                        <td class="roleText" style="width: 25%">
+                            <input name="status" class="nui-dictcombobox" valueField="dictId" textField="dictName"
+                                   emptyText="全部" dictTypeId="IM_MD_STATUS" showNullItem="true" nullItemText="全部"
+                                   style="width:98%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" align="center">
+                            <input class="nui-button" iconCls="icon-search" text="查询" onclick="search"/>
+                            <span style="display:inline-block;width:25px;"></span>
+                            <input class="nui-button" iconCls="icon-reset" text="重置" onclick="onFormReset('form1')"/>
+                            <span style="display:inline-block;width:25px;"></span>
+                            <input class="nui-button" iconCls="icon-download" text="下载" onclick="download()"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="updateForm" style="width:100%;height:auto;overflow:hidden;">
+        <table style="width:100%;table-layout:fixed;" class="nui-form-table">
+            <tr>
+                <th class="nui-form-label" width="15%" align="right"><label>EXCEL配置文件：</label></th>
+                <td><input id="fileUpload" class="nui-fileupload" style="width:100%"
+                           name="excelFile" limitType="*.xls;*.xlsx"
+                           flashUrl="${basePath}/s/js/nui/swfupload/swfupload.swf"
+                           uploadUrl="${basePath}/im/md/upload"
+                           onuploadsuccess="uploadSuccess"
+                />
+                </td>
+                <td width="15%" align="center">
+                    <a type="submit" id="impimp" class="nui-button" iconCls="icon-upload" onclick="startUpload">上传</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div style="display:none">
+        <table>
+            <form id="downForm" action="${basePath}/com/file/download" method="get">
+                <input id="filePath" name="filePath" type="hidden"/>
+            </form>
+        </table>
+    </div>
+
+</div>
+
+<div class="nui-fit" style="height: 100px;">
+    <div id="datagrid1" class="nui-datagrid" style="width:100%;height:100%;"
+         url="${basePath}/im/md/page" idField="pkId" allowResize="false" sortMode="client"
+         sizeList="[10,20,50,100]" pageSize="20" multiSelect="true" dataField="data"
+         allowCellSelect="false" onselectionchanged="selected" onrowdblclick="info">
+        <div property="columns">
+            <div type="checkcolumn" width="20"></div>
+            <div field="name" headerAlign="center" allowSort="true">名称</div>
+            <div field="describe" headerAlign="center" allowSort="true">说明</div>
+            <div field="tbName" headerAlign="center" allowSort="true">表名</div>
+            <div field="dsName" headerAlign="center" allowSort="true" renderer="dsRenderer">数据源</div>
+            <div field="type" headerAlign="center" allowSort="true" renderer="renderMdType">类型</div>
+            <div field="status" headerAlign="center" allowSort="true" renderer="renderMdStatus">状态</div>
+            <div field="crtTime" headerAlign="center" allowSort="true" renderer="timeFormat">创建时间</div>
+            <div field="uptTime" headerAlign="center" allowSort="true" renderer="timeFormat">更新时间</div>
+            <div field="note" headerAlign="center" allowSort="true">备注</div>
+            <div field="operate" headerAlign="center" align="center" allowSort="true" renderer="setOperation">操作</div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var grid1;
+    var dsIdObj;
+
+    var updateForm;
+    var uploadFileStatus;
+    var fileIndex = 0;
+
+    /**
+     * 按需加载资源文件
+     */
+    require(['jquery', 'nui'], function ($, nui) {
+        nui.parse();
+        grid1 = nui.get("datagrid1");
+        grid1.load();
+        $("#pull").hide();
+        dsIdObj = nui.get("dsId");
+
+        updateForm = new nui.Form("updateForm");
+        uploadFileStatus = false;
+    });
+
+    /**
+     * 搜索按钮转换
+     */
+    function moreOption() {
+        $("#push").toggle();
+        $("#pull").toggle();
+        $("#query").toggle();
+        nui.layout(document.body);
+    }
+
+    /**
+     * 搜索
+     */
+    function search() {
+        var form = new nui.Form("#form1");
+        var data = form.getData(true, true);
+        grid1.load(data);
+    }
+
+    /**
+     * 选中
+     * type：0内表、1外表，status：1未建、2已建
+     */
+    function selected() {
+        var rows = grid1.getSelecteds();
+        if (rows.length == 1) {
+            rows[0].type == 0 && rows[0].status == 2 ? nui.get("remove").disable() : nui.get("remove").enable();
+            rows[0].type == 0 && rows[0].status == 2 ? nui.get("edit").disable() : nui.get("edit").enable();
+        } else if (rows.length == 0) {
+            nui.get("edit").disable();
+            nui.get("remove").disable();
+        } else {
+            nui.get("edit").disable();
+            nui.get("remove").disable();
+            var canRemove = true;
+            $.each(rows, function (i, val) {
+                if (val.type == 0 && val.status == 2) {
+                    canRemove = false;
+                    return;
+                }
+            });
+            if (canRemove) {
+                nui.get("remove").enable();
+            }
+        }
+    }
+
+    /**
+     * 添加
+     */
+    function add() {
+        nui.open({
+            url: "${basePath}/goframe/p/im.cm.md.add",
+            title: "添加",
+            width: 800,
+            height: 600,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+                if (action == "success") {
+                    grid1.load();
+                }
+            }
+        });
+    }
+
+    /**
+     * 编辑
+     * @param pkId
+     */
+    function edit() {
+        var row = grid1.getSelected();
+        if (!row) {
+            nui.alert("请选择一条记录!");
+            return;
+        }
+        nui.open({
+            url: "${basePath}/goframe/p/im.cm.md.edit?pkId=" + row.pkId,
+            title: "编辑",
+            width: 800,
+            height: 600,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+                if (action == "success") {
+                    grid1.load();
+                }
+            }
+        })
+    }
+
+    /**
+     * 删除
+     */
+    function remove() {
+        var rows = grid1.getSelecteds();
+        if (!rows) {
+            nui.alert("请至少选择一条记录!");
+            return;
+        }
+        nui.confirm("确定删除选中记录？", "系统提示", function (action) {
+            if (action == "ok") {
+                var json = nui.encode(getRows(rows));
+                grid1.loading("正在删除中,请稍等...");
+                $.ajax({
+                    url: "${basePath}/im/md/delete",
+                    type: 'POST',
+                    data: json,
+                    cache: false,
+                    contentType: 'application/json',
+                    success: function (result) {
+                        if (result.status == true) {
+                            nui.alert(result.message);
+                            grid1.reload();
+                        } else {
+                            nui.alert(result.message, "错误提示");
+                            grid1.unmask();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 获取多行
+     * @param rows
+     * @returns {Array}
+     */
+    function getRows(rows) {
+        var nodes = [];
+        for (var i = 0, len = rows.length; i < len; i++) {
+            nodes.push({pkId: rows[i].pkId});
+        }
+        return nodes;
+    }
+
+    /**
+     * 双击查看详情
+     */
+    function info() {
+        var row = grid1.getSelected();
+        if (!row) {
+            nui.alert("请选择一条记录!");
+            return;
+        }
+        nui.open({
+            url: "${basePath}/goframe/p/im.cm.md.info/?pkId=" + row.pkId,
+            title: "详情-" + row.describe,
+            width: 800,
+            height: 500,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+            }
+        });
+    }
+
+    /**
+     * 时间格式化
+     * @param e
+     */
+    function timeFormat(e) {
+        if (e.value) {
+            var date = new Date(e.value);
+            return nui.formatDate(date, "yyyy-MM-dd HH:mm:ss");
+        }
+    }
+
+    /**
+     * 数据源渲染
+     * @param e
+     * @returns {string}
+     */
+    function dsRenderer(e) {
+        return "<a href='#' class='underline' onclick='showDatabaseInfo(\"" + e.row.dsId + "\",\"" + e.row.dsName + "\")'>" + e.row.dsName + "</a>";
+    }
+
+    /**
+     * 转换元数据类型
+     * @param e
+     * @returns {*}
+     */
+    function renderMdType(e) {
+        return nui.getDictText("IM_MD_TYPE", e.row.type);
+    }
+
+    /**
+     * 转换元数据状态
+     * @param e
+     * @returns {*}
+     */
+    function renderMdStatus(e) {
+        return nui.getDictText("IM_MD_STATUS", e.row.status);
+    }
+
+    /**
+     * 显示数据源信息
+     * @param pkId
+     * @param dbName
+     */
+    function showDatabaseInfo(dsId, dsName) {
+        nui.open({
+            url: "${basePath}/goframe/p/com.ds.info/?pkId=" + dsId + "&model=IM",
+            title: "详情-" + dsName,
+            width: 800,
+            height: 600,
+            onload: function () {
+            },
+            ondestroy: function (action) {
+            }
+        });
+    }
+
+
+    /**
+     * 开始上传文件
+     */
+    function startUpload() {
+        var o = updateForm.getData(true, true);
+        updateForm.validate();
+        if (updateForm.isValid() == false) return;
+        var fileupload = nui.get("fileUpload");
+        var file = fileupload.text;
+        if (file == "") {
+            nui.alert("请选择上传文件");
+            return;
+        }
+        var obj = fileupload.swfUpload.getFile(fileIndex);
+        if (obj == null && fileIndex > 0)
+            obj = fileupload.swfUpload.getFile(fileIndex - 1);
+        if (obj == null) {
+            nui.alert("文件已上传，请重新选择文件上传");
+            return;
+        } else if (obj.filestatus != -1) {
+            if (obj.filestatus == -4 && uploadFileStatus) {
+                nui.alert("文件已上传，请重新选择文件上传");
+                return;
+            } else if (obj.filestatus == -3) {
+                nui.alert("文件上传失败，请重新选择文件上传");
+                return;
+            } else if (!uploadFileStatus) {
+                nui.alert("请重新选择文件上传");
+                return;
+            }
+        }
+        fileupload.startUpload();
+        mask();
+    }
+
+    function mask() {
+        mini.mask({
+            el: document.body,
+            cls: 'mini-mask-loading',
+            html: '导入中...'
+        })
+    }
+
+    /**
+     * 上传成功
+     */
+    function uploadSuccess(e) {
+        var retData = nui.decode(e.serverData);
+        uploadFileStatus = retData.status;
+        nui.unmask(document.body);
+        if (uploadFileStatus) {
+            nui.alert("导入成功！");
+            uploadFileStatus = true;
+            grid1.reload();
+        } else {
+            if (undefined == retData.message || "" == retData.message) {
+                nui.alert("上传失败！请重新上传");
+            } else {
+                nui.alert(retData.message);
+            }
+            uploadFileStatus = false;
+        }
+        fileIndex++;
+    }
+
+    /**
+     * 下载
+     */
+    function download() {
+        var rows = grid1.getSelecteds();
+        if (!rows || rows.length == 0) {
+            nui.alert("请至少选择一条记录!");
+            return;
+        }
+        var json = nui.encode(getRows(rows));
+        grid1.loading("正在导出中,请稍等...");
+        $.ajax({
+            url: "${basePath}/im/md/download",
+            type: 'POST',
+            data: json,
+            cache: false,
+            contentType: 'application/json',
+            success: function (text) {
+                if (text != null && text.trim() != "") {
+                    $("#filePath").val(text);
+                    $("#downForm").submit();
+                    nui.alert("导出Excel成功", "系统提示");
+                } else {
+                    nui.alert("导出Excel失败", "系统提示");
+                }
+                grid1.unmask();
+            }
+        });
+    }
+
+    /**
+     * 操作显示
+     */
+    function setOperation(e) {
+        if (e.row.type == 1) {//0 内表 1 外表
+            return null;
+        }
+        if (e.row.status == 1) { //1 未建 2 已建
+            return "<a href=\"javascript:;\" onclick=\"createTable('" + e.row.pkId + "')\">建表</a>";
+        }
+        if (e.row.status == 2) { //1 未建 2 已建
+            return "<a href=\"javascript:;\" onclick=\"dropTable('" + e.row.pkId + "')\">删表</a>";
+        }
+    }
+
+    /**
+     * 删表
+     */
+    function dropTable(pkId) {
+        nui.confirm("确定删表？", "系统提示", function (action) {
+            if (action != "ok") {
+                return;
+            }
+            grid1.loading("正在删表中,请稍等...");
+            $.ajax({
+                url: "${basePath}/im/md/dropTable/" + pkId,
+                type: 'POST',
+                data: null,
+                cache: false,
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.status == true) {
+                        nui.alert(result.message);
+                    } else {
+                        //nui.alert(result.message, "系统提示");
+                        showMessage(result.message);
+                    }
+                    grid1.unmask();
+                    grid1.load();
+                },
+                error: function () {
+                    nui.alert("系统错误", "系统提示", function (action) {
+                        if (action == "ok" || action == "close") {
+//                            CloseWindow("failed");
+                        }
+                    });
+                    form1.unmask();
+                }
+            });
+        });
+    }
+
+    /**
+     * 建表
+     * @param pkId
+     */
+    function createTable(pkId) {
+        nui.confirm("确定建表？", "系统提示", function (action) {
+            if (action != "ok") {
+                return;
+            }
+            grid1.loading("正在建表中,请稍等...");
+            $.ajax({
+                url: "${basePath}/im/md/createTable/" + pkId,
+                type: 'POST',
+                data: null,
+                cache: false,
+                contentType: 'application/json',
+                success: function (result) {
+                    if (result.status == true) {
+                        nui.alert(result.message);
+                    } else {
+                        //nui.alert(result.message, "系统提示")
+                        showMessage(result.message);
+                    }
+                    grid1.unmask();
+                    grid1.load();
+                },
+                error: function () {
+                    nui.alert("系统错误", "系统提示", function (action) {
+                        if (action == "ok" || action == "close") {
+//                            CloseWindow("failed");
+                        }
+                    });
+                    form1.unmask();
+                }
+            });
+        });
+    }
+
+    /**
+     * 显示提示信息
+     */
+    function showMessage(message) {
+        nui.open({
+            url: "${basePath}/goframe/p/im.cm.message",
+            title: '提示信息',
+            width: 600,
+            height: 560,
+            onload: function () {
+                var iframe = this.getIFrameEl();
+                iframe.contentWindow.setData(message);
+            }
+        });
+    }
+</script>
+<!--#end-->

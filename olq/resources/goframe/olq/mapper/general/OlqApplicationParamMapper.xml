@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.olq.dao.OlqApplicationParamMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.olq.model.OlqApplicationParam" >
+    <result column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+    <result column="PARAM_NAME" property="paramName" jdbcType="VARCHAR" />
+    <result column="PARAM_DESC" property="paramDesc" jdbcType="VARCHAR" />
+    <result column="DEFAULT_VALUE" property="defaultValue" jdbcType="VARCHAR" />
+    <result column="IS_NEED" property="isNeed" jdbcType="CHAR" />
+    <result column="OLQ_APP_ID" property="olqAppId" jdbcType="VARCHAR" />
+    <result column="SEQ" property="seq" jdbcType="DECIMAL" />
+  </resultMap>
+  <insert id="insert" parameterType="com.hex.bigdata.udsp.olq.model.OlqApplicationParam" >
+    insert into OLQ_APPLICATION_PARAM (PK_ID, PARAM_NAME, PARAM_DESC, 
+      DEFAULT_VALUE, IS_NEED, OLQ_APP_ID,SEQ
+      )
+    values (#{pkId,jdbcType=VARCHAR}, #{paramName,jdbcType=VARCHAR}, #{paramDesc,jdbcType=VARCHAR}, 
+      #{defaultValue,jdbcType=VARCHAR}, #{isNeed,jdbcType=CHAR}, #{olqAppId,jdbcType=VARCHAR},#{seq,jdbcType=DECIMAL}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select PK_ID, PARAM_NAME, PARAM_DESC, DEFAULT_VALUE, IS_NEED, OLQ_APP_ID,SEQ
+    from OLQ_APPLICATION_PARAM
+  </select>
+  <select id="selectByCondition" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.olq.model.OlqApplicationParam">
+    select PK_ID, PARAM_NAME, PARAM_DESC, DEFAULT_VALUE, IS_NEED, OLQ_APP_ID,SEQ
+    from OLQ_APPLICATION_PARAM
+    <where>
+      <if test="olqAppId!='' and olqAppId!=null ">OLQ_APP_ID = #{olqAppId} </if>
+    </where>
+  </select>
+
+  <delete id="deleteListByAppId" parameterType="java.lang.String" >
+    delete from OLQ_APPLICATION_PARAM
+    where OLQ_APP_ID = #{id,jdbcType=VARCHAR}
+  </delete>
+
+</mapper>

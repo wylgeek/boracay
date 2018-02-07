@@ -1,5 +1,6 @@
 package com.hex.bigdata.udsp.controller;
 
+import com.hex.bigdata.udsp.common.util.ExceptionUtil;
 import com.hex.bigdata.udsp.service.ConsumerService;
 import com.hex.bigdata.udsp.thread.SocketRunnable;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class SocketController {
             e.start();
             log.info("启动socket服务完成！");
         } catch (Exception e) {
-            log.error("启动socket出现错误！"+e.getMessage());
+            log.error("启动socket出现错误！" + ExceptionUtil.getMessage(e));
         }
     }
 

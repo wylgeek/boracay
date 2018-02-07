@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.im.dao.ImMetadataMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.im.model.ImMetadata" >
+    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+    <result column="DS_ID" property="dsId" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIBE" property="describe" jdbcType="VARCHAR" />
+    <result column="NOTE" property="note" jdbcType="VARCHAR" />
+    <result column="DEL_FLG" property="delFlg" jdbcType="CHAR" />
+    <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR" />
+    <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR" />
+    <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR" />
+    <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR" />
+    <result column="TB_NAME" property="tbName" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="CHAR" />
+    <result column="TYPE" property="type" jdbcType="CHAR" />
+  </resultMap>
+
+  <resultMap id="ImMetadataView" type="com.hex.bigdata.udsp.im.dto.ImMetadataView" extends="BaseResultMap">
+    <result column="DS_NAME" property="dsName" jdbcType="VARCHAR" />
+    <result column="DS_DESC" property="dsDesc" jdbcType="VARCHAR" />
+    <result column="DS_TYPE" property="dsType" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from IM_METADATA
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </delete>
+  <update id="deleteByPrimaryKeyFake" parameterType="java.lang.String" >
+    update IM_METADATA set DEL_FLG = '1' where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <insert id="insert" parameterType="com.hex.bigdata.udsp.im.model.ImMetadata" >
+    insert into IM_METADATA (PK_ID, DS_ID, NAME, 
+      DESCRIBE, NOTE, DEL_FLG, 
+      CRT_USER, CRT_TIME, UPT_USER, 
+      UPT_TIME, TB_NAME, STATUS, 
+      TYPE)
+    values (#{pkId,jdbcType=VARCHAR}, #{dsId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{describe,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, #{delFlg,jdbcType=CHAR}, 
+      #{crtUser,jdbcType=VARCHAR}, #{crtTime,jdbcType=VARCHAR}, #{uptUser,jdbcType=VARCHAR}, 
+      #{uptTime,jdbcType=VARCHAR}, #{tbName,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, 
+      #{type,jdbcType=CHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.im.model.ImMetadata" >
+    update IM_METADATA
+      set DS_ID = #{dsId,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESCRIBE = #{describe,jdbcType=VARCHAR},
+      NOTE = #{note,jdbcType=VARCHAR},
+      DEL_FLG = #{delFlg,jdbcType=CHAR},
+      CRT_USER = #{crtUser,jdbcType=VARCHAR},
+      CRT_TIME = #{crtTime,jdbcType=VARCHAR},
+      UPT_USER = #{uptUser,jdbcType=VARCHAR},
+      UPT_TIME = #{uptTime,jdbcType=VARCHAR},
+      TB_NAME = #{tbName,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=CHAR},
+      TYPE = #{type,jdbcType=CHAR}
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, DS_ID, NAME, DESCRIBE, NOTE, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, 
+    UPT_TIME, TB_NAME, STATUS, TYPE
+    from IM_METADATA
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select PK_ID, DS_ID, NAME, DESCRIBE, NOTE, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER, 
+    UPT_TIME, TB_NAME, STATUS, TYPE
+    from IM_METADATA
+    where DEL_FLG = '0'
+    ORDER BY CRT_TIME desc
+  </select>
+  <select id="select" resultMap="ImMetadataView" >
+    select A.PK_ID, A.DS_ID, A.NAME, A.DESCRIBE, A.NOTE, A.DEL_FLG, A.CRT_USER, A.CRT_TIME, A.UPT_USER,
+    A.UPT_TIME, A.TB_NAME, A.STATUS, A.TYPE, B.NAME AS DS_NAME, B.TYPE as DS_TYPE, B.DESCRIBE as DS_DESC
+    from IM_METADATA A
+    left join com_datasource B
+    on A.DS_ID = B.PK_ID
+    where A.DEL_FLG = '0'
+    <if test="pkId!='' and pkId!=null ">and A.PK_ID = #{pkId}</if>
+    <if test="dsId!='' and dsId!=null ">and A.DS_ID = #{dsId}</if>
+    <if test="name!='' and name!=null ">and A.NAME like '%' || #{name} || '%'</if>
+    <if test="describe!='' and describe!=null ">and A.DESCRIBE like '%' || #{describe} || '%'</if>
+    <if test="note!='' and note!=null ">and A.NOTE like '%' || #{note} || '%'</if>
+    <if test="type!='' and type!=null ">and A.TYPE = #{type}</if>
+    <if test="status!='' and status!=null ">and A.STATUS = #{status}</if>
+    <if test="crtTimeStart!=null and crtTimeStart!='' ">and A.CRT_TIME >= #{crtTimeStart}</if>
+    <if test="crtTimeEnd!=null and crtTimeEnd!='' ">and #{crtTimeEnd} >= A.CRT_TIME</if>
+    <if test="uptTimeStart!=null and uptTimeStart!='' ">and A.UPT_TIME >= #{uptTimeStart}</if>
+    <if test="uptTimeEnd!=null and uptTimeEnd!='' ">and #{uptTimeEnd} >= A.UPT_TIME</if>
+    <if test="crtUser!='' and crtUser!=null ">and A.CRT_USER like '%' || #{crtUser} || '%'</if>
+    <if test="uptUser!='' and uptUser!=null ">and A.UPT_USER like '%' || #{uptUser} || '%'</if>
+    ORDER BY CRT_TIME desc
+  </select>
+  <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, DS_ID, NAME, DESCRIBE, NOTE, DEL_FLG, CRT_USER, CRT_TIME, UPT_USER,
+    UPT_TIME, TB_NAME, STATUS, TYPE
+    from IM_METADATA
+    where DEL_FLG = '0'
+    and NAME = #{name,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectTargetMateData" resultMap="ImMetadataView" parameterType="string">
+    select IM.PK_ID, IM.DS_ID, IM.NAME, IM.DESCRIBE, IM.NOTE, IM.DEL_FLG, IM.CRT_USER, IM.CRT_TIME, IM.UPT_USER,
+    IM.UPT_TIME, IM.TB_NAME, IM.STATUS, IM.TYPE, CD.NAME AS DS_NAME, CD.TYPE as DS_TYPE, CD.DESCRIBE as DS_DESC
+    from IM_METADATA IM
+    LEFT JOIN COM_DATASOURCE CD
+    ON CD.PK_ID = IM.DS_ID
+    LEFT JOIN T_GF_DICT TGD
+    on TGD.DICT_ID = CD.TYPE
+    where IM.DEL_FLG = '0'
+    and IM.STATUS = '2'
+    <if test="_parameter!=null and _parameter=='1'.toString()">and TGD.DICT_TYPE_ID = 'IM_DS_TARGET_BATCH_TYPE'</if>
+    <if test="_parameter!=null and _parameter=='2'.toString()">and TGD.DICT_TYPE_ID = 'IM_DS_TARGET_REALTIME_TYPE'</if>
+  </select>
+</mapper>

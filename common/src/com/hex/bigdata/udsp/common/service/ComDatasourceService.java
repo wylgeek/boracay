@@ -5,10 +5,8 @@ import com.hex.bigdata.udsp.common.dao.ComDatasourceMapper;
 import com.hex.bigdata.udsp.common.dto.ComDatasourcePropsView;
 import com.hex.bigdata.udsp.common.dto.ComDatasourceView;
 import com.hex.bigdata.udsp.common.model.*;
-import com.hex.bigdata.udsp.common.util.CreateFileUtil;
-import com.hex.bigdata.udsp.common.util.ExcelCopyUtils;
-import com.hex.bigdata.udsp.common.util.ExcelUploadhelper;
-import com.hex.bigdata.udsp.common.util.FTPClientConfig;
+import com.hex.bigdata.udsp.common.util.*;
+import com.hex.goframe.model.GFDict;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.service.BaseService;
 import com.hex.goframe.util.DateUtil;
@@ -131,6 +129,10 @@ public class ComDatasourceService extends BaseService {
 
     public ComDatasource selectByModelAndName(String model, String name) {
         return comDatasourceMapper.selectByModelAndName(model, name);
+    }
+
+    public List<ComDatasource> selectAll() {
+        return comDatasourceMapper.selectAll();
     }
 
     /**
@@ -273,6 +275,23 @@ public class ComDatasourceService extends BaseService {
             }
         }
         return null;
+    }
+
+    public List<GFDict> selectParameterBySourceId(String sourceId) {
+
+        return comDatasourceMapper.selectParameterBySourceId(sourceId);
+    }
+
+    public List<ComDatasource> selectImSourceDs() {
+        return comDatasourceMapper.selectImSourceDs();
+    }
+
+    public boolean checkSourceType(String sourceId) {
+        return comDatasourceMapper.checkSourceType(sourceId);
+    }
+
+    public List<ComDatasource> selectEngineDs() {
+        return comDatasourceMapper.selectEngineDs();
     }
 }
 

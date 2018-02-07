@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hex.bigdata.udsp.ed.dao.EdInterfaceCountMapper" >
+  <resultMap id="BaseResultMap" type="com.hex.bigdata.udsp.ed.model.EdInterfaceCount" >
+    <id column="PK_ID" property="pkId" jdbcType="VARCHAR" />
+    <result column="APP_ID" property="appId" jdbcType="VARCHAR" />
+    <result column="REQ_USER" property="reqUser" jdbcType="VARCHAR" />
+    <result column="REQ_TIME" property="reqTime" jdbcType="TIMESTAMP" />
+    <result column="REQ_PARAM" property="reqParam" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from ED_INTERFACE_COUNT
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hex.bigdata.udsp.ed.model.EdInterfaceCount" >
+    insert into ED_INTERFACE_COUNT (PK_ID, APP_ID, REQ_USER, 
+      REQ_TIME, REQ_PARAM)
+    values (#{pkId,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR}, #{reqUser,jdbcType=VARCHAR}, 
+      #{reqTime,jdbcType=TIMESTAMP}, #{reqParam,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hex.bigdata.udsp.ed.model.EdInterfaceCount" >
+    update ED_INTERFACE_COUNT
+    set APP_ID = #{appId,jdbcType=VARCHAR},
+      REQ_USER = #{reqUser,jdbcType=VARCHAR},
+      REQ_TIME = #{reqTime,jdbcType=TIMESTAMP},
+      REQ_PARAM = #{reqParam,jdbcType=VARCHAR}
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select PK_ID, APP_ID, REQ_USER, REQ_TIME, REQ_PARAM
+    from ED_INTERFACE_COUNT
+    where PK_ID = #{pkId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select PK_ID, APP_ID, REQ_USER, REQ_TIME, REQ_PARAM
+    from ED_INTERFACE_COUNT
+  </select>
+</mapper>

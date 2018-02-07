@@ -8,88 +8,186 @@ ${extends("/goframe/function_layout.httl")}
         <input name="crtTime" class="nui-hidden"/>
         <input name="uptUser" class="nui-hidden"/>
         <input name="uptTime" class="nui-hidden"/>
-        <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
-            <tr>
-                <th class="nui-form-label"><label for="serviceType">应用类型：</label></th>
-                <td>
-                    <input id="serviceType" name="serviceType"class="nui-dictcombobox nui-form-input" style="width: 97%;"  emptyText="请选择应用类型" onvaluechanged="selectServices"
-                           valueField="dictId" textField="dictName" dictTypeId="UDSP_SERVICE_TYPE" readonly="true"/>
-                </td>
-                <th class="nui-form-label"><label for="serviceId">服务名称：</label></th>
-                <td>
-                    <input id="serviceId" name="serviceId"class="nui-combobox" style="width: 97%;"  emptyText="请选择服务名称"
-                           valueField="pkId" textField="name" readonly="true"/>
-                </td>
-            </tr>
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">基础栏</span></legend>
+            <table style="width:100%;height:100%;" cellpadding="5px,0px,5px,0px" class="nui-form-table">
+                <tr>
+                    <th class="nui-form-label"><label for="serviceType">应用类型：</label></th>
+                    <td>
+                        <input id="serviceType" name="serviceType" class="nui-dictcombobox nui-form-input"
+                               style="width: 97%;" emptyText="请选择应用类型" onvaluechanged="selectServices"
+                               valueField="dictId" textField="dictName" dictTypeId="UDSP_SERVICE_TYPE" readonly="true"/>
+                    </td>
+                    <th class="nui-form-label"><label for="serviceId">服务名称：</label></th>
+                    <td>
+                        <input id="serviceId" name="serviceId" class="nui-combobox" style="width: 97%;"
+                               emptyText="请选择服务名称"
+                               valueField="pkId" textField="name" readonly="true"/>
+                    </td>
+                </tr>
 
-            <tr>
-                <th class="nui-form-label"><label for="userId">用户：</label></th>
-                <td colspan="3">
-                    <input id="userId" name="userId"class="nui-lookup" allowInput="false" popupWidth="450px;"textField="userName" valueField="userId"
-                           popup="#gridPanel" grid="#serachGrid" style="width: 99%;"  emptyText="请选择用户" readonly="true"/>
+                <tr>
+                    <th class="nui-form-label"><label for="userId">用户：</label></th>
+                    <td colspan="3">
+                        <input id="userId" name="userId" class="nui-lookup" allowInput="false" popupWidth="450px;"
+                               textField="userName" valueField="userId"
+                               popup="#gridPanel" grid="#serachGrid" style="width: 99%;" emptyText="请选择用户"
+                               readonly="true"/>
 
-                    <div id="gridPanel" class="nui-panel" title="header" iconCls="icon-add" style="width: 100%;height: 250px"
-                         showToolbar="true" showCloseButton="true" showHeader="false" bodyStyle="padding:0" borderStyle="border:0">
-                        <div property="toolbar" style="padding: 5px;padding-left:8px;text-align: center">
-                            <span>用户名</span>
-                            <input id="keyText" class="nui-textbox" style="width: 160px" onenter="onSearchClick">
-                            <a class="nui-button" onclick="onSearchClick">Search</a>
-                        </div>
+                        <div id="gridPanel" class="nui-panel" title="header" iconCls="icon-add"
+                             style="width: 100%;height: 250px"
+                             showToolbar="true" showCloseButton="true" showHeader="false" bodyStyle="padding:0"
+                             borderStyle="border:0">
+                            <div property="toolbar" style="padding: 5px;padding-left:8px;text-align: center">
+                                <span>用户名</span>
+                                <input id="keyText" class="nui-textbox" style="width: 160px" onenter="onSearchClick">
+                                <a class="nui-button" onclick="onSearchClick">Search</a>
+                            </div>
 
-                        <div id="serachGrid" class="nui-datagrid" style="width:100%;height:100%;"
-                             pageStyle="padding:2px;" multiSelect="true" idField="id"
-                             url="${basePath}/goframe/user/queryUsers?appId=default"
-                             showPageSize="true" showPageIndex="true" sizeList="[10,20,40,80,160]" pageSize="20" >
-                            <div property="columns">
-                                <div type="checkcolumn"></div>
-                                <div field="userId" with="180" headerAlign="center" allowSort="true">用户Id</div>
-                                <div field="userName" with="180" headerAlign="center" allowSort="true">用户名</div>
+                            <div id="serachGrid" class="nui-datagrid" style="width:100%;height:100%;"
+                                 pageStyle="padding:2px;" multiSelect="true" idField="id"
+                                 url="${basePath}/goframe/user/queryUsers?appId=default"
+                                 showPageSize="true" showPageIndex="true" sizeList="[10,20,40,80,160]" pageSize="20">
+                                <div property="columns">
+                                    <div type="checkcolumn"></div>
+                                    <div field="userId" with="180" headerAlign="center" allowSort="true">用户ID</div>
+                                    <div field="userName" with="180" headerAlign="center" allowSort="true">用户名</div>
+                                </div>
                             </div>
                         </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="ipSection">ip段：</label></th>
+                    <td colspan="3">
+                        <input id="ipSection" class="nui-textarea" style="height:60px; width:99%;" emptyText="*.*.*.*"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="maxSyncNum">运行队列大小（同步）：</label></th>
+                    <td>
+                        <input id="maxSyncNum" name="maxSyncNum" class="nui-textbox" style="width:97%" readonly="true"
+                               vtype="int"/>
+                    </td>
+                    <th class="nui-form-label"><label for="maxAsyncNum">运行队列大小（异步）：</label></th>
+                    <td>
+                        <input id="maxAsyncNum" name="maxAsyncNum" class="nui-textbox" style="width:97%" readonly="true"
+                               vtype="int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="maxSyncWaitNum">等待队列大小（同步）：</label></th>
+                    <td>
+                        <input id="maxSyncWaitNum" name="maxSyncWaitNum" class="nui-textbox" style="width:97%"
+                               readonly="true" vtype="int"/>
+                    </td>
+                    <th class="nui-form-label"><label for="maxAsyncWaitNum">等待队列大小（异步）：</label></th>
+                    <td>
+                        <input id="maxAsyncWaitNum" name="maxAsyncWaitNum" class="nui-textbox" style="width:97%"
+                               readonly="true" vtype="int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="maxSyncExecuteTimeout">运行超时时间（同步/单位：秒）：</label></th>
+                    <td>
+                        <input id="maxSyncExecuteTimeout" name="maxSyncExecuteTimeout" class="nui-textbox"
+                               style="width:97%" readonly="true" vtype="int"/>
+                    </td>
+                    <th class="nui-form-label"><label for="maxAsyncExecuteTimeout">运行超时时间（异步/单位：秒）：</label></th>
+                    <td>
+                        <input id="maxAsyncExecuteTimeout" name="maxAsyncExecuteTimeout" class="nui-textbox"
+                               style="width:97%" readonly="true" vtype="int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="maxSyncWaitTimeout">等待超时时间（同步/单位：秒）：</label></th>
+                    <td>
+                        <input id="maxSyncWaitTimeout" name="maxSyncWaitTimeout" class="nui-textbox" style="width:97%"
+                               readonly="true" vtype="int"/>
+                    </td>
+                    <th class="nui-form-label"><label for="maxAsyncWaitTimeout">等待超时时间（异步/单位：秒）：</label></th>
+                    <td>
+                        <input id="maxAsyncWaitTimeout" name="maxAsyncWaitTimeout" class="nui-textbox" style="width:97%"
+                               readonly="true" vtype="int"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="crtUser">创建者：</label></th>
+                    <td>
+                        <input id="crtUser" name="crtUser" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                    <th class="nui-form-label"><label for="crtTime">创建时间：</label></th>
+                    <td>
+                        <input id="crtTime" name="crtTime" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="uptUser">更新者：</label></th>
+                    <td>
+                        <input id="uptUser" name="uptUser" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                    <th class="nui-form-label"><label for="uptTime">更新时间：</label></th>
+                    <td>
+                        <input id="uptTime" name="uptTime" class="nui-textbox" style="width:99%" readonly="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="nui-form-label"><label for="alarmType">告警方式：</label></th>
+                    <td>
+                        <input id="alarmType" name="alarmType" class="nui-dictcombobox" valueField="dictId"
+                               textField="dictName" readonly="true"
+                               dictTypeId="RC_ALARM_TYPE" style="width:97%" onvaluechanged="alarmTypeChanged"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset style="border:dotted 1px #227EA0;">
+            <legend><span style="font-weight: bold">配置栏</span></legend>
+            <div style="padding: 5px 5px 0px 5px;">
+                <div class="nui-toolbar" style="border-bottom: 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="text-align: left;">
+                                <b>配置参数</b>
+                            </td>
+                            <td style="text-align: right;">
+                                <a class="nui-button" iconCls="icon-add" onclick="add" enabled="false">添加</a>
+                                <a class="nui-button" iconCls="icon-add" onclick="adds" enabled="false">批量添加</a>
+                                <a class="nui-button" iconCls="icon-remove" onclick="remove" enabled="false">删除</a>
+                                <span class="separator"></span>
+                                <a class="nui-button" iconCls="icon-upload" onclick="moveUp()" enabled="false">上移</a>
+                                <a class="nui-button" iconCls="icon-download" onclick="moveDown()"
+                                   enabled="false">下移</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="nui-fit" style="height:200px; padding: 0px 5px 0px 5px;">
+                <div id="datagrid1" class="nui-datagrid" style="width:100%; height: 100%;" dataField="data"
+                     idField="pkId" multiSelect="true" allowCellSelect="true" sortMode="client" showPager="false"
+                     url="${basePath}/com/props/select/${pkId}">
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="5"></div>
+                        <div type="indexcolumn" headerAlign="center" width="8">位置</div>
+                        <div name="name" field="name" allowSort="true" width="30">名称<font color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-combobox" textField="dictId"
+                                   valueField="dictId" name="propsName" allowInput="true"
+                                   onbeforeshowpopup="propsNameBeforeShowPopup" vtype="maxLength:256" required="true"
+                                   onvaluechanged="propsNameChanged" onvalidation="propsNameValidation"/>
+                        </div>
+                        <div name="value" field="value" headerAlign="center" allowSort="true" width="30">数值<font
+                                color="#FF0000">（必填）</font>
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                        </div>
+                        <div name="describe" field="describe" headerAlign="center" allowSort="true" width="40">说明
+                            <input property="editor" class="nui-textbox" vtype="maxLength:4000"/>
+                        </div>
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <th class="nui-form-label"><label for="ipSection">ip段：</label></th>
-                <td colspan="3">
-                    <input id="ipSection" name="ipSection" class="nui-textbox"  style="width:99%"
-                           emptyText="*.*.*.*" readonly="true"/>
-                </td>
-            </tr>
-
-            <tr>
-                <th class="nui-form-label"><label for="maxSyncNum">最大同步并发数：</label></th>
-                <td>
-                    <input id="maxSyncNum" name="maxSyncNum"  class="nui-textbox"  style="width:97%" readonly="true" vtype="int"/>
-                </td>
-                <th class="nui-form-label"><label for="maxAsyncNum">最大异步并发数：</label></th>
-                <td>
-                    <input id="maxAsyncNum" name="maxAsyncNum"  class="nui-textbox"  style="width:97%" readonly="true" vtype="int" />
-                </td>
-            </tr>
-
-            <tr>
-                <th class="nui-form-label"><label for="crtUser">创建者：</label></th>
-                <td >
-                    <input id="crtUser" name="crtUser" class="nui-textbox" style="width:99%" readonly="true"/>
-                </td>
-                <th class="nui-form-label"><label for="crtTime">创建时间：</label></th>
-                <td >
-                    <input id="crtTime" name="crtTime" class="nui-textbox" style="width:99%" readonly="true"/>
-                </td>
-            </tr>
-            <tr>
-                <th class="nui-form-label"><label for="uptUser">更新者：</label></th>
-                <td >
-                    <input id="uptUser" name="uptUser" class="nui-textbox" style="width:99%" readonly="true"/>
-                </td>
-                <th class="nui-form-label"><label for="uptTime">更新时间：</label></th>
-                <td >
-                    <input id="uptTime" name="uptTime" class="nui-textbox" style="width:99%" readonly="true"/>
-                </td>
-            </tr>
-
-        </table>
+                </div>
+            </div>
+        </fieldset>
         <div class="nui-toolbar" style="text-align:center;padding-top:10px;padding-bottom:5px;" borderStyle="border:0;">
             <a class="nui-button" style="" iconCls="icon-cancel" onclick="cancel">返回</a>
         </div>
@@ -112,19 +210,20 @@ ${extends("/goframe/function_layout.httl")}
         nui.parse();
         form1 = new nui.Form("#form1");
         grid1 = nui.get("datagrid1");
-        userId_nuiObject=nui.get("userId");
-        serviceId_nuiObject=nui.get("serviceId");
-        serachGrid=nui.get("serachGrid");
-        serviceType_nuiObject=nui.get("serviceType");
-        userId_nuiObject=nui.get("userId");
+        userId_nuiObject = nui.get("userId");
+        serviceId_nuiObject = nui.get("serviceId");
+        serachGrid = nui.get("serachGrid");
+        serviceType_nuiObject = nui.get("serviceType");
+        userId_nuiObject = nui.get("userId");
         serachGrid.load();
         setData();
+        grid1.load();
         var userName;
         debugger;
-        serachGrid.load({},function(){
-            var rows = serachGrid.findRows(function(row){
-                if(row.userId==originUserId){
-                    userName=row.userName;
+        serachGrid.load({}, function () {
+            var rows = serachGrid.findRows(function (row) {
+                if (row.userId == originUserId) {
+                    userName = row.userName;
                     return true;
                 }
             });
@@ -148,7 +247,7 @@ ${extends("/goframe/function_layout.httl")}
             success: function (text) {
                 if (text.status) {
                     debugger;
-                    var obj=text.data;
+                    var obj = text.data;
                     form1.setData(obj);
                     form1.setChanged(false);
                     originServiceId = obj.serviceId;
@@ -163,41 +262,41 @@ ${extends("/goframe/function_layout.httl")}
     /**
      * lookup 下拉搜索
      */
-    function onSearchClick(){
-        var keyText=nui.get("keyText").getValue();
-        var user={};
-        user.userName=keyText;
+    function onSearchClick() {
+        var keyText = nui.get("keyText").getValue();
+        var user = {};
+        user.userName = keyText;
         serachGrid.load(user);
     }
     /**
      * 选择服务
      */
-    function selectServices(e){
+    function selectServices(e) {
         serviceId_nuiObject.setValue("");
         $.ajax({
-            url: "${basePath}/rc/service/selectServices/"+ e.value,
+            url: "${basePath}/rc/service/selectServices/" + e.value,
             type: 'POST',
             cache: false,
             contentType: 'application/json',
             success: function (result) {
-                if (result.status ) {
+                if (result.status) {
                     serviceId_nuiObject.setData(result.data);
                 }
             }
         });
     }
 
-    function selectServicesInit(){
+    function selectServicesInit() {
         debugger;
-        var value=serviceType_nuiObject.getValue();
+        var value = serviceType_nuiObject.getValue();
         serviceId_nuiObject.setValue("");
         $.ajax({
-            url: "${basePath}/rc/service/selectServices/"+value,
+            url: "${basePath}/rc/service/selectServices/" + value,
             type: 'POST',
             cache: false,
             contentType: 'application/json',
             success: function (result) {
-                if (result.status ) {
+                if (result.status) {
                     serviceId_nuiObject.setData(result.data);
                     serviceId_nuiObject.setValue(originServiceId);
                 }
@@ -205,22 +304,22 @@ ${extends("/goframe/function_layout.httl")}
         });
     }
 
-    function showSelectUsers(){
-        var userIdObject=nui.get("userId");
+    function showSelectUsers() {
+        var userIdObject = nui.get("userId");
         nui.open({
             url: "${basePath}/goframe/p/rc.user.usersSelected",
             title: "添加",
             width: 680,
             height: 420,
-            onload:function(){
+            onload: function () {
                 debugger;
                 var data = userIdObject.getValue();
                 var iframe = this.getIFrameEl();
                 iframe.contentWindow.SetData(data);
             },
-            ondestroy:function(action){
+            ondestroy: function (action) {
                 debugger;
-                if(action == "ok"){
+                if (action == "ok") {
                     var iframe = this.getIFrameEl();
                     var data = iframe.contentWindow.GetData();
                     userIdObject.setValue(data);

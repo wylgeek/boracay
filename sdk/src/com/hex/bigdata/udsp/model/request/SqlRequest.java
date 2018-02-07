@@ -1,5 +1,7 @@
 package com.hex.bigdata.udsp.model.request;
 
+import com.hex.bigdata.udsp.model.Page;
+
 /**
  * Created with IntelliJ IDEA
  * Author: tomnic.wang
@@ -12,11 +14,24 @@ public class SqlRequest extends UdspRequest {
      */
     private String sql;
 
+    /**
+     * 分页参数
+     */
+    private Page page;
+
     public String getSql() {
         return sql;
     }
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public Page getPage() {
+        return page;
+    }
+
+    public void setPage(Page page) {
+        this.page = page;
     }
 }

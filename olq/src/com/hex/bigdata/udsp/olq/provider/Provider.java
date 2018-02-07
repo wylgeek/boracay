@@ -1,37 +1,23 @@
 package com.hex.bigdata.udsp.olq.provider;
 
 import com.hex.bigdata.udsp.common.provider.model.Datasource;
-import com.hex.bigdata.udsp.common.provider.model.Page;
-import com.hex.bigdata.udsp.olq.model.OLQQuerySql;
-import com.hex.bigdata.udsp.olq.provider.model.OLQRequest;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponse;
-import com.hex.bigdata.udsp.olq.provider.model.OLQResponseFetch;
+import com.hex.bigdata.udsp.olq.provider.model.OlqRequest;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponse;
+import com.hex.bigdata.udsp.olq.provider.model.OlqResponseFetch;
 
 /**
  * Created by junjiem on 2017-2-15.
  */
 public interface Provider {
-    /**
-     * 初始化
-     *
-     * @param datasource
-     */
-    void init(Datasource datasource);
 
     /**
      * 执行
      *
+     * @param consumeId
      * @param request
      * @return
      */
-    OLQResponse execute(OLQRequest request);
-
-    /**
-     * 关闭
-     *
-     * @param datasource
-     */
-    void close(Datasource datasource);
+    OlqResponse execute(String consumeId, OlqRequest request);
 
     /**
      * 测试数据源
@@ -47,13 +33,5 @@ public interface Provider {
      * @param request
      * @return
      */
-    OLQResponseFetch executeFetch(OLQRequest request);
-
-    /**
-     * 获取分页SQL语句
-     * @param sql
-     * @param page
-     * @return
-     */
-    OLQQuerySql getPageSql(String sql,Page page);
+    OlqResponseFetch executeFetch(String consumeId, OlqRequest request);
 }
