@@ -351,6 +351,11 @@ ${extends("/goframe/function_layout.httl")}
                 form1.unmask();
                 //解除保存按钮禁用
                 nui.get("saveButton").enable();
+            },
+            error: function () {
+                nui.alert("请求出错，请重试！");
+                form1.unmask();
+                nui.get("saveButton").enable();
             }
         });
     }
@@ -572,6 +577,49 @@ ${extends("/goframe/function_layout.httl")}
     function moveDown2() {
         var rows = grid2.getSelecteds();
         grid2.moveDown(rows);
+    }
+
+    /**
+     * 元数据值变化时触发
+     */
+    function interfaceIdChanged(e) {
+        //--------------------------------查询字段-----------------------------------
+        count1 = 0;
+        // --字段信息变化--
+        grid1.clearRows();
+        $.post("${basePath}/interfaceParam/selectListRequest/" + interfaceIdObj.value, {}, function (result) {
+            var data = result.data;
+            var cols = [];
+            if (data.length > 0) {
+                for (var i = 0, len = data.length; i < len; i++) {
+                    cols.push({
+                        "name": data[i].name,
+                        "describe": data[i].describe,
+                        "isNeed": "0",
+                        "defaultVal": ""
+                    });
+                }
+            }
+            grid1.addRows(cols);
+        });
+
+        //--------------------------------返回字段-----------------------------------
+        count2 = 0;
+        // --字段信息变化--
+        grid2.clearRows();
+        $.post("${basePath}/interfaceParam/selectListResponse/" + interfaceIdObj.value, {}, function (result) {
+            var data = result.data;
+            var cols = [];
+            if (data.length > 0) {
+                for (var i = 0, len = data.length; i < len; i++) {
+                    cols.push({
+                        "name": data[i].name,
+                        "describe": data[i].describe
+                    });
+                }
+            }
+            grid2.addRows(cols);
+        });
     }
 
     /**

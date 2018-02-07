@@ -1,0 +1,24 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="udspwar">
+    <output-path>$PROJECT_DIR$/out/artifacts/udspwar</output-path>
+    <root id="archive" name="udspwar.war">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="common" />
+          <element id="module-output" name="console" />
+          <element id="module-output" name="ed" />
+          <element id="module-output" name="im" />
+          <element id="module-output" name="iq" />
+          <element id="module-output" name="mc" />
+          <element id="module-output" name="md" />
+          <element id="module-output" name="mm" />
+          <element id="module-output" name="olq" />
+          <element id="module-output" name="rc" />
+          <element id="module-output" name="rts" />
+          <element id="module-output" name="sdk" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="console/web/Web" />
+    </root>
+  </artifact>
+</component>

@@ -7,6 +7,7 @@ import com.hex.goframe.model.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -20,9 +21,10 @@ public class McConsumeLogMapper extends AsyncInsertMapper<McConsumeLog> {
      */
     @Override
     protected boolean insertExe(McConsumeLog mcConsumeLog) {
+        //输入内容过长处理
         String requestContent = mcConsumeLog.getRequestContent();
-        if (StringUtils.isNotBlank(requestContent) && requestContent.length() > 4000) {
-            mcConsumeLog.setResponseContent(requestContent.substring(0, 4000));
+        if(StringUtils.isNotBlank(requestContent) && requestContent.length() > 4000) {
+            mcConsumeLog.setRequestContent(requestContent.substring(0,4000));
         }
         try {
             return this.sqlSessionTemplate.insert("com.hex.bigdata.udsp.mc.dao.McConsumeLogMapper.insert", mcConsumeLog) == 1;

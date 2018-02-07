@@ -42,6 +42,7 @@
   <select id="selectAll" resultMap="BaseResultMap" >
     select PK_ID, INTERFACE_ID, SEQ, NAME, DESCRIBE, TYPE, NOTE, COL_TYPE
     from ED_INTERFACE_PARAM
+    order by SEQ asc
   </select>
 
   <select id="selectList" resultMap="BaseResultMap" >
@@ -64,10 +65,18 @@
     select PK_ID, INTERFACE_ID, SEQ, NAME, DESCRIBE, TYPE, NOTE, COL_TYPE
     from ED_INTERFACE_PARAM
     where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
+    order by SEQ asc
   </select>
 
   <delete id="deleteByInterfaceId" parameterType="java.lang.String" >
     delete from ED_INTERFACE_PARAM
     where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR}
   </delete>
+
+  <select id="selectByInterfaceIdAndType" resultMap="BaseResultMap" parameterType="com.hex.bigdata.udsp.ed.model.EdInterfaceParam" >
+    select PK_ID, INTERFACE_ID, SEQ, NAME, DESCRIBE, TYPE, NOTE, COL_TYPE
+    from ED_INTERFACE_PARAM
+    where INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR} and TYPE = #{type,jdbcType=CHAR}
+    order by SEQ asc
+  </select>
 </mapper>

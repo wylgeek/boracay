@@ -29,7 +29,6 @@
     <orderEntry type="library" name="common" level="project" />
     <orderEntry type="library" name="mybatis" level="project" />
     <orderEntry type="library" name="spring" level="project" />
-    <orderEntry type="library" name="jdbc" level="project" />
     <orderEntry type="library" name="tools" level="project" />
     <orderEntry type="library" name="jetty" level="project" />
     <orderEntry type="library" name="poi" level="project" />
@@ -45,6 +44,6 @@
     <orderEntry type="module" module-name="im" />
     <orderEntry type="module" module-name="ed" />
     <orderEntry type="module" module-name="md" />
-    <orderEntry type="library" name="hadoop" level="project" />
+    <orderEntry type="library" name="jdbc" level="project" />
   </component>
 </module>

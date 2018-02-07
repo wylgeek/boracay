@@ -1,6 +1,8 @@
 package com.hex.bigdata.udsp.ed.connect.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.hex.bigdata.udsp.common.constant.StatusCode;
 import com.hex.bigdata.udsp.common.util.JSONUtil;
 import com.hex.bigdata.udsp.common.util.MD5Util;
 import com.hex.bigdata.udsp.ed.connect.util.RestTemplateUtil;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,19 +49,21 @@ public class ConnectService {
 
     /**
      * 取数据统一入口
-     *
-     * @param reqParam
+     * @param serviceName
+     * @param reqTemp
      * @param edApplication
+     * @param udspUser
      * @return
+     * @throws Exception
      */
-    public String getData(Map reqParam, EdApplication edApplication, String udspUser) throws UnsupportedEncodingException {
+    public String getData(String serviceName, Map reqTemp, EdApplication edApplication, String udspUser) throws Exception {
         String appId = edApplication.getPkId();
         //检查必须参数是否齐全
         if (ConnectCheck.CHECK.getValue().equals(edApplication.getIsCheck())) {
             List<EdAppRequestParam> reqList = edAppRequestParamService.getEdAppRequestParamByAppId(edApplication.getPkId());
             for (EdAppRequestParam edAppRequestParam : reqList) {
                 if (ConnectIsNeed.NEED.getValue().equals(edAppRequestParam.getIsNeed())) {
-                    Object value = reqParam.get(edAppRequestParam.getName());
+                    Object value = reqTemp.get(edAppRequestParam.getName());
                     if (value == null) {
                         return "";
                     }
@@ -66,6 +71,9 @@ public class ConnectService {
             }
         }
 
+        Map reqParam = new HashMap();
+        reqParam.put("data",reqTemp);
+        reqParam.put("serviceName",serviceName);
         //将输入参数转成json字符串
         String req = JSON.toJSON(reqParam).toString();
 
@@ -78,7 +86,7 @@ public class ConnectService {
         if (InterfaceType.CACHE_ACCESS.getValue().equals(interfaceInfo.getInterfaceType())) {
             //从缓存获取数据
             returnJson = getDateFromCache(req, interfaceInfo, appId, udspUser);
-        } else if (InterfaceType.DIRECT_ACCESS.getValue().equals(interfaceInfo.getInterfaceType())) {
+        } else {
             //实时访问数据
             returnJson = getDataFromRemote(req, interfaceInfo, appId, udspUser);
         }
@@ -87,11 +95,14 @@ public class ConnectService {
 
     /**
      * 从connector层获取数据
-     *
      * @param reqParam
+     * @param interfaceInfo
+     * @param appId
+     * @param udspUser
      * @return
+     * @throws Exception
      */
-    public String getDataFromRemote(String reqParam, InterfaceInfo interfaceInfo, String appId, String udspUser) {
+    public String getDataFromRemote(String reqParam, InterfaceInfo interfaceInfo, String appId, String udspUser) throws Exception {
         //远程访问需要记录到表，方便统计
         this.insertCount(reqParam, appId, udspUser);
         RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
@@ -100,70 +111,74 @@ public class ConnectService {
     }
 
     /**
-     * 从cache获取数据（先确认是否创建表）
+     * 从cache获取数据
      * 当数据超过保质期后，调用【getDataFromSourceAndSave】方法，获取数据并保存到Hbase
-     *
      * @param reqParam
+     * @param interfaceInfo
+     * @param appId
+     * @param udspUser
      * @return
+     * @throws Exception
      */
-    public String getDateFromCache(String reqParam, InterfaceInfo interfaceInfo, String appId, String udspUser) throws UnsupportedEncodingException {
+    public String getDateFromCache(String reqParam, InterfaceInfo interfaceInfo, String appId, String udspUser) throws Exception {
         String interfaceCode = interfaceInfo.getInterfaceCode();
 
         //根据接口编码和请求参数的json字符串生成rowId
-        String rowId = MD5Util.MD5_32(interfaceCode + reqParam);
+        String rowIdLeft = MD5Util.MD5_16(interfaceCode + reqParam);
+        long currentTime = new Date().getTime();
+        String rowIdRight = StringUtils.leftPad(Long.toString(currentTime),13,'0');
+        String rowId = rowIdLeft + rowIdRight;
 
         //表名
         String tableName = interfaceCode;
 
-        //获取存入时间
-        byte[] crtTimeAsByte = dataStoreService.getDataCrtTime(tableName, rowId);
+        //保质期。单位：毫秒
+        long validTime = interfaceInfo.getValidTime() * 1000 * 60;
 
-        //检查是否有缓存数据
-        if (crtTimeAsByte == null || crtTimeAsByte.length == 0) {
+        String returnStr = dataStoreService.getDataList(tableName,rowId,validTime);
+        if(StringUtils.isBlank(returnStr)) {
             return getDataFromSourceAndSave(reqParam, interfaceInfo, tableName, rowId, appId, udspUser);
-        }
-
-        //校验缓存是否过期
-        long crtTime = Bytes.toLong(crtTimeAsByte);
-        long currentTime = new Date().getTime();
-        long validTime = interfaceInfo.getValidTime();
-        validTime = validTime * 60 * 1000;
-        if (crtTime + validTime > currentTime) {
-            //3、从缓存取数据
-            String responseJson = new String(dataStoreService.getDataInfo(tableName, rowId), "UTF-8");
-            return responseJson;
         } else {
-            return getDataFromSourceAndSave(reqParam, interfaceInfo, tableName, rowId, appId, udspUser);
+            return returnStr;
         }
     }
 
     /**
      * 从connector获取数据，同时保存到Hbase
-     *
+     * @param reqParam
+     * @param interfaceInfo
      * @param tableName
      * @param rowId
+     * @param appId
+     * @param udspUser
      * @return
      * @throws Exception
      */
     public String getDataFromSourceAndSave(String reqParam, InterfaceInfo interfaceInfo, String tableName, String rowId,
-                                           String appId, String udspUser) throws UnsupportedEncodingException {
+                                           String appId, String udspUser) throws Exception {
         String data = this.getDataFromRemote(reqParam, interfaceInfo, appId, udspUser);
-        //存到缓存
+
+        //存到缓存,仅有查到数据，同时查询结果正常时存入缓存中
         byte[] dataAsByte;
         if(StringUtils.isBlank(data)){
-            dataAsByte = null;
+            return data;
         } else {
+            // 处理远程查询结果
+            // 如果查询出现错误，则不需要存入缓存中
+            Map map = JSONObject.parseObject(data,Map.class);
+            if(StatusCode.DEFEAT.getValue().equals(map.get("statusCode").toString())) {
+                return data;
+            }
             dataAsByte = data.getBytes("UTF-8");
         }
-        long currentTime = new Date().getTime();
-        byte[] crtTimeAsByte = Bytes.toBytes(currentTime);
-        dataStoreService.putData(tableName, rowId, dataAsByte, crtTimeAsByte);
+        byte[] paramAsByte = reqParam.getBytes("UTF-8");
+        dataStoreService.putData(tableName, rowId, dataAsByte, paramAsByte);
         return data;
     }
 
     /**
      * 创建表（每一个接口创建一个表）
-     *
+     * 在接口信息创建的时候调用
      * @param storeName
      * @return
      */
@@ -171,6 +186,12 @@ public class ConnectService {
         return dataStoreService.createTable(storeName);
     }
 
+    /**
+     * 远程访问日志记录
+     * @param reqParam
+     * @param appId
+     * @param udspUser
+     */
     public void insertCount(String reqParam, String appId, String udspUser) {
         EdInterfaceCount edInterfaceCount = new EdInterfaceCount();
         edInterfaceCount.setAppId(appId);

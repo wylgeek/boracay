@@ -70,6 +70,7 @@
     UPT_USER, UPT_TIME, NOTE, IS_CHECK
     from ED_APPLICATION
     WHERE DEL_FLG = '0'
+    order by UPT_TIME desc,CRT_TIME desc
   </select>
 
     <select id="getEdApplicationInfoPage" parameterType="com.hex.bigdata.udsp.ed.dto.EdApplicationDto" resultMap="BaseResultMapExtends" >
@@ -101,10 +102,8 @@
 
     <select id="getEdApplicationExl" parameterType="java.lang.String" resultMap="BaseResultMapExl" >
         select app.PK_ID, app.INTERFACE_ID, app.NAME, app.DESCRIBE, app.MAX_NUM, app.DEL_FLG, app.CRT_USER, app.CRT_TIME,
-        app.UPT_USER, app.UPT_TIME, app.NOTE, app.IS_CHECK, info.INTERFACE_CODE, info.INTERFACE_NAME
+        app.UPT_USER, app.UPT_TIME, app.NOTE, app.IS_CHECK
         from ED_APPLICATION app
-        left JOIN ED_INTERFACE_INFO info
-        ON info.PK_ID = app.INTERFACE_ID
         WHERE app.PK_ID = #{pkId,jdbcType=VARCHAR} and app.DEL_FLG = '0'
     </select>
 

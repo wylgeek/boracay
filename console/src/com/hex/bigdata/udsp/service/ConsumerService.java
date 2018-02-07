@@ -692,7 +692,7 @@ public class ConsumerService {
         } else if (RcConstant.UDSP_SERVICE_TYPE_ED.equals(appType)) {
             //开始ED消费
             logger.debug("execute ED SYNC START");
-            Future<Response> edFuture = executorService.submit(new EdSyncServiceCallable(appId, request.getData(),udspUser));
+            Future<Response> edFuture = executorService.submit(new EdSyncServiceCallable(request.getServiceName(),appId, request.getData(),udspUser));
             try {
                 response = edFuture.get(maxSyncExecuteTimeout, TimeUnit.SECONDS);
             } catch (TimeoutException e) {

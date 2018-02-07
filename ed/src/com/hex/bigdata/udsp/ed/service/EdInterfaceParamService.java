@@ -22,6 +22,11 @@ public class EdInterfaceParamService extends BaseService{
     @Autowired
     private EdInterfaceParamMapper edInterfaceParamMapper;
 
+    /**
+     * 删除接口参数
+     * @param pkId
+     * @return
+     */
     public MessageResult deleteByPrimaryKey(String pkId) {
         int result = edInterfaceParamMapper.deleteByPrimaryKey(pkId);
         if(result == 1) {
@@ -30,6 +35,11 @@ public class EdInterfaceParamService extends BaseService{
         return new MessageResult(false,"删除失败！");
     }
 
+    /**
+     * 插入接口参数
+     * @param record
+     * @return
+     */
     public MessageResult insert(EdInterfaceParam record) {
         record.setPkId(Util.uuid());
         int result = edInterfaceParamMapper.insert(record);
@@ -39,6 +49,12 @@ public class EdInterfaceParamService extends BaseService{
         return new MessageResult(false,"添加失败！");
     }
 
+    /**
+     * 修改接口参数
+     * @param edInterfaceParams
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor=Exception.class)
     public MessageResult updateByPrimaryKey(List<EdInterfaceParam> edInterfaceParams) throws Exception {
         for(EdInterfaceParam edInterfaceParam:  edInterfaceParams){
@@ -73,6 +89,15 @@ public class EdInterfaceParamService extends BaseService{
     public int deleteByInterfaceId(String interfaceId) {
         return edInterfaceParamMapper.deleteByInterfaceId(interfaceId);
     }
+
+    /**
+     * 总入口
+     * 添加输入参数
+     * @param interfaceId
+     * @param edInterfaceParams
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor=Exception.class)
     public MessageResult insertRequestColList(String interfaceId, List<EdInterfaceParam> edInterfaceParams) throws Exception {
         for(EdInterfaceParam edInterfaceParam:edInterfaceParams) {
@@ -87,6 +112,14 @@ public class EdInterfaceParamService extends BaseService{
         return new MessageResult(true,"输入参数插入成功");
     }
 
+    /**
+     * 总入口
+     * 添加输出参数
+     * @param interfaceId
+     * @param edInterfaceParams
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor=Exception.class)
     public MessageResult insertResponseColList(String interfaceId, List<EdInterfaceParam> edInterfaceParams) throws Exception {
         for(EdInterfaceParam edInterfaceParam:edInterfaceParams) {
@@ -101,7 +134,19 @@ public class EdInterfaceParamService extends BaseService{
         return new MessageResult(true,"输出参数插入成功");
     }
 
+    /**
+     * 获取接口参数列表
+     * @param record
+     * @return
+     */
     public List<EdInterfaceParam> selectList(EdInterfaceParam record) {
         return edInterfaceParamMapper.selectList(record);
+    }
+
+    public List<EdInterfaceParam> selectByInterfaceIdAndType(String interfaceId,String type) {
+        EdInterfaceParam edInterfaceParam = new EdInterfaceParam();
+        edInterfaceParam.setInterfaceId(interfaceId);
+        edInterfaceParam.setType(type);
+        return this.edInterfaceParamMapper.selectByInterfaceIdAndType(edInterfaceParam);
     }
 }

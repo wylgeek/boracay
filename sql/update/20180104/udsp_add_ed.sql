@@ -7,7 +7,10 @@ insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED
 insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_TYPE','2','实时服务','2','default');
 
 insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','1','同盾数据','1','default');
-insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','2','百融数据','1','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','2','百融数据','2','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','3','义务数据','3','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','4','芝麻信用','4','default');
+insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_INTERFACE_COMPANY','5','国政通','5','default');
 
 insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','360','6小时','5','default');
 insert into T_GF_DICT (DICT_TYPE_ID,DICT_ID,DICT_NAME,SORT_NO,APPID) values ('ED_CACHE_TIME','720','12小时','9','default');

@@ -23,13 +23,15 @@ ${extends("/goframe/function_layout.httl")}
                     <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
                 </td>
                 <td style="text-align: right;">
-
+                    #if(hasPermission("ED.cm.app.list.add"))
                     <a class="nui-button" iconCls="icon-add" plain="true" onclick="add">添加</a>
-
+                    #end
+                    #if(hasPermission("ED.cm.app.list.edit"))
                     <a class="nui-button" iconCls="icon-edit" plain="true" onclick="edit" enabled="false" id="edit">编辑</a>
-
+                    #end
+                    #if(hasPermission("ED.cm.app.list.remove"))
                     <a class="nui-button" iconCls="icon-remove" plain="true" onclick="remove" enabled="false" id="remove">删除</a>
-
+                    #end
                 </td>
             </tr>
         </table>

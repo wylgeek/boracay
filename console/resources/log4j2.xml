@@ -39,7 +39,7 @@
             <AppenderRef ref="Console"/>
         </Root>
 
-        <logger name="com.hex.bigdata.udsp" level="debug" additivity="false">
+        <logger name="com.hex.bigdata.udsp" level="info" additivity="false">
             <AppenderRef ref="UDSP"/>
             <AppenderRef ref="Console"/>
         </logger>

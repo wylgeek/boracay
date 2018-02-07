@@ -7,8 +7,8 @@ package com.hex.bigdata.udsp.ed.constant;
  */
 public enum ConnectIsNeed {
 
-    NEED("需要", "1"),
-    UN_NEED("不需要", "0");
+    NEED("需要", "0"),
+    UN_NEED("不需要", "1");
 
     private String value;
     private String name;

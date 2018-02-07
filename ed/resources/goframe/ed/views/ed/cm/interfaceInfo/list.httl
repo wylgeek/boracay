@@ -18,13 +18,15 @@ ${extends("/goframe/function_layout.httl")}
                     <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
                 </td>
                 <td style="text-align: right;">
-
+                    #if(hasPermission("ED.cm.interfaceInfo.list.add"))
                     <a class="nui-button" iconCls="icon-add" plain="true" onclick="add">添加</a>
-
+                    #end
+                    #if(hasPermission("ED.cm.interfaceInfo.list.edit"))
                     <a class="nui-button" iconCls="icon-edit" plain="true" onclick="edit" enabled="false" id="edit">编辑</a>
-
+                    #end
+                    #if(hasPermission("ED.cm.interfaceInfo.list.remove"))
                     <a class="nui-button" iconCls="icon-remove" plain="true" onclick="remove" enabled="false" id="remove">删除</a>
-
+                    #end
                 </td>
             </tr>
         </table>
@@ -88,7 +90,7 @@ ${extends("/goframe/function_layout.httl")}
                 <td><input id="fileUpload" class="nui-fileupload" style="width:100%"
                            name="excelFile" limitType="*.xls;*.xlsx"
                            flashUrl="${basePath}/s/js/nui/swfupload/swfupload.swf"
-                           uploadUrl="${basePath}/mm/contractor/upload"
+                           uploadUrl="${basePath}/interfaceInfo/upload"
                            onuploadsuccess="uploadSuccess"
                 />
                 </td>
@@ -130,11 +132,18 @@ ${extends("/goframe/function_layout.httl")}
 </div>
 <script type="text/javascript">
     var grid;
+
+    var updateForm ;
+    var uploadFileStatus;
+    var fileIndex = 0;
     require(['jquery','nui'],function($, nui) {
         nui.parse();
         grid = nui.get("datagrid1");
         search();
         $("#pull").hide();
+
+        updateForm =  new nui.Form("updateForm");
+        uploadFileStatus = false ;
     });
 
     /**
@@ -301,6 +310,106 @@ ${extends("/goframe/function_layout.httl")}
         } else {
             start_time.setMaxDate(endTime);
         }
+    }
+
+    /**
+     * 获取多行
+     * @param rows
+     * @returns {Array}
+     */
+    function getRows(rows) {
+        var nodes = [];
+        for (var i = 0, len = rows.length; i < len; i++) {
+            nodes.push({pkId: rows[i].pkId,interfaceCode:rows[i].interfaceCode});
+        }
+        return nodes;
+    }
+
+    // 开始上传文件
+    function startUpload() {
+        var o = updateForm.getData(true,true);
+        updateForm.validate();
+        if (updateForm.isValid() == false) return;
+        var fileupload = nui.get("fileUpload");
+        var file = fileupload.text ;
+        if(file==""){
+            nui.alert("请选择上传文件");
+            return ;
+        }
+        var obj = fileupload.swfUpload.getFile(fileIndex);
+        if(obj==null&&fileIndex>0)
+            obj = fileupload.swfUpload.getFile(fileIndex-1);
+        if(obj==null){
+            nui.alert("文件已上传，请重新选择文件上传");
+            return ;
+        }else if(obj.filestatus!=-1){
+            if(obj.filestatus==-4 && uploadFileStatus){
+                nui.alert("文件已上传，请重新选择文件上传");
+                return ;
+            }else if(obj.filestatus==-3){
+                nui.alert("文件上传失败，请重新选择文件上传");
+                return ;
+            }else if(!uploadFileStatus){
+                nui.alert("请重新选择文件上传");
+                return ;
+            }
+        }
+        fileupload.startUpload();
+        mask();
+    }
+
+    function mask(content){
+        mini.mask({
+            el:document.body,
+            cls:'mini-mask-loading',
+            html:'导入中...'
+        })
+    }
+
+    function uploadSuccess(e){
+        var retData = nui.decode(e.serverData);
+        uploadFileStatus = retData.status;
+        nui.unmask(document.body);
+        if(uploadFileStatus){
+            nui.alert("导入成功！") ;
+            uploadFileStatus=true;
+            grid1.reload();
+        }else{
+            if(undefined==retData.message || ""==retData.message){
+                nui.alert("上传失败！请重新上传") ;
+            }else{
+                nui.alert(retData.message) ;
+            }
+            uploadFileStatus=false;
+        }
+        fileIndex++;
+    }
+
+    function downLoad(){
+        var rows = grid.getSelecteds();
+        if (!rows || rows.length == 0) {
+            nui.alert("请至少选择一条记录!");
+            return;
+        }
+        var json = nui.encode(getRows(rows));
+        grid.loading("正在导出中,请稍等...");
+        $.ajax({
+            url:"${basePath}/interfaceInfo/download",
+            type : 'POST',
+            data : json,
+            cache : false,
+            contentType : 'application/json',
+            success : function(text) {
+                if (text != null && text.trim() != "") {
+                    $("#filePath").val(text);
+                    $("#downForm").submit();
+                    nui.alert("导出Excel成功", "系统提示");
+                } else {
+                    nui.alert("导出Excel失败", "系统提示");
+                }
+                grid.unmask();
+            }
+        });
     }
 </script>
 <!--#end-->

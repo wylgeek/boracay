@@ -23,7 +23,6 @@ public class EdAppRequestParamService {
 
     /**
      * 删除一条接口输入参数信息
-     *
      * @param pkId
      * @return
      */
@@ -37,7 +36,6 @@ public class EdAppRequestParamService {
 
     /**
      * 修改一条接口输入参数
-     *
      * @param edAppRequestParam
      * @return
      */
@@ -54,7 +52,6 @@ public class EdAppRequestParamService {
 
     /**
      * 查询接口输入参数
-     *
      * @param pkId
      * @return
      */
@@ -75,6 +72,11 @@ public class EdAppRequestParamService {
         return edAppRequestParamMapper.addEdAppRequestParam(edAppRequestParam);
     }
 
+    /**
+     * 获取接口应用输入参数
+     * @param appId
+     * @return
+     */
     public List<EdAppRequestParam> getEdAppRequestParamByAppId(String appId) {
         return edAppRequestParamMapper.getEdAppRequestParamByAppId(appId);
     }
@@ -94,6 +96,14 @@ public class EdAppRequestParamService {
         return new MessageResult(true, "添加成功");
     }
 
+    /**
+     * 总入口
+     * 添加接口应用输入参数
+     * @param pkId
+     * @param edAppRequestParams
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
     public MessageResult addEdAppRequestParam(String pkId, List<EdAppRequestParam> edAppRequestParams) throws Exception {
         for (EdAppRequestParam edAppRequestParam : edAppRequestParams) {

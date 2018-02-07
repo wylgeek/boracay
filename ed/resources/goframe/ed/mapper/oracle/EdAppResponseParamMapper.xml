@@ -28,6 +28,7 @@
   <select id="selectAll" resultMap="BaseResultMap" >
     select PK_ID, SEQ, NAME, DESCRIBE, APP_ID
     from ED_APPLICATION_RESPONSE_PARAM
+    order by SEQ asc
   </select>
 
   <insert id="addEdAppResponseParam" parameterType="com.hex.bigdata.udsp.ed.model.EdAppResponseParam" >
@@ -40,6 +41,7 @@
     select PK_ID, SEQ, NAME, DESCRIBE, APP_ID
     from ED_APPLICATION_RESPONSE_PARAM
     where APP_ID = #{appId,jdbcType=VARCHAR}
+    order by SEQ asc
   </select>
   <delete id="deleteEdAppResponseParamByAppId" parameterType="java.lang.String" >
     delete from ED_APPLICATION_RESPONSE_PARAM

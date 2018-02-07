@@ -9,7 +9,7 @@ import com.hex.bigdata.udsp.ed.service.InterfaceInfoService;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.model.PageListResult;
-import net.sf.json.JSONObject;
+import com.hex.goframe.util.FileUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -151,13 +153,11 @@ public class InterfaceInfoController {
      */
     @RequestMapping("/selectInterfaceInfoTest")
     @ResponseBody
-    public String selectInterfaceInfoTest(@RequestBody String name, String sex) {
+    public Object selectInterfaceInfoTest(@RequestBody String name, String sex) {
         try {
             List<InterfaceInfo> interfaceInfos = interfaceInfoService.getInterfaceInfoList();
             String str = JSONUtil.parseList2JSON(interfaceInfos);
-            System.out.println(str);
-            System.out.println("\""+str + "\"");
-            return str;
+            return JSON.toJSON(interfaceInfos);
         } catch (Exception e) {
             logger.info("服务请求异常{}", this.getClass().getName());
             e.printStackTrace();
@@ -191,5 +191,44 @@ public class InterfaceInfoController {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @RequestMapping("upload")
+    @ResponseBody
+    public MessageResult upload(MultipartFile excelFile) {
+        boolean status = true;
+        String message = "上传成功";
+
+        if (((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xlsx")) {
+            return new MessageResult(false, "目前仅支持xls类型的文件，请修改后重试");
+        }
+        //判断结尾是否为xl或者xlsx
+        if (((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xls")) {
+            //将文件放到项目上传文件目录中
+            String uploadFilePath = FileUtil.uploadFile(FileUtil
+                    .getRealUploadPath("EXCEL_UPLOAD"), excelFile);
+            Map<String, String> result = interfaceInfoService.uploadExcel(uploadFilePath);
+            if ("false".equals(result.get("status"))) {
+                status = false;
+                message = result.get("message");
+            }
+        } else {
+            status = false;
+            message = "请上传正确格式的文件！";
+        }
+        return new MessageResult(status, message);
+    }
+
+    @ResponseBody
+    @RequestMapping("/download")
+    public String createExcel(@RequestBody InterfaceInfo[] interfaceInfos) {
+        // 写入Excel文件
+        String filePath = "";
+        try {
+            filePath = interfaceInfoService.createExcel(interfaceInfos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return filePath;
     }
 }

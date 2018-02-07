@@ -16,8 +16,9 @@ import com.hex.bigdata.udsp.ed.dto.EdIndexDto;
 import com.hex.bigdata.udsp.ed.model.EdAppRequestParam;
 import com.hex.bigdata.udsp.ed.model.EdAppResponseParam;
 import com.hex.bigdata.udsp.ed.model.EdApplication;
+import com.hex.bigdata.udsp.ed.model.InterfaceInfo;
+import com.hex.bigdata.udsp.rc.dao.RcServiceMapper;
 import com.hex.bigdata.udsp.rc.model.RcService;
-import com.hex.bigdata.udsp.rc.service.RcServiceService;
 import com.hex.goframe.model.MessageResult;
 import com.hex.goframe.model.Page;
 import com.hex.goframe.service.BaseService;
@@ -64,22 +65,29 @@ public class EdApplicationService extends BaseService {
     private InterfaceInfoMapper interfaceInfoMapper;
 
     @Autowired
-    private RcServiceService rcServiceService;
+    private RcServiceMapper rcServiceMapper;
 
     private static List<ComExcelParam> comExcelParams = new ArrayList<>();
 
     static {
         comExcelParams.add(new ComExcelParam(1, 1, "name"));
-        comExcelParams.add(new ComExcelParam(1, 3, "interfaceCode"));
+        comExcelParams.add(new ComExcelParam(1, 3, "interfaceId"));
         comExcelParams.add(new ComExcelParam(2, 1, "describe"));
         comExcelParams.add(new ComExcelParam(2, 3, "maxNum"));
         comExcelParams.add(new ComExcelParam(3, 1, "note"));
+        comExcelParams.add(new ComExcelParam(3, 3, "isCheck"));
     }
 
     public int deleteByPrimaryKey(String pkId) {
         return edApplicationMapper.deleteByPrimaryKey(pkId);
     }
 
+    /**
+     * 添加接口应用信息
+     * @param edApplication
+     * @return
+     * @throws Exception
+     */
     public String insert(EdApplication edApplication) throws Exception {
         EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
         if (edApplication1 != null) {
@@ -109,6 +117,11 @@ public class EdApplicationService extends BaseService {
         return edApplicationMapper.addEdApplication(edApplication);
     }
 
+    /**
+     * 修改接口应用信息
+     * @param edApplication
+     * @return
+     */
     public int updateEdApplication(EdApplication edApplication) {
         EdApplication edApplication1 = this.getEdApplicationByName(edApplication.getName());
         if (edApplication1 != null && !edApplication.getPkId().equals(edApplication1.getPkId())) {
@@ -128,6 +141,11 @@ public class EdApplicationService extends BaseService {
         return edApplicationMapper.deleteEdApplication(edApplication);
     }
 
+    /**
+     * 通过ID查询接口应用信息
+     * @param pkId
+     * @return
+     */
     public EdApplication selectByPrimaryKey(String pkId) {
         return edApplicationMapper.selectByPrimaryKey(pkId);
     }
@@ -136,52 +154,86 @@ public class EdApplicationService extends BaseService {
         return edApplicationMapper.getEdApplicationAll();
     }
 
+    /**
+     * 获取接口应用列表
+     * @param edApplicationDto
+     * @param page
+     * @return
+     */
     public List<EdApplicationDto> getEdApplicationInfoPage(EdApplicationDto edApplicationDto, Page page) {
         return edApplicationMapper.getEdApplicationInfoPage(edApplicationDto, page);
     }
 
+    /**
+     * 总入口
+     * 添加接口应用
+     * @param edApplicationParamDto
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
     public MessageResult addEdApplicationAndParam(EdApplicationParamDto edApplicationParamDto) throws Exception {
+        //添加接口应用
         String result = insert(edApplicationParamDto.getEdApplication());
         if (result == "") {
             throw new Exception();
         }
+        //添加输入参数
         edAppRequestParamService.addEdAppRequestParam(result, edApplicationParamDto.getEdAppRequestParam());
+        //添加输出参数
         edAppResponseParamService.addEdAppResponseParam(result, edApplicationParamDto.getEdAppResponseParam());
         return new MessageResult(true, "添加成功");
     }
 
+    /**
+     * 总入口
+     * 修改接口信息
+     * @param edApplicationParamDto
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
     public MessageResult updateEdApplicationAndParam(EdApplicationParamDto edApplicationParamDto) throws Exception {
         String appId = edApplicationParamDto.getEdApplication().getPkId();
         //校验服务是否停止
-        RcService rcService = rcServiceService.selectByAppTypeAndAppId("ED", appId);
-        if (RcServiceStatus.START.getValue().equals(rcService.getStatus())) {  //启停标志（0：启动，1：停用）
+        String result = this.checkRcService(appId);
+        if (!"".equals(result)) {
             return new MessageResult(false, "此服务正在使用，请停止服务后修改！");
         }
-
+        //修改接口应用信息
         int result1 = this.updateEdApplication(edApplicationParamDto.getEdApplication());
+        //删除接口应用输入参数
         int result2 = edAppRequestParamService.deleteEdAppRequestParamByAppId(appId);
+        //删除接口应用输出参数
         int result3 = edAppResponseParamService.deleteEdAppResponseParamByAppId(appId);
         if (result1 != 1 || result2 <= 0 || result3 <= 0) {
             throw new Exception();
         }
+        //删除接口应用输入参数
         edAppRequestParamService.addEdAppRequestParam(appId, edApplicationParamDto.getEdAppRequestParam());
+        //删除接口应用输出参数
         edAppResponseParamService.addEdAppResponseParam(appId, edApplicationParamDto.getEdAppResponseParam());
         return new MessageResult(true, "修改成功");
     }
 
+    /**
+     * 总入口
+     * 删除接口应用
+     * @param edApplications
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
     public MessageResult deleteEdApplicationAndParam(EdApplication[] edApplications) throws Exception {
         String str = "";
         for (EdApplication edApplication : edApplications) {
             String pkId = edApplication.getPkId();
             //校验服务是否启动
-            RcService rcService = rcServiceService.selectByAppTypeAndAppId("ED", pkId);
-            if (RcServiceStatus.START.getValue().equals(rcService.getStatus())) {
+            String result = this.checkRcService(pkId);
+            if (!"".equals(result)) {
                 String name = edApplication.getName();
                 String desc = edApplication.getDescribe();
-                str = str + "["+name+":" + desc+"];";
+                str = str + "[" + name + ":" + desc + "];";
             }
         }
         if (!"".equals(str)) {
@@ -190,8 +242,11 @@ public class EdApplicationService extends BaseService {
 
         for (EdApplication edApplication : edApplications) {
             String pkId = edApplication.getPkId();
+            //删除接口应用信息
             int result1 = this.deleteByPrimaryKey(pkId);
+            //删除接口应用输入参数
             int result2 = edAppRequestParamService.deleteEdAppRequestParamByAppId(pkId);
+            //删除接口应用输出参数
             int result3 = edAppResponseParamService.deleteEdAppResponseParamByAppId(pkId);
             if (result1 != 1 || result2 <= 0 || result3 <= 0) {
                 throw new Exception();
@@ -200,8 +255,31 @@ public class EdApplicationService extends BaseService {
         return new MessageResult(true, "删除成功");
     }
 
+    /**
+     * 通过接口名查询接口应用信息
+     * @param name
+     * @return
+     */
     public EdApplication getEdApplicationByName(String name) {
         return edApplicationMapper.getEdApplicationByName(name);
+    }
+
+    /**
+     * 校验服务是否正在运行
+     * @param appId
+     * @return
+     */
+    public String checkRcService(String appId) {
+        //校验服务是否正在运行
+        String str = "";
+        RcService rcService = rcServiceMapper.selectByAppTypeAndAppId("ED", appId);
+        if (rcService == null) {
+            return str;
+        }
+        if (RcServiceStatus.START.getValue().equals(rcService.getStatus())) {
+            str = appId;
+        }
+        return str;
     }
 
     /**
@@ -221,8 +299,8 @@ public class EdApplicationService extends BaseService {
             dataSourceContent.setComExcelParams(comExcelParams);
             List<ComExcelProperties> comExcelPropertiesList = new ArrayList<>();
             //添加对应的配置栏内容
-            comExcelPropertiesList.add(new ComExcelProperties("查询字段", "com.hex.bigdata.udsp.ed.model.EdAppRequestParam", 10, 0, 1, ComExcelEnums.MmAppliactionExecuteParam.getAllNums()));
-            comExcelPropertiesList.add(new ComExcelProperties("返回字段", "com.hex.bigdata.udsp.ed.model.EdAppResponseParam", 10, 0, 2, ComExcelEnums.MmAppliactionReturnParam.getAllNums()));
+            comExcelPropertiesList.add(new ComExcelProperties("查询字段", "com.hex.bigdata.udsp.ed.model.EdAppRequestParam", 10, 0, 1, ComExcelEnums.EdAppRequestParam.getAllNums()));
+            comExcelPropertiesList.add(new ComExcelProperties("返回字段", "com.hex.bigdata.udsp.ed.model.EdAppResponseParam", 10, 0, 2, ComExcelEnums.EdAppResponseParam.getAllNums()));
 
             dataSourceContent.setComExcelPropertiesList(comExcelPropertiesList);
             dataSourceContent.setType("fixed");
@@ -235,18 +313,19 @@ public class EdApplicationService extends BaseService {
                 Map<String, List> uploadExcelModel = ExcelUploadhelper.getUploadExcelModel(sheet, dataSourceContent);
                 List<EdApplication> edApplications = (List<EdApplication>) uploadExcelModel.get("com.hex.bigdata.udsp.ed.model.EdApplication");
                 EdApplication edApplication = edApplications.get(0);
+                InterfaceInfo interfaceInfo = interfaceInfoMapper.getInterfaceInfoByInterfaceCode(edApplication.getName());
                 if (edApplicationMapper.getEdApplicationByName(edApplication.getName()) != null) {
                     resultMap.put("status", "false");
                     resultMap.put("message", "第" + (i + 1) + "个名称重复！");
                     break;
                 }
-                if (interfaceInfoMapper.getInterfaceInfoByPkId(edApplication.getInterfaceId()) == null) {
+                if (interfaceInfo == null) {
                     resultMap.put("status", "false");
                     resultMap.put("message", "第" + (i + 1) + "个应用对应的模型配置不存在！");
                     break;
                 }
                 //设置模型id
-                edApplication.setInterfaceId(interfaceInfoMapper.getInterfaceInfoByPkId(edApplication.getInterfaceId()).getPkId());
+                edApplication.setInterfaceId(interfaceInfo.getPkId());
                 String pkId = insert(edApplication);
 
                 List<EdAppRequestParam> edAppExecuteParams = (List<EdAppRequestParam>) uploadExcelModel.get("com.hex.bigdata.udsp.ed.model.EdAppRequestParam");
@@ -259,7 +338,7 @@ public class EdApplicationService extends BaseService {
                     resultMap.put("status", "true");
                 } else {
                     resultMap.put("status", "false");
-                    resultMap.put("message", "第" + (i + 1) + "个保存失败！");
+                    resultMap.put("message", "参数保存失败！");
                     break;
                 }
             }

@@ -15,12 +15,12 @@
     <orderEntry type="library" name="spring" level="project" />
     <orderEntry type="library" name="hbase" level="project" />
     <orderEntry type="library" name="redis" level="project" />
-    <orderEntry type="library" name="jdbc" level="project" />
     <orderEntry type="library" name="poi" level="project" />
     <orderEntry type="library" name="jetty" level="project" />
     <orderEntry type="library" name="solr" level="project" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="rc" />
     <orderEntry type="module" module-name="im" />
+    <orderEntry type="library" name="jdbc" level="project" />
   </component>
 </module>

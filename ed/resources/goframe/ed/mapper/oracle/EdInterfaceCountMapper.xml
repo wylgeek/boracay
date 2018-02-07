@@ -8,6 +8,20 @@
     <result column="REQ_TIME" property="reqTime" jdbcType="TIMESTAMP" />
     <result column="REQ_PARAM" property="reqParam" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="CountResultMap" type="com.hex.bigdata.udsp.ed.dto.EdInterfaceCountResDto">
+    <result column="NAME" property="name" jdbcType="VARCHAR"/>
+    <result column="DESCRIBE" property="describe" jdbcType="VARCHAR"/>
+    <result column="TYPE" property="type" jdbcType="VARCHAR"/>
+    <result column="APP_ID" property="appId" jdbcType="VARCHAR"/>
+    <result column="DEL_FLG" property="delFlg" jdbcType="CHAR"/>
+    <result column="CRT_USER" property="crtUser" jdbcType="VARCHAR"/>
+    <result column="CRT_TIME" property="crtTime" jdbcType="VARCHAR"/>
+    <result column="UPT_USER" property="uptUser" jdbcType="VARCHAR"/>
+    <result column="UPT_TIME" property="uptTime" jdbcType="VARCHAR"/>
+    <result column="success_count" property="reqSuccessCount" jdbcType="INTEGER"/>
+    <result column="failed_count" property="reqFailedCount" jdbcType="INTEGER"/>
+    <result column="remote_count" property="remoteCount" jdbcType="INTEGER"/>
+  </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from ED_INTERFACE_COUNT
     where PK_ID = #{pkId,jdbcType=VARCHAR}
@@ -34,5 +48,46 @@
   <select id="selectAll" resultMap="BaseResultMap" >
     select PK_ID, APP_ID, REQ_USER, REQ_TIME, REQ_PARAM
     from ED_INTERFACE_COUNT
+  </select>
+
+  <select id="selectCountInfo" resultMap="CountResultMap"
+          parameterType="com.hex.bigdata.udsp.ed.dto.EdInterfaceCountReqDto">
+    select rcservice.PK_ID,rcservice.NAME,rcservice.DESCRIBE,rcservice.TYPE,rcservice.APP_ID,rcservice.DEL_FLG,
+      rcservice.CRT_USER,rcservice.CRT_TIME,rcservice.UPT_USER,rcservice.UPT_TIME,
+      case when SERVICE_STATIS.failed_count is null then 0 else SERVICE_STATIS.failed_count end as failed_count,
+      case when SERVICE_STATIS.success_count is null then 0 else SERVICE_STATIS.success_count end as success_count,
+      case when in_count.remote_count is null then 0 else in_count.remote_count end as remote_count
+    from RC_SERVICE rcservice
+    left join (select
+                  case when mcselect1.SERVICE_NAME is null then mcselect2.SERVICE_NAME else mcselect1.SERVICE_NAME end as service_name,
+                  mcselect1.failed_count, mcselect2.success_count
+              from (select distinct mclog.SERVICE_NAME,count(mclog.status) as failed_count
+                    from MC_CONSUME_LOG mclog
+                    where mclog.status = '1'
+                    <if test="startTime != null and startTime != ''">and mclog.REQUEST_START_TIME &gt;= #{startTime}</if>
+                    <if test="endTime != null and endTime != ''">and mclog.REQUEST_START_TIME &lt;= #{endTime}</if>
+                    <!--<if test="startTime != null and startTime != ''">and to_date(mclog.REQUEST_START_TIME,'yyyy-mm-dd') &gt;= to_date(#{startTime},'yyyy-mm-dd')</if>
+                    <if test="endTime != null and endTime != ''">and to_date(mclog.REQUEST_START_TIME,'yyyy-mm-dd') &lt;= to_date(#{endTime},'yyyy-mm-dd')</if>-->
+                    group by mclog.SERVICE_NAME, mclog.STATUS) mcselect1
+              full join (select distinct SERVICE_NAME,count(status) as success_count
+                        from MC_CONSUME_LOG mclog
+                        where mclog.status = '0'
+                        <if test="startTime != null and startTime != ''">and mclog.REQUEST_START_TIME &gt;= #{startTime}</if>
+                        <if test="endTime != null and endTime != ''">and mclog.REQUEST_START_TIME &lt;= #{endTime}</if>
+                        <!--<if test="startTime != null and startTime != ''">and to_date(mclog.REQUEST_START_TIME,'yyyy-mm-dd') &gt;= to_date(#{startTime},'yyyy-mm-dd')</if>
+                        <if test="endTime != null and endTime != ''">and to_date(mclog.REQUEST_START_TIME,'yyyy-mm-dd') &lt;= to_date(#{endTime},'yyyy-mm-dd')</if>-->
+                        group by SERVICE_NAME, STATUS) mcselect2
+                        on mcselect2.SERVICE_NAME = mcselect1.SERVICE_NAME) SERVICE_STATIS
+    ON rcservice.Name = SERVICE_STATIS.SERVICE_NAME
+    left join (select remote_count,app_id
+              from (select distinct c1.app_id,count(c1.app_id) as remote_count
+                    from ED_INTERFACE_COUNT c1
+                    where 1=1
+                    <if test="startTime != null and startTime != ''">and c1.Req_Time &gt;= to_date(#{startTime},'yyyy-mm-dd')</if>
+                    <if test="endTime != null and endTime != ''">and c1.Req_Time &lt;= to_date(#{endTime},'yyyy-mm-dd')</if>
+                    group by c1.APP_ID) )in_count
+    on in_count.app_id = rcservice.APP_ID
+    where rcservice.DEL_FLG = '0' and rcservice.TYPE ='ED'
+    <if test="serviceName != null and serviceName != ''">and rcservice.NAME like '${serviceName}%'</if>
   </select>
 </mapper>

@@ -68,6 +68,11 @@ public class EdAppResponseParamService {
         return edAppResponseParamMapper.addEdAppResponseParam(edAppResponseParam);
     }
 
+    /**
+     * 获取接口应用输出参数
+     * @param appId
+     * @return
+     */
     public List<EdAppResponseParam> getEdAppResponseParamByAppId(String appId) {
         return edAppResponseParamMapper.getEdAppResponseParamByAppId(appId);
     }
@@ -87,6 +92,14 @@ public class EdAppResponseParamService {
         return new MessageResult(true, "添加成功");
     }
 
+    /**
+     * 总入口
+     * 添加接口应用输出参数
+     * @param pkId
+     * @param edAppResponseParams
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
     public MessageResult addEdAppResponseParam(String pkId, List<EdAppResponseParam> edAppResponseParams) throws Exception {
         for (EdAppResponseParam edAppResponseParam : edAppResponseParams) {

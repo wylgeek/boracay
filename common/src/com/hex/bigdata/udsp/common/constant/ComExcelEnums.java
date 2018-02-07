@@ -64,6 +64,176 @@ public class ComExcelEnums {
         }
     }
 
+    public enum EdInterfaceParam implements ExcelProperty {
+        Excel_0("seq", "0"),
+        Excel_1("name", "1"),
+        Excel_2("describe", "2"),
+        Excel_3("colType", "3"),
+        Excel_4("note", "4");
+
+
+        private String value;
+        private String name;
+
+        private static List<EdInterfaceParam> enums;
+
+        private EdInterfaceParam(String na, String va) {
+            value = va;
+            name = na;
+        }
+
+        public static List getAllNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+            }
+            return enums;
+        }
+
+        public List getNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+            }
+            return enums;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public enum EdAppRequestParam implements ExcelProperty {
+        Excel_0("seq", "0"),
+        Excel_1("name", "1"),
+        Excel_2("describe", "2"),
+        Excel_3("defaultVal", "3"),
+        Excel_4("isNeed", "4");
+
+
+        private String value;
+        private String name;
+
+        private static List<EdAppRequestParam> enums;
+
+        private EdAppRequestParam(String na, String va) {
+            value = va;
+            name = na;
+        }
+
+        public static List getAllNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+            }
+            return enums;
+        }
+
+        public List getNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+                enums.add(Excel_3);
+                enums.add(Excel_4);
+            }
+            return enums;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public enum EdAppResponseParam implements ExcelProperty {
+        Excel_0("seq", "0"),
+        Excel_1("name", "1"),
+        Excel_2("describe", "2");
+
+
+        private String value;
+        private String name;
+
+        private static List<EdAppResponseParam> enums;
+
+        private EdAppResponseParam(String na, String va) {
+            value = va;
+            name = na;
+        }
+
+        public static List getAllNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+            }
+            return enums;
+        }
+
+        public List getNums() {
+            if (enums == null) {
+                enums = new ArrayList();
+                enums.add(Excel_0);
+                enums.add(Excel_1);
+                enums.add(Excel_2);
+            }
+            return enums;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
 
     public enum IqApplicationQueryCoumn implements ExcelProperty {
         Excel_0("seq", "0"),

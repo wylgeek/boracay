@@ -24,6 +24,17 @@ public class InnerRequest extends Request implements Serializable {
     private Map<String, String> data;
     private List<Map<String, String>> dataStream;
     private String requestIp;//请求IP
+    private String serviceName;
+
+    @Override
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    @Override
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 
     public String getUdspUser() {
         return udspUser;

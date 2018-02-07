@@ -1,10 +1,37 @@
 <component name="libraryTable">
   <library name="jdbc">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/lib/jdbc" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/db2jcc4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/druid-1.0.16.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/jt400.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/jtds-1.2.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/kylin-jdbc-1.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/mysql-connector-java-5.1.18.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/ojdbc6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/postgresql-9.0-801.jdbc4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdbc/terajdbc4.jar!/" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/as400" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/db2" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/hive" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/impala" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/kylin" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/mssql" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/mysql" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/oracle" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/pgsql" />
+      <root url="file://$PROJECT_DIR$/lib/jdbc/td" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
-    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/as400" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/db2" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/hive" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/impala" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/kylin" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/mssql" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/mysql" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/oracle" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/pgsql" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/jdbc/td" recursive="false" />
   </library>
 </component>

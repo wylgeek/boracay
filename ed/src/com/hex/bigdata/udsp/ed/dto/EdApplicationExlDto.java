@@ -35,6 +35,16 @@ public class EdApplicationExlDto {
 
     private String interfaceName;
 
+    private String isCheck;
+
+    public String getIsCheck() {
+        return isCheck;
+    }
+
+    public void setIsCheck(String isCheck) {
+        this.isCheck = isCheck;
+    }
+
     public String getPkId() {
         return pkId;
     }

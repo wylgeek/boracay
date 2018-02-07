@@ -13,14 +13,13 @@
     <orderEntry type="library" name="common" level="project" />
     <orderEntry type="library" name="mybatis" level="project" />
     <orderEntry type="library" name="spring" level="project" />
-    <orderEntry type="library" name="jdbc" level="project" />
     <orderEntry type="library" name="poi" level="project" />
     <orderEntry type="library" name="hbase" level="project" />
     <orderEntry type="library" name="kafka" level="project" />
     <orderEntry type="library" name="solr" level="project" />
-    <orderEntry type="library" name="hive" level="project" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="console" />
     <orderEntry type="module" module-name="md" />
+    <orderEntry type="library" name="jdbc" level="project" />
   </component>
 </module>

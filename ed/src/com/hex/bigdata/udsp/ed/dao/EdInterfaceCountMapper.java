@@ -1,8 +1,12 @@
 package com.hex.bigdata.udsp.ed.dao;
 
+import com.hex.bigdata.udsp.ed.dto.EdInterfaceCountReqDto;
+import com.hex.bigdata.udsp.ed.dto.EdInterfaceCountResDto;
 import com.hex.bigdata.udsp.ed.model.EdInterfaceCount;
 import com.hex.goframe.dao.BaseMapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Created by jc.zhao
@@ -16,5 +20,9 @@ public class EdInterfaceCountMapper extends BaseMapper {
                 edInterfaceCount);
     }
 
+    public List<EdInterfaceCountResDto> selectCountInfo(EdInterfaceCountReqDto edInterfaceCountReqDto){
+        return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdInterfaceCountMapper.selectCountInfo",
+                edInterfaceCountReqDto);
+    }
 
 }

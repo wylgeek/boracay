@@ -10,25 +10,22 @@ import org.springframework.stereotype.Service;
 
 @Service("paramService")
 public class ParamService {
-    /*
-    udsp相关参数
-     */
+
+    //udsp相关参数
     // udsp存储的HBASE表和Solr Collection名称的前缀
     private String udspStorePrefix;
 
-    /*
-    HBase相关参数
-     */
+
+    //HBase相关参数
     // HBASE存储数据的族名称
     private String hbaseDataFamily;
     // HBASE存储数据的列名称
     private String hbaseDataColumn;
     // HBASE存储信息的列名称
-    private String hbaseCrtTimeColumn;
+    private String hbaseParamColumn;
 
-    /*
-    Solr相关参数
-     */
+
+    //Solr相关参数
     // SOLR服务的IP和端口集合
     private String solrServers;
 
@@ -53,12 +50,12 @@ public class ParamService {
         this.hbaseDataColumn = hbaseDataColumn;
     }
 
-    public byte[] getHbaseCrtTimeColumn() {
-        return Bytes.toBytes(hbaseCrtTimeColumn);
+    public byte[] getHbaseParamColumn() {
+        return Bytes.toBytes(hbaseParamColumn);
     }
 
-    public void setHbaseCrtTimeColumn(String hbaseCrtTimeColumn) {
-        this.hbaseCrtTimeColumn = hbaseCrtTimeColumn;
+    public void setHbaseParamColumn(String hbaseParamColumn) {
+        this.hbaseParamColumn = hbaseParamColumn;
     }
 
     public String getSolrServers() {

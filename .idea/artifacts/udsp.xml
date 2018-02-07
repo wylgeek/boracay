@@ -1,0 +1,40 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="udsp">
+    <output-path>$PROJECT_DIR$/out/artifacts/udsp</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="console" />
+          <element id="module-output" name="common" />
+          <element id="module-output" name="iq" />
+          <element id="module-output" name="rc" />
+          <element id="module-output" name="mc" />
+          <element id="module-output" name="mm" />
+          <element id="module-output" name="olq" />
+          <element id="module-output" name="rts" />
+          <element id="module-output" name="im" />
+          <element id="module-output" name="md" />
+          <element id="module-output" name="ed" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="elasticsearch" />
+          <element id="library" level="project" name="goframe" />
+          <element id="library" level="project" name="common" />
+          <element id="library" level="project" name="mybatis" />
+          <element id="library" level="project" name="spring" />
+          <element id="library" level="project" name="tools" />
+          <element id="library" level="project" name="jetty" />
+          <element id="library" level="project" name="poi" />
+          <element id="library" level="project" name="cxf" />
+          <element id="library" level="project" name="redis" />
+          <element id="library" level="project" name="hbase" />
+          <element id="library" level="project" name="solr" />
+          <element id="library" level="project" name="mail" />
+          <element id="library" level="project" name="kafka" />
+          <element id="library" level="project" name="jdbc" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="console/web/Web" />
+    </root>
+  </artifact>
+</component>

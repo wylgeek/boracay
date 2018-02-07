@@ -134,7 +134,7 @@ public class EdApplicationController {
             if (edApplication == null) {
                 return new MessageResult(false);
             }
-            return new MessageResult(true);
+            return new MessageResult(true, edApplication);
         } catch (Exception e) {
             logger.info("请求错误！");
             e.printStackTrace();
@@ -174,15 +174,30 @@ public class EdApplicationController {
         }
     }
 
+    @RequestMapping("/selectAll")
+    @ResponseBody
+    public PageListResult selectAll() {
+        try {
+            List list = edApplicationService.selectAll();
+            return new PageListResult(list);
+        } catch (Exception e) {
+            logger.info("请求错误！");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @RequestMapping("/upload")
     @ResponseBody
     public MessageResult upload(MultipartFile excelFile) {
         boolean status = true;
         String message = "上传成功";
 
+        if (((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xlsx")) {
+            return new MessageResult(false, "目前仅支持xls类型文件解析,请修改文件类型");
+        }
         //判断结尾是否为xl或者xlsx
-        if (((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xls")
-                || ((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xlsx")) {
+        if (((CommonsMultipartFile) excelFile).getFileItem().getName().endsWith(".xls")) {
             //将文件放到项目上传文件目录中
             String uploadFilePath = FileUtil.uploadFile(FileUtil
                     .getRealUploadPath("EXCEL_UPLOAD"), excelFile);

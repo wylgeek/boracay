@@ -27,9 +27,21 @@ public class Response implements Serializable {
 
     private String errorCode; //错误编码
 
-    public String responseContent;//返回信息
+    private String responseContent;//返回信息
 
-    public Object responseData; //返回数据
+    private Object responseData; //返回数据
+
+    private String responseJson;    //ED应用测试中需要返回内容的
+
+    public String getResponseJson() {
+        return responseJson;
+    }
+
+    public void setResponseJson(String responseJson) {
+        this.responseJson = responseJson;
+    }
+
+    private LinkedHashMap<String,String> returnColumns;//返回字段信息
 
     public Object getResponseData() {
         return responseData;
@@ -38,8 +50,6 @@ public class Response implements Serializable {
     public void setResponseData(Object responseData) {
         this.responseData = responseData;
     }
-
-    private LinkedHashMap<String,String> returnColumns;//返回字段信息
 
     public String getConsumeId() {
         return consumeId;

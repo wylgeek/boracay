@@ -1,0 +1,193 @@
+${extends("/goframe/function_layout.httl")}
+<!--#macro(head)-->
+<link rel="stylesheet" href="${basePath}/s/css/udsp.css"/>
+<link rel="stylesheet" href="${basePath}/s/css/font-awesome.css"/>
+<!--#end-->
+
+<!--#macro(content)-->
+<style type="text/css">
+    #btnQuery > span {
+        width: 100px;
+    }
+</style>
+
+<div class="nui-toolbar">
+
+    <div class="panel-toolbar">
+        <table style="width:100%">
+            <tr>
+                <td style="white-space:nowrap;">
+                    <a class="nui-button" id="pull" iconCls="icon-search" onclick="moreOption">搜索︽</a>
+                    <a class="nui-button" id="push" iconCls="icon-search" onclick="moreOption">搜索︾</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="panel-query search-condition" style="display:none;" id="query">
+        <div class="list">
+            <div id="form1">
+                <!-- 搜索栏 -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="nui-fit" style="height: 70%;">
+    <div>
+        <h3>请求结果：</h3>
+    </div>
+    <div style="height: 80%;width: 100%">
+        <input id="textContent" name="textContent" class="nui-textarea" style="height: 100%;width: 100%">
+    </div>
+</div>
+
+<script type="text/javascript">
+    var appId;
+    var serviceName;
+    /**
+     * 按需加载资源文件
+     */
+    require(['jquery', 'nui'], function ($, nui) {
+        nui.parse();
+        $("#pull").hide();
+        serviceName = window.location.search.split('=')[1].split('&')[0];
+        $.get("${basePath}/edApp/getEdApplicationByName?name="+serviceName, {}, function (result) {
+            if (!result.data) {
+                nui.alert("错误的应用名称：${name}，请联系管理员！");
+                return;
+            }
+            appId = result.data.pkId;
+
+            //--搜索栏动态生成--
+            var form1 = $("#form1");
+            form1.empty();
+            var formHtml = getFormHtml(appId);
+            //console.warn(formHtml);
+            form1.append(formHtml);
+
+            nui.parse();
+        });
+    });
+
+
+    /**
+     * 搜索按钮转换
+     */
+    function moreOption() {
+        $("#push").toggle();
+        $("#pull").toggle();
+        $("#query").toggle();
+        nui.layout(document.body);
+    }
+
+    /**
+     *数据渲染前检查是否报错
+     */
+    function checkError() {
+        var grid1 = nui.get("datagrid1");
+        var resultObject = grid1._dataSource._resultObject;
+        if ((resultObject.data == null || resultObject.data.length == 0) && (resultObject.message != "" && resultObject.message != null && resultObject.message != "执行成功")) {
+            nui.alert(resultObject.message);
+        }
+        return;
+    }
+
+    /**
+     * 获取Form动态的HTML
+     */
+    function getFormHtml(appId) {
+        var queryCols = getQueryCols(appId);
+        //console.warn(queryCols);
+        var count = 0;
+        var html = "<table style='width:100%'>";
+        $.each(queryCols, function (_index, record) {
+            //console.warn(record);
+            var seq = record.seq;
+            var name = record.name;
+            var describe = record.describe;
+            var isNeed = record.isNeed == "1" ? false : true;
+            var defaultVal = record.defaultVal ? record.defaultVal : "";
+            var tdHtml = "<td class='tit roleLabel' style='width: 100px;text-align: right'>" + describe + "：</td>"
+                    + "<td class='roleText' style='width: 25%'>"
+                    + "<input name='" + name + "' class='nui-textbox' style='width:98%;' value='" + defaultVal + "' required='" + isNeed + "'/>"
+                    + "</td>";
+            count++;
+            if (count % 4 == 1) {
+                html += "<tr>" + tdHtml;
+            } else if (count % 4 == 0) {
+                html += tdHtml + "</tr>";
+            } else {
+                html += tdHtml;
+            }
+        });
+        if (count % 4 != 0) {
+            html += "</tr>";
+        }
+        html += "<tr>"
+        + "<td colspan='8' align='center'>"
+        + "<input class='nui-button' iconCls='icon-search' text='查询' onclick='search'/>"
+        + "<span style='display:inline-block;width:25px;'></span>"
+        + "<input class='nui-button' iconCls='icon-reset' text='重置' onclick='onFormReset(\"form1\")'/>"
+        + "</td>"
+        + "</tr>"
+        + "</table>";
+        //console.warn(html);
+        return html;
+    }
+
+    /**
+     * 获取查询字段信息(同步)
+     */
+    function getQueryCols(appId) {
+        var data;
+        $.ajax({
+            url: "${basePath}/edApp/getEdAppRequestParamByAppId/" + appId,
+            type: 'POST',
+            cache: false,
+            async: false,
+            contentType: 'apllication/json',
+            success: function (result) {
+                data = result.data;
+            }
+        });
+        return data;
+    }
+
+    /**
+     * 搜索
+     */
+    function search() {
+        var form1 = new nui.Form("#form1");
+        form1.validate();
+        if (form1.isValid() == false) return;
+        var data = form1.getData(true, true);
+        var reqJson = nui.encode({
+            "appType": "ED",
+            "appId": appId,
+            "type": "sync",
+            "entity": "start",
+            "data": data,
+            "serviceName": serviceName
+        });
+        $.ajax({
+            url: "${basePath}/http/inner/consume",
+            type: 'POST',
+            data: reqJson,
+            cache: false,
+            async: false,
+            contentType: 'apllication/json',
+            success: function (result) {
+                if(result.status) {
+                    nui.get("textContent").setValue(JSON.stringify(result.responseData));
+                } else {
+                    nui.get("textContent").setValue(result.message);
+                }
+            }
+        });
+    }
+
+</script>
+
+<!--#end-->

@@ -16,14 +16,14 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateUtil {
     private static Logger logger = LogManager.getLogger(RestTemplateUtil.class);
 
-    public String post(String reqParam, String url) {
+    public String post(String reqParam, String url) throws Exception {
         // 核心返回结果报文字符串
         String returnJson = "";
 
         //复杂构造函数的使用
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(1000);// 设置超时
-        requestFactory.setReadTimeout(1000);
+        requestFactory.setConnectTimeout(5000);// 设置超时
+        requestFactory.setReadTimeout(5000);
 
         //利用复杂构造器可以实现超时设置，内部实际实现为 HttpClient
         RestTemplate restTemplate = new RestTemplate(requestFactory);
@@ -38,9 +38,9 @@ public class RestTemplateUtil {
         HttpEntity<String> entity = new HttpEntity<String>(reqParam, headers);
         returnJson = restTemplate.postForObject(url, entity, String.class);
 
-        logger.info("返回结果：【开始】");
+        logger.info("RestTemplate返回结果：【开始】");
         logger.info(returnJson);
-        logger.info("返回结果：【结束】");
+        logger.info("RestTemplate返回结果：【结束】");
         return returnJson;
     }
 }

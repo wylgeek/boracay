@@ -38,7 +38,7 @@
         <if test="interfaceCompany != null and interfaceCompany != ''">and i.INTERFACE_COMPANY = #{interfaceCompany}</if>
         <if test="startTime != null and startTime != ''">and i.CRT_TIME &gt;= to_date(#{startTime},'yyyy-mm-dd')</if>
         <if test="endTime != null and endTime != ''">and i.CRT_TIME &lt;= to_date(#{endTime},'yyyy-mm-dd')</if>
-        order by i.CRT_TIME desc
+        order by i.UPDATE_TIME desc, i.CRT_TIME desc
     </select>
 
     <select id="getInterfaceInfoByInterfaceCode" resultMap="BaseResultMap" parameterType="java.lang.String">
@@ -87,7 +87,7 @@
         i.INTERFACE_COMPANY, i.CRT_USER, i.CRT_TIME, i.UPDATE_USER, i.UPDATE_TIME
         FROM ED_INTERFACE_INFO i
         WHERE IS_DEL = '0'
-        order by i.CRT_TIME desc
+        order by i.UPDATE_TIME desc, i.CRT_TIME desc
     </select>
 
     <select id="getInterfaceInfoExl" resultMap="BaseResultMap" parameterType="java.lang.String">

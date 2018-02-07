@@ -12,10 +12,10 @@
     <orderEntry type="library" name="common" level="project" />
     <orderEntry type="library" name="spring" level="project" />
     <orderEntry type="library" name="mybatis" level="project" />
-    <orderEntry type="library" name="jdbc" level="project" />
     <orderEntry type="library" name="poi" level="project" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="console" />
     <orderEntry type="module" module-name="rc" />
+    <orderEntry type="library" name="jdbc" level="project" />
   </component>
 </module>

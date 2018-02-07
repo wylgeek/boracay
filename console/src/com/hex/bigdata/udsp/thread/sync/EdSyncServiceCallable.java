@@ -20,15 +20,18 @@ public class EdSyncServiceCallable<T> implements Callable<Response> {
 
     private String udspUser;
 
-    public EdSyncServiceCallable(String appId, Map<String, String> data, String udspUser) {
+    private String serviceName;
+
+    public EdSyncServiceCallable(String serviceName, String appId, Map<String, String> data, String udspUser) {
         this.appId = appId;
         this.data = data;
         this.udspUser = udspUser;
+        this.serviceName = serviceName;
         this.edSyncService = (EdSyncService) WebApplicationContextUtil.getBean("edSyncService");
     }
 
     @Override
     public Response call() throws Exception {
-        return edSyncService.start(appId, data, udspUser);
+        return edSyncService.start(serviceName, appId, data, udspUser);
     }
 }

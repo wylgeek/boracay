@@ -278,6 +278,11 @@ ${extends("/goframe/function_layout.httl")}
                 form1.unmask();
                 //解除保存按钮禁用
                 nui.get("saveButton").enable();
+            },
+            error: function () {
+                nui.alert("请求出错，请重试！");
+                form1.unmask();
+                nui.get("saveButton").enable();
             }
         });
     }
@@ -568,7 +573,7 @@ ${extends("/goframe/function_layout.httl")}
         }
         // --下拉选项变化--
         if(count2 == 0) {
-            e.source.load("${basePath}/interfaceParam/selectListRequest/" + interfaceIdObj.value);
+            e.source.load("${basePath}/interfaceParam/selectListResponse/" + interfaceIdObj.value);
             count2++;
         }
     }

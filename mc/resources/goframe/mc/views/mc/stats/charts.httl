@@ -365,6 +365,7 @@ ${extends("/goframe/function_layout.httl")}
         var yData5 = []; // RTS_CONSUMER Array
         var yData6 = []; // OLQ_APP Array
         var yData7 = []; // IM Array
+        var yData8 = []; // ED Array
         var dataMap1 = {}; // IQ Map
         var dataMap2 = {}; // OLQ Map
         var dataMap3 = {}; // MM Map
@@ -372,6 +373,7 @@ ${extends("/goframe/function_layout.httl")}
         var dataMap5 = {}; // RTS_CONSUMER Map
         var dataMap6 = {}; // OLQ_APP Map
         var dataMap7 = {}; // IM Map
+        var dataMap8 = {}; // ED Map
         var befDatetime = new Date(new Date(datetime).getTime() - interval * 60000);
         //var name = "时间（分）";
         var milli = 60000;
@@ -427,6 +429,8 @@ ${extends("/goframe/function_layout.httl")}
                         dataMap6[key] = getVal(dataMap6, key, record.countNum);
                     else if ('IM' == record.appType)
                         dataMap7[key] = getVal(dataMap7, key, record.countNum);
+                    else if ('ED' == record.appType)
+                        dataMap8[key] = getVal(dataMap8, key, record.countNum);
                 });
                 for (var i = 0; i < len; i++) {
                     var dt = nui.formatDate(new Date(befDatetime.getTime() + (i+1) * milli), format);
@@ -438,6 +442,7 @@ ${extends("/goframe/function_layout.httl")}
                     yData5[i] = getNum(dataMap5, dt);
                     yData6[i] = getNum(dataMap6, dt);
                     yData7[i] = getNum(dataMap7, dt);
+                    yData8[i] = getNum(dataMap8, dt);
                 }
                 var option = {
                     title: {
@@ -450,7 +455,7 @@ ${extends("/goframe/function_layout.httl")}
                         x: 'left',
                         y: 'center',
                         orient: 'vertical',
-                        data: ['交互查询', '联机查询', '模型管理', '实时流-生产者', '实时流-消费者', '联机查询应用', '交互建模']
+                        data: ['交互查询', '联机查询', '模型管理', '实时流-生产者', '实时流-消费者', '联机查询应用', '交互建模', '外部数据']
                     },
                     toolbox: {
                         show: true,
@@ -579,6 +584,19 @@ ${extends("/goframe/function_layout.httl")}
                                 }
                             },
                             data: yData7
+                        },
+                        {
+                            name: '外部数据',
+                            type: 'line',
+                            stack: '总量',
+                            itemStyle: {
+                                normal: {
+                                    areaStyle: {
+                                        type: 'default'
+                                    }
+                                }
+                            },
+                            data: yData8
                         }
                     ]
                 };
@@ -727,6 +745,7 @@ ${extends("/goframe/function_layout.httl")}
         var yData5 = []; // RTS_CONSUMER Array
         var yData6 = []; // OLQ_APP Array
         var yData7 = []; // IM Array
+        var yData8 = []; // ED Array
         var dataMap1 = {}; // IQ Map
         var dataMap2 = {}; // OLQ Map
         var dataMap3 = {}; // MM Map
@@ -734,6 +753,7 @@ ${extends("/goframe/function_layout.httl")}
         var dataMap5 = {}; // RTS_CONSUMER Map
         var dataMap6 = {}; // OLQ_APP Map
         var dataMap7 = {}; // IM Map
+        var dataMap8 = {}; // ED Map
         $.ajax({
             url: "${basePath}/mc/stats/charts/chart4?datetime=" + datetime + "&interval=" + interval,
             type: 'POST',
@@ -758,6 +778,7 @@ ${extends("/goframe/function_layout.httl")}
                         dataMap5[key] = getVal(dataMap5, key, 0);
                         dataMap6[key] = getVal(dataMap6, key, 0);
                         dataMap7[key] = getVal(dataMap7, key, 0);
+                        dataMap8[key] = getVal(dataMap8, key, 0);
                     } else if ('OLQ' == record.appType) {
                         dataMap1[key] = getVal(dataMap1, key, 0);
                         dataMap2[key] = getVal(dataMap2, key, record.countNum);
@@ -766,6 +787,7 @@ ${extends("/goframe/function_layout.httl")}
                         dataMap5[key] = getVal(dataMap5, key, 0);
                         dataMap6[key] = getVal(dataMap6, key, 0);
                         dataMap7[key] = getVal(dataMap7, key, 0);
+                        dataMap8[key] = getVal(dataMap8, key, 0);
                     } else if ('MM' == record.appType) {
                         dataMap1[key] = getVal(dataMap1, key, 0);
                         dataMap2[key] = getVal(dataMap2, key, 0);
@@ -774,38 +796,52 @@ ${extends("/goframe/function_layout.httl")}
                         dataMap5[key] = getVal(dataMap5, key, 0);
                         dataMap6[key] = getVal(dataMap6, key, 0);
                         dataMap7[key] = getVal(dataMap7, key, 0);
+                        dataMap8[key] = getVal(dataMap8, key, 0);
                     } else if ('RTS_PRODUCER' == record.appType) {
                         dataMap1[key] = getVal(dataMap1, key, 0);
                         dataMap2[key] = getVal(dataMap2, key, 0);
-                        dataMap2[key] = getVal(dataMap2, key, 0);
+                        dataMap3[key] = getVal(dataMap3, key, 0);
                         dataMap4[key] = getVal(dataMap4, key, record.countNum);
                         dataMap5[key] = getVal(dataMap5, key, 0);
                         dataMap6[key] = getVal(dataMap6, key, 0);
                         dataMap7[key] = getVal(dataMap7, key, 0);
+                        dataMap8[key] = getVal(dataMap8, key, 0);
                     } else if ('RTS_CONSUMER' == record.appType) {
                         dataMap1[key] = getVal(dataMap1, key, 0);
                         dataMap2[key] = getVal(dataMap2, key, 0);
-                        dataMap2[key] = getVal(dataMap2, key, 0);
                         dataMap3[key] = getVal(dataMap3, key, 0);
+                        dataMap4[key] = getVal(dataMap4, key, 0);
                         dataMap5[key] = getVal(dataMap5, key, record.countNum);
                         dataMap6[key] = getVal(dataMap6, key, 0);
                         dataMap7[key] = getVal(dataMap7, key, 0);
+                        dataMap8[key] = getVal(dataMap8, key, 0);
                     }else if ('OLQ_APP' == record.appType) {
                         dataMap1[key] = getVal(dataMap1, key, 0);
                         dataMap2[key] = getVal(dataMap2, key, 0);
-                        dataMap2[key] = getVal(dataMap2, key, 0);
                         dataMap3[key] = getVal(dataMap3, key, 0);
+                        dataMap4[key] = getVal(dataMap4, key, 0);
                         dataMap5[key] = getVal(dataMap5, key, 0);
                         dataMap6[key] = getVal(dataMap6, key, record.countNum);
                         dataMap7[key] = getVal(dataMap7, key, 0);
+                        dataMap8[key] = getVal(dataMap8, key, 0);
                     }else if ('IM' == record.appType) {
                         dataMap1[key] = getVal(dataMap1, key, 0);
                         dataMap2[key] = getVal(dataMap2, key, 0);
-                        dataMap2[key] = getVal(dataMap2, key, 0);
                         dataMap3[key] = getVal(dataMap3, key, 0);
+                        dataMap4[key] = getVal(dataMap4, key, 0);
                         dataMap5[key] = getVal(dataMap5, key, 0);
                         dataMap6[key] = getVal(dataMap6, key, 0);
                         dataMap7[key] = getVal(dataMap7, key, record.countNum);
+                        dataMap8[key] = getVal(dataMap8, key, 0);
+                    }else if ('ED' == record.appType) {
+                        dataMap1[key] = getVal(dataMap1, key, 0);
+                        dataMap2[key] = getVal(dataMap2, key, 0);
+                        dataMap3[key] = getVal(dataMap3, key, 0);
+                        dataMap4[key] = getVal(dataMap4, key, 0);
+                        dataMap5[key] = getVal(dataMap5, key, 0);
+                        dataMap6[key] = getVal(dataMap6, key, 0);
+                        dataMap7[key] = getVal(dataMap7, key, 0);
+                        dataMap8[key] = getVal(dataMap8, key, record.countNum);
                     }
                 });
                 var i = 0;
@@ -818,6 +854,7 @@ ${extends("/goframe/function_layout.httl")}
                     yData5[i] = getNum(dataMap5, key);
                     yData6[i] = getNum(dataMap6, key);
                     yData7[i] = getNum(dataMap7, key);
+                    yData8[i] = getNum(dataMap8, key);
                     i++;
                 }
                 var option = {
@@ -831,7 +868,7 @@ ${extends("/goframe/function_layout.httl")}
                         x: 'left',
                         y: 'center',
                         orient: 'vertical',
-                        data: ['交互查询', '联机查询', '模型管理', '实时流-生产者', '实时流-消费者','联机查询应用','交互建模']
+                        data: ['交互查询', '联机查询', '模型管理', '实时流-生产者', '实时流-消费者','联机查询应用','交互建模', '外部数据']
                     },
                     toolbox: {
                         show: true,
@@ -959,6 +996,20 @@ ${extends("/goframe/function_layout.httl")}
                                 }
                             },
                             data: yData7
+                        },
+                        {
+                            name: '外部数据',
+                            type: 'bar',
+                            barMaxWidth: 20,
+                            stack: '总量',
+                            itemStyle: {
+                                normal: {
+                                    areaStyle: {
+                                        type: 'default'
+                                    }
+                                }
+                            },
+                            data: yData8
                         }
                     ]
                 };

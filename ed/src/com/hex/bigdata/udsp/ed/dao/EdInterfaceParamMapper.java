@@ -62,4 +62,9 @@ public class EdInterfaceParamMapper extends BaseMapper {
         return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdInterfaceParamMapper.selectList",
                 record);
     }
+
+    public List<EdInterfaceParam> selectByInterfaceIdAndType(EdInterfaceParam record) {
+        return this.sqlSessionTemplate.selectList("com.hex.bigdata.udsp.ed.dao.EdInterfaceParamMapper.selectByInterfaceIdAndType",
+                record);
+    }
 }

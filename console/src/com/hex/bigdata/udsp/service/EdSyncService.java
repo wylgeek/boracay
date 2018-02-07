@@ -1,6 +1,8 @@
 package com.hex.bigdata.udsp.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.hex.bigdata.metadata.db.util.JsonUtil;
 import com.hex.bigdata.udsp.common.constant.ErrorCode;
 import com.hex.bigdata.udsp.common.constant.Status;
@@ -11,11 +13,14 @@ import com.hex.bigdata.udsp.ed.model.EdApplication;
 import com.hex.bigdata.udsp.ed.service.EdAppResponseParamService;
 import com.hex.bigdata.udsp.ed.service.EdApplicationService;
 import com.hex.bigdata.udsp.model.Response;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.lang.model.type.ErrorType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,29 +43,37 @@ public class EdSyncService {
 
     /**
      * 启动
-     *
+     * @param serviceName
      * @param appId
      * @param data
      * @return
      */
-    public Response start(String appId, Map<String, String> data, String udspUser) {
+    public Response start(String serviceName, String appId, Map<String, String> data, String udspUser) {
         Response response = new Response();
         try {
             EdApplication edApplication = edApplicationService.selectByPrimaryKey(appId);
-            String responseJson = connectService.getData(data, edApplication, udspUser);
-            responseJson = formatResponseContent(responseJson, appId);
-
-            Object responseObj = formatResponseData(responseJson, appId);
-            response.setResponseData(responseObj);
-
-            response.setResponseContent(responseJson);
-            response.setStatus(Status.SUCCESS.getValue());
-            response.setStatusCode(StatusCode.SUCCESS.getValue());
+            String responseJson = connectService.getData(serviceName, data, edApplication,udspUser);
+            if(!StringUtils.isBlank(responseJson)){
+                Map map = JsonUtil.parseJSON2Map(responseJson);
+                if(StatusCode.DEFEAT.getValue().equals(map.get("statusCode").toString())) {
+                    response.setMessage(map.get("message").toString());
+                    response.setStatus(Status.DEFEAT.getValue());
+                    response.setErrorCode(map.get("errorCode").toString());
+                    response.setStatusCode(StatusCode.DEFEAT.getValue());
+                } else {
+                    Object returnObj = formatResponse(map, appId);
+                    response.setResponseData(returnObj);
+                    response.setStatus(Status.SUCCESS.getValue());
+                    response.setStatusCode(StatusCode.SUCCESS.getValue());
+                }
+            } else {
+                response.setMessage("请检查输入参数！");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.setMessage(e.getMessage());
             response.setStatus(Status.DEFEAT.getValue());
-            response.setErrorCode(ErrorCode.ERROR_000007.getValue());
+            response.setErrorCode(ErrorCode.ERROR_500001.getValue());
             response.setStatusCode(StatusCode.DEFEAT.getValue());
         }
         return response;
@@ -69,68 +82,49 @@ public class EdSyncService {
     /**
      * 筛选输出参数
      * 输出应用配置的输出参数
-     *
-     * @param jsonStr
+     * @param map
      * @param appId
      * @return
      */
-    public String formatResponseContent(String jsonStr, String appId) {
-        Map map = JsonUtil.parseJSON2Map(jsonStr);
-        Map responseMap = new HashMap();
-        responseMap.put("consumeId", map.get("consumeId"));
-        responseMap.put("consumeTime", map.get("consumeTime"));
-        String status = (String) map.get("status");
-        responseMap.put("status", status);
-        //判断接口是否异常，如果异常则不返回数据。
-        if (Status.DEFEAT.getValue().equals(status)) {
-            responseMap.put("message", map.get("message"));
-            responseMap.put("statusCode", ErrorCode.ERROR_500001.getValue());
-            String returnJson = JsonUtil.parseMap2JSON(responseMap);
-            return returnJson;
-        }
-        //处理要返回的数据
-        Object dataObj = map.get("retData");
-        String dataStr = JsonUtil.parseObj2JSON(dataObj);
-        Map dataMap = JsonUtil.parseJSON2Map(dataStr);
-        Map dataMapTemp = new HashMap();
+    public Object formatResponse(Map map, String appId) {
+        //获取返回参数列表
         List<EdAppResponseParam> edAppResponseParams = edAppResponseParamService.getEdAppResponseParamByAppId(appId);
-        for (EdAppResponseParam edAppResponseParam : edAppResponseParams) {
-            String name = edAppResponseParam.getName();
-            Object value = dataMap.get(name);
-            dataMapTemp.put(name, value);
+        Object dataObj = map.get("retData");
+        //判断返回数据是不是数组
+        if(dataObj instanceof ArrayList){
+            List dataList = (ArrayList) dataObj;
+            List list = new ArrayList();
+            for(int i=0;i<dataList.size();i++){
+                Object dataObj2 = dataList.get(i);
+                //判断是否还是数组，（默认数组中的对象是返回数据）
+                if(!(dataObj2 instanceof ArrayList)){
+                    Object obj = getData2Return(dataObj2,edAppResponseParams);
+                    list.add(obj);
+                }
+            }
+            return JSON.toJSON(list);
+        } else {
+            //组装返回值
+            return getData2Return(dataObj,edAppResponseParams);
         }
-        responseMap.put("retData", dataMapTemp);
-        String returnJson = JsonUtil.parseMap2JSON(responseMap);
-        return returnJson;
     }
 
-    public Object formatResponseData(String jsonStr, String appId) {
-        Map map = JsonUtil.parseJSON2Map(jsonStr);
-        Map responseMap = new HashMap();
-        responseMap.put("consumeId", map.get("consumeId"));
-        responseMap.put("consumeTime", map.get("consumeTime"));
-        String status = (String) map.get("status");
-        responseMap.put("status", status);
-        //判断接口是否异常，如果异常则不返回数据。
-        if (Status.DEFEAT.getValue().equals(status)) {
-            responseMap.put("message", map.get("message"));
-            responseMap.put("statusCode", ErrorCode.ERROR_500001.getValue());
-            String returnJson = JsonUtil.parseMap2JSON(responseMap);
-            return returnJson;
-        }
-        //处理要返回的数据
-        Object dataObj = map.get("retData");
-        String dataStr = JsonUtil.parseObj2JSON(dataObj);
-        Map dataMap = JsonUtil.parseJSON2Map(dataStr);
+    /**
+     * 筛选出返回数据列表中对应的数据
+     * @param dataObj
+     * @param edAppResponseParams
+     * @return
+     */
+    public Object getData2Return(Object dataObj, List<EdAppResponseParam> edAppResponseParams){
+        String dataStr = JSONObject.toJSONString(dataObj);
+        Map dataMap = JSONObject.toJavaObject(JSONObject.parseObject(dataStr),Map.class);
         Map dataMapTemp = new HashMap();
-        List<EdAppResponseParam> edAppResponseParams = edAppResponseParamService.getEdAppResponseParamByAppId(appId);
         for (EdAppResponseParam edAppResponseParam : edAppResponseParams) {
             String name = edAppResponseParam.getName();
             Object value = dataMap.get(name);
-            dataMapTemp.put(name, value);
+            dataMapTemp.put(name,value);
         }
-        responseMap.put("retData", dataMapTemp);
-        Object returnObj = JSON.toJSON(responseMap);
+        Object returnObj = JSON.toJSON(dataMapTemp);
         return returnObj;
     }
 }
